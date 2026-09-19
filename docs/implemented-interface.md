@@ -101,7 +101,15 @@ all other API routes require `Authorization: Bearer <token>`.
 | GET `/api/world` | Full active world. |
 | GET `/api/worlds` | Local saved-world summaries. |
 | POST `/api/worlds/create` | `{id, name, seed, frequency?}`; refuses overwrite. |
-| POST `/api/worlds/open` | `{id}`; loads a saved world. |
+| POST `/api/worlds/open` | `{id}`; loads a saved world and persists the selection. |
+| GET `/api/checkpoints` | Valid checkpoints for the active world. |
+| POST `/api/checkpoints` | `{label, expectedRevision}`; creates a named checkpoint. |
+| POST `/api/checkpoints/preview` | `{id, expectedRevision}`; restore summary, no state change. |
+| POST `/api/checkpoints/restore` | `{id, expectedRevision}`; backup current state, restore, increment revision. |
+| POST `/api/worlds/branch` | `{id, name, expectedRevision, checkpointId?}`; independent copy, then open it. |
+| GET `/api/worlds/export` | Portable version-1 `logos-world` JSON archive. |
+| POST `/api/worlds/import/preview` | `{archive, id, name}`; validate and summarize a new copy. |
+| POST `/api/worlds/import` | Same input; validate again, create and open a new world. |
 | POST `/api/step` | `{expectedRevision, days?}`; 1–10 days, default 1. |
 | POST `/api/proposals/preview` | Proposal envelope; five-day copied-state forecast. |
 | POST `/api/proposals/apply` | Proposal envelope; commits without advancing time. |
@@ -112,6 +120,10 @@ all other API routes require `Authorization: Bearer <token>`.
 | POST `/api/prompts/cancel` | `{id}`; cancels the active request. |
 | POST `/api/prompts/export` | Prompt request; exports scoped context without a model call. |
 | POST `/api/prompts/import` | `{requestId, reply}`; validates an external response. |
+
+Most JSON requests are limited to 64,000 bytes; world import and import preview
+allow up to 32 MiB. World management is a player/server interface, not a model
+operation.
 
 The browser sends one step at a time while playing and visible. There is no
 server simulation timer, offline catch-up, or autonomous agent. Model calls occur
@@ -124,9 +136,11 @@ paused. Multiple tabs share one active world; stale commands are rejected.
 
 `worlds/<id>/state.json` is a checksummed self-contained save, replaced atomically
 with file/directory sync. It contains definitions currently represented by the
-schemas, state, rainfall/temperature rules, custom definitions/rules, and accepted transactions. The expanded directory
-layout, append-only journal, checkpoint history, general artifact migrations, and plugin artifacts
-are future milestones. Run one server/writer against a world directory; do not
+schemas, state, rainfall/temperature rules, custom definitions/rules, and accepted transactions. Checkpoints now store immutable snapshot and definition artifacts; see
+[storage and restore behavior](world-checkpoints.md). Automatic server checkpoints
+run every 100 days and retain ten; manual checkpoints and restore backups persist.
+An append-only journal, general artifact migrations, and plugin artifacts remain
+future milestones. Run one server/writer against a world directory; do not
 run the CLI against a world being edited by the server.
 
 Local Claude Code and optional Anthropic API adapters implement the

@@ -1,0 +1,31 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import {mkdtemp,rm,readFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';import {join} from 'node:path';
+import {startServer} from '../dist/apps/server/src/index.js';
+import {WorldStore} from '../dist/apps/server/src/store.js';
+import {createWorld} from '../dist/packages/worldgen/src/index.js';
+const root=await mkdtemp(join(tmpdir(),'logos-checkpoint-browser-'));let calls=0;
+await new WorldStore(root).save(createWorld({id:'first-world',name:'Checkpoint garden',seed:'checkpoint-garden',frequency:2}));
+const app=await startServer({root,port:0,provider:{name:'No calls expected',async generate(){calls++;throw Error('Unexpected call');}}});
+const base=`http://127.0.0.1:${app.server.address().port}`,browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+try {
+ const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base);await page.waitForFunction(()=>document.querySelector('#save-status')?.textContent?.includes('Saved locally'));
+ await page.locator('#worlds-toggle').click();await page.locator('#checkpoint-label').fill('Before the rain');await page.locator('#save-checkpoint button').click();await page.getByText('Before the rain · day 0 · named',{exact:true}).waitFor();
+ await page.locator('#worlds-toggle').click();await page.locator('#step').click();await page.waitForFunction(()=>document.querySelector('#day').textContent==='DAY 1');
+ await page.locator('#worlds-toggle').click();assert.match(await page.locator('#worlds').textContent(),/every 100 days/);
+ const named=page.locator('.checkpoint-row').filter({hasText:'Before the rain'});await named.getByRole('button',{name:'Review restore'}).click();await page.locator('#world-review').waitFor({state:'visible'});
+ assert.match(await page.locator('#world-review-note').textContent(),/saved as a restore backup/);await page.screenshot({path:'.local/screenshots/checkpoint-restore.png'});
+ await page.locator('#cancel-world-review').click();assert.equal(await page.locator('#day').textContent(),'DAY 1');
+ await named.getByRole('button',{name:'Review restore'}).click();await page.locator('#apply-world-review').click();await page.locator('#world-review').waitFor({state:'hidden'});assert.equal(await page.locator('#day').textContent(),'DAY 0');
+ await page.locator('#worlds-toggle').click();await page.getByText('Before restore · day 1 · day 1 · restore backup',{exact:true}).waitFor();
+ await page.locator('#copy-name').fill('A separate path');await page.locator('#branch-world').click();await page.waitForFunction(()=>document.querySelector('#world-name').textContent==='A separate path');
+ await page.locator('#step').click();await page.waitForFunction(()=>document.querySelector('#day').textContent==='DAY 1');assert.equal((await new WorldStore(root).load('first-world')).tick,0);
+ await page.locator('#worlds-toggle').click();const downloaded=page.waitForEvent('download');await page.locator('#export-world').click();const download=await downloaded,archive=JSON.parse(await readFile(await download.path(),'utf8'));assert.equal(archive.format,'logos-world');
+ await page.locator('#copy-name').fill('Imported garden');await page.locator('#import-world').setInputFiles({name:'world.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(archive))});await page.locator('#world-review').waitFor({state:'visible'});assert.match(await page.locator('#world-review-summary').textContent(),/Imported garden/);
+ await page.locator('#apply-world-review').click();await page.locator('#world-review').waitFor({state:'hidden'});await page.waitForFunction(()=>document.querySelector('#world-name').textContent==='Imported garden');
+ await page.reload();await page.waitForFunction(()=>document.querySelector('#world-name').textContent==='Imported garden');await page.locator('#worlds-toggle').click();await page.waitForFunction(()=>document.querySelectorAll('#world-list button').length===3&&!document.body.classList.contains('busy'));await page.screenshot({path:'.local/screenshots/checkpoints-desktop.png'});
+ await page.setViewportSize({width:390,height:844});await page.screenshot({path:'.local/screenshots/checkpoints-mobile.png'});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);assert.equal(calls,0);
+ console.log('Checkpoint browser passed: named save, cancel/review/restore, backup, independent branch, export/import review, reload, desktop/mobile; no model calls.');
+}finally{await browser.close();await app.close();await rm(root,{recursive:true,force:true});}

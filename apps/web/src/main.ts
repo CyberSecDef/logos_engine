@@ -1,3 +1,4 @@
+import type { Checkpoint } from '../../../packages/contracts/src/checkpoints.js';
 import { WorldGlobe } from './globe.js';
 import { appearance, type Overlay } from '../../../packages/globe/src/appearance.js';
 import type { PromptJob, PromptRequest } from '../../../packages/contracts/src/prompts.js';
@@ -20,16 +21,16 @@ async function api<T>(path:string,body?:unknown):Promise<T> {
  const data=await res.json();if(!res.ok)throw Error(data.error??'Request failed');return data;
 }
 function setPlaying(value:boolean) {
- if(value&&(promptJobId||!$('conversation').hidden))return;
+ if(value&&(promptJobId||!$('conversation').hidden||!$('worlds').hidden||!$('world-review').hidden))return;
  playing=value;clearTimeout(timer);text('play',value?'Ⅱ Pause time':'▶ Let time flow');
  if(value)timer=setTimeout(tick,Number($<HTMLSelectElement>('speed').value));
 }
 async function action(fn:()=>Promise<void>) {
- if(busy)return;busy=true;document.body.classList.add('busy');$<HTMLInputElement>('chat-import').disabled=true;
+ if(busy)return;busy=true;document.body.classList.add('busy');$<HTMLInputElement>('chat-import').disabled=true;$<HTMLInputElement>('import-world').disabled=true;
  try {await fn();}catch(e){setPlaying(false);error(e);try{setWorld(await api<World>('world'));}catch{}}
- finally{busy=false;document.body.classList.remove('busy');$<HTMLInputElement>('chat-import').disabled=!!promptJobId;}
+ finally{busy=false;document.body.classList.remove('busy');$<HTMLInputElement>('chat-import').disabled=!!promptJobId;$<HTMLInputElement>('import-world').disabled=!!promptJobId;}
 }
-function setWorld(value:World) {const changed=world?.id!==value.id;world=value;if(changed){selected=-1;$('conversation').hidden=true;document.body.classList.remove('chat-open');$('chat-history').replaceChildren();promptState(promptJobId);}updateCustomLayers();globe.setWorld(world);selectTile(selected);text('world-name',world.name);text('day',`DAY ${world.tick}`);text('save-status',`Saved locally · ${fmt(world.tiles.length)} places`);}
+function setWorld(value:World) {const changed=world?.id!==value.id;world=value;if(changed){pending=null;$('proposal').hidden=true;selected=-1;$('conversation').hidden=true;document.body.classList.remove('chat-open');$('chat-history').replaceChildren();promptState(promptJobId);}updateCustomLayers();globe.setWorld(world);selectTile(selected);text('world-name',world.name);text('day',`DAY ${world.tick}`);text('save-status',`Saved locally · ${fmt(world.tiles.length)} places`);}
 function selectTile(id:number) {
  if(promptJobId&&id!==selected)return;
  const changed=id!==selected;selected=id;globe.select(id);
@@ -49,7 +50,7 @@ function selectTile(id:number) {
  text('communication-change',t.communication?'Isolate communication':'Restore communication');
 }
 async function tick() {
- if(!world||document.hidden){setPlaying(false);return;}
+ if(!world||document.hidden||!$('world-review').hidden){setPlaying(false);return;}
  await action(async()=>{setWorld(await api<World>('step',{expectedRevision:world.revision,days:1}));});
  if(playing)timer=setTimeout(tick,Number($<HTMLSelectElement>('speed').value));
 }
@@ -74,10 +75,62 @@ $('apply-proposal').onclick=()=>void action(async()=>{if(!pending)return;setWorl
 $('proposal').addEventListener('keydown',e=>{if(e.key==='Escape')$('cancel-proposal').click();if(e.key==='Tab'){const first=$('cancel-proposal'),last=$('apply-proposal');if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
 const layers:{id:Overlay;label:string;legend:string}[]=[{id:'terrain',label:'Terrain',legend:'Ocean / grassland / forest / alpine'},{id:'water',label:'Water',legend:'Dry land / retained water / flooding above 100 mm'},{id:'rain',label:'Rainfall',legend:'Dark → light · 0–100+ mm per day'},{id:'temperature',label:'Temperature',legend:'Blue: cold · red: warm · darker: extreme temperatures'},{id:'communication',label:'Connections',legend:'Green: connected · amber: isolated'}];
 for(const l of layers){const b=document.createElement('button');b.textContent=l.label;b.classList.toggle('active',l.id==='terrain');b.onclick=()=>{globe.overlay=l.id;$<HTMLSelectElement>('custom-layer').value='';globe.update();text('legend',l.legend);for(const x of Array.from($('layer-buttons').children))x.classList.toggle('active',x===b);};$('layer-buttons').append(b);}
+type WorldSummary={name:string;tick:number;tiles:number;fields:number;rules:number;interventions:number};
+let worldReview:{path:string;body:unknown}|null=null;
+function finishWorldReview() {
+ worldReview=null;$('world-review').hidden=true;
+ for(const child of Array.from(document.body.children))if(child instanceof HTMLElement)child.inert=false;
+ document.body.classList.remove('world-review-open');$('worlds-toggle').focus();
+}
+function reviewWorld(title:string,summary:WorldSummary,note:string,label:string,path:string,body:unknown) {
+ setPlaying(false);worldReview={path,body};text('world-review-title',title);
+ text('world-review-summary',`${summary.name} · day ${summary.tick} · ${summary.tiles} zones · ${summary.fields} custom properties · ${summary.rules} custom rules · ${summary.interventions} recorded changes.`);
+ text('world-review-note',note);text('apply-world-review',label);$('world-review').hidden=false;
+ for(const child of Array.from(document.body.children))if(child instanceof HTMLElement&&child.id!=='world-review'&&child.id!=='toast')child.inert=true;
+ document.body.classList.add('world-review-open');$('cancel-world-review').focus();
+}
+$('cancel-world-review').onclick=finishWorldReview;
+$('world-review').addEventListener('keydown',e=>{if(e.key==='Escape')finishWorldReview();});
+$('apply-world-review').onclick=()=>void action(async()=>{
+ if(!worldReview)return;const next=await api<World>(worldReview.path,worldReview.body);
+ pending=null;$('proposal').hidden=true;setWorld(next);$('conversation').hidden=true;document.body.classList.remove('chat-open');promptState(null);
+ finishWorldReview();$('worlds').hidden=true;
+});
+async function refreshWorlds() {
+ const worlds=await api<{id:string;name:string;tick:number}[]>('worlds');$('world-list').replaceChildren();
+ for(const w of worlds){const b=document.createElement('button');b.textContent=`${w.name} · day ${w.tick}${w.id===world.id?' · current':''}`;b.onclick=()=>void action(async()=>{setWorld(await api<World>('worlds/open',{id:w.id}));$('worlds').hidden=true;});$('world-list').append(b);}
+ const checkpoints=await api<Checkpoint[]>('checkpoints');$('checkpoint-list').replaceChildren();
+ for(const checkpoint of checkpoints) {
+  const row=document.createElement('div');row.className='checkpoint-row';const label=document.createElement('p');label.textContent=`${checkpoint.label} · day ${checkpoint.tick} · ${checkpoint.kind==='manual'?'named':checkpoint.kind==='automatic'?'automatic':'restore backup'}`;
+  const restore=document.createElement('button');restore.textContent='Review restore';restore.onclick=()=>void action(async()=>{
+   const body={id:checkpoint.id,expectedRevision:world.revision},result=await api<{summary:WorldSummary}>('checkpoints/preview',body);
+   reviewWorld('Restore checkpoint?',result.summary,'Your current state will be saved as a restore backup. Time stays paused. Previously proposed changes will need a new prompt.','Restore','checkpoints/restore',body);
+  });
+  const branch=document.createElement('button');branch.textContent='Branch from here';branch.onclick=()=>void branchWorld(checkpoint.id);row.append(label,restore,branch);$('checkpoint-list').append(row);
+ }
+ if(!checkpoints.length){const p=document.createElement('p');p.className='muted';p.textContent='No checkpoints yet.';$('checkpoint-list').append(p);}
+}
+async function branchWorld(checkpointId?:string) {await action(async()=>{
+ setWorld(await api<World>('worlds/branch',{id:`world-${requestId()}`,name:$<HTMLInputElement>('copy-name').value,expectedRevision:world.revision,checkpointId}));$('worlds').hidden=true;
+});}
 $('worlds-toggle').onclick=()=>void action(async()=>{
  setPlaying(false);$('worlds').hidden=!$('worlds').hidden;if($('worlds').hidden)return;
- const worlds=await api<{id:string;name:string;tick:number}[]>('worlds');$('world-list').replaceChildren();
- for(const w of worlds){const b=document.createElement('button');b.textContent=`${w.name} · day ${w.tick}`;b.onclick=()=>void action(async()=>{setWorld(await api<World>('worlds/open',{id:w.id}));$('worlds').hidden=true;});$('world-list').append(b);}
+ $<HTMLInputElement>('copy-name').value=`${world.name} branch`.slice(0,80);await refreshWorlds();
+});
+$('save-checkpoint').onsubmit=e=>{e.preventDefault();void action(async()=>{
+ await api('checkpoints',{label:$<HTMLInputElement>('checkpoint-label').value,expectedRevision:world.revision});$<HTMLInputElement>('checkpoint-label').value='';await refreshWorlds();
+});};
+$('branch-world').onclick=()=>void branchWorld();
+$('export-world').onclick=()=>void action(async()=>{
+ const archive=await api('worlds/export'),href=URL.createObjectURL(new Blob([JSON.stringify(archive)],{type:'application/json'})),link=document.createElement('a');
+ link.href=href;link.download=`logos-${world.id}-day-${world.tick}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(href),1000);
+});
+$('import-world').onchange=()=>void action(async()=>{
+ const input=$<HTMLInputElement>('import-world'),file=input.files?.[0];input.value='';if(!file)return;
+ if(file.size>32*1024*1024)throw Error('World archives must be under 32 MiB');
+ const archive=JSON.parse(await file.text()),body={archive,id:`world-${requestId()}`,name:$<HTMLInputElement>('copy-name').value};
+ const summary=await api<WorldSummary>('worlds/import/preview',body);
+ reviewWorld('Import an independent world?',summary,'This creates a separate world using the copy name above. It includes saved state, rules, and change history. Conversations and other checkpoints are not included.','Import world','worlds/import',body);
 });
 $('new-world').onsubmit=e=>{e.preventDefault();void action(async()=>{setWorld(await api<World>('worlds/create',{id:`world-${requestId()}`,name:$<HTMLInputElement>('new-name').value,seed:$<HTMLInputElement>('new-seed').value,frequency:12}));$('worlds').hidden=true;});};
 function describeRead(read:Read):string {const labels={temperatureC:'temperature (°C)',rainMm:'rainfall (mm)',waterMm:'standing water (mm)',vegetation:'vegetation fraction',elevationM:'elevation (m)',population:'population'};return `${read.sample==='neighbors-average'?'neighbor average of ':read.sample==='neighbors-min'?'neighbor minimum of ':read.sample==='neighbors-max'?'neighbor maximum of ':''}${read.source==='custom'?(world.definitions.fields.find(f=>f.id===read.fieldId)?.label??read.fieldId):labels[read.source]}`;}

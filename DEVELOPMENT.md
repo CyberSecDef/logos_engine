@@ -9,7 +9,10 @@ before each milestone commit. Never mark unverified functionality complete.
 Temperature interventions are complete, published, and live on the LAN server.
 The Phase 4b resource-transfer milestone is complete and running locally:
 conserved custom resources, daily accounting, formula clamps, and neighbor extrema.
-This milestone is published; remaining Phase 4 work is listed below.
+Phase 4e is complete and live: immutable checkpoints, 100-day automatic
+checkpoints (ten retained), reviewed restore with backup, independent branches,
+portable world import/export, and persistent world selection. Publication is in
+progress. Plugin isolation, general migrations, and artwork remain pending.
 
 ## Completed
 
@@ -412,11 +415,14 @@ runoff with sediment conservation, and checksummed storage/path validation.
   inspector/overlays, model authority — complete.
 - 4b: conserved custom-resource transfers, daily accounting, bounded formula
   clamps and neighbor extrema — complete. General definition/entity migrations
-  and immutable artifact/history storage remain pending.
+  remain pending. Immutable checkpoint snapshots/definitions are implemented;
+  a complete append-only history remains pending.
 - 4c: isolated world-plugin runtime feasibility, deterministic budgets, staged
   artifacts, execution and failure recovery. No plugin execution is enabled yet.
 - 4d: forest/city artwork packs and actual texture rendering.
-- 4e: world branches, rollback, and complete world import/export.
+- 4e: world checkpoints, branches, restore, and portable state import/export —
+  complete and live; publication in progress. Plugin/texture bundles
+  and selective event replay remain future work.
 - Pollution/disease transport remains future broader-simulation work; custom
   numeric fields alone do not implement those physical/population systems.
 
@@ -490,3 +496,40 @@ runoff with sediment conservation, and checksummed storage/path validation.
   capabilities are available, and the browser reports no page errors.
 - Reload the game to use mana sharing. No resources or rules were automatically
   added to user worlds; the guide uses an explicit creator proposal.
+
+### 2026-09-19 — Phase 4e started
+
+- User confirmed mana sharing works and requested continued Phase 4 development.
+- Implementing immutable snapshot/definition artifacts and named checkpoints.
+- User chose rolling automatic checkpoints during play, in addition to manual
+  checkpoints and a backup before every restore.
+- Next: server commands, world-management UI, isolation/retention/restore tests,
+  browser acceptance, documentation, LAN deployment, and publication.
+- User set the automatic cadence to every 100 simulated days; retain ten, plus
+  the initial checkpoint until it rotates out. Manual/restore backups never rotate.
+
+### 2026-09-19 — Phase 4e implementation checks
+
+- Added immutable checksummed snapshot/definition artifacts, named checkpoints,
+  automatic retention (100-day cadence, ten kept), and restore backups.
+- Added reviewed restore, independent branches, validated portable JSON archives,
+  collision-safe creation, and persistent active-world selection.
+- Worlds UI now exposes these controls; review dialogs pause time.
+- Typecheck and all 43 tests passed, including custom state/ledger preservation,
+  corruption rejection, retention, restore revisions, copy isolation, and restart.
+- Browser acceptance, documentation, final checks and deployment still in progress.
+
+### 2026-09-19 — Phase 4e acceptance and deployment
+
+- `npm run check` passed: typecheck, 43 tests, and production build.
+- Checkpoint browser acceptance passed save/review/cancel/restore, restore backup,
+  independent branching, export/import, reload, and desktop/mobile layouts.
+- Existing mana browser regression passed. No model calls were made by world
+  management or these acceptance checks.
+- Added failure coverage: a failed pre-restore backup leaves live/disk state intact.
+- Added the checkpoint/storage guide, API routes, archive limits, and documented
+  exclusions (conversation/checkpoint collections and future executable/assets).
+- Restarted `0.0.0.0:5180`, preserving first-world at day 308/revision 316.
+- Live browser verified 100-day controls and no page errors, without advancing time.
+- Publishing this milestone; plugins, texture rendering, general migrations and
+  a full append-only replay journal are still pending.

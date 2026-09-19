@@ -22,7 +22,8 @@
     "test:dev-cache": "tsc && node tests/dev-cache.mjs",
     "test:prompts": "npm run build && node tests/prompt-browser.mjs",
     "test:extensions": "npm run build && node tests/extensions-browser.mjs",
-    "test:resources": "npm run build && node tests/resources-browser.mjs"
+    "test:resources": "npm run build && node tests/resources-browser.mjs",
+    "test:checkpoints": "npm run build && node tests/checkpoints-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",

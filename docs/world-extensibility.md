@@ -121,9 +121,9 @@ compatible backups are not overwritten; corrupt backups stop migration writes.
 Read-only migration was verified against the existing local worlds.
 
 Definitions and current rules are embedded in the checksummed `state.json`;
-accepted transactions retain their versioned definitions in history. This is not
-yet the planned separate immutable artifact store, append-only journal, general
-rollback UI, or branches/import/export. Older engine builds cannot load schema 3;
+accepted transactions retain their versioned definitions in history. A complete
+append-only journal and general entity migrations remain pending. [Checkpoints and branches](world-checkpoints.md)
+now provide immutable snapshots/definitions, reviewed restore, and portable import/export. Older engine builds cannot load schema 3;
 keep the backup when moving between versions. Run one writer per world directory.
 
 Executable schemas: `packages/contracts/src/extensions.ts`; evaluator and

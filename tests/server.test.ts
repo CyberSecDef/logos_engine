@@ -66,6 +66,7 @@ test('prompt HTTP requests are user-triggered, cancellable, and keep mutations p
   assert.equal((await post('prompts',request)).status,202);
   assert.equal((await post('step',{expectedRevision:0})).status,400);
   assert.equal((await post('worlds/open',{id:world.id})).status,400);
+  for(const path of ['checkpoints','checkpoints/restore','worlds/branch','worlds/import'])assert.equal((await post(path,{})).status,400);
   assert.equal((await post('prompts/cancel',{id:request.id})).status,200);
   for(let i=0;i<100;i++){const job=await get('prompts/jobs/'+request.id);if(job.status==='cancelled')break;await new Promise(r=>setTimeout(r,5));}
   assert.equal((await get('prompts/jobs/'+request.id)).status,'cancelled');assert.equal(calls,1);assert.deepEqual(await get('world'),world);

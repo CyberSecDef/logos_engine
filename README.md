@@ -29,7 +29,8 @@ up when each server stops.
 Select a tile, inspect its conditions, preview a rainfall/elevation/temperature/communication
 change, then Apply. Use **+1 day** or **Let time flow** to observe consequences.
 Drag to orbit, scroll to zoom; when the globe has keyboard focus, use left/right
-arrows to select tiles. The Worlds panel creates and opens seeded worlds.
+arrows to select tiles. The Worlds panel creates and opens seeded worlds, saves/restores checkpoints,
+and branches or imports/exports independent copies.
 
 The game starts paused, pauses when its tab is hidden, and never catches up on
 offline time. Saves are automatic under `worlds/<id>/state.json` and excluded
@@ -55,6 +56,10 @@ home network; this milestone has no user login.
 - Conserved adjacent stock-resource sharing, capacity limits, formula clamps,
   and daily resource accounting. Try [mana sharing](docs/resource-transfers.md).
 
+- Named checkpoints, ten rolling automatic checkpoints at 100-day intervals,
+  reviewed restore with a backup, world branching, and portable JSON import/export.
+  See [checkpoints and branches](docs/world-checkpoints.md).
+
 **Still planned:** automatic Cursor CLI launching, texture images, sandboxed world plugins, richer erosion, trade,
 population, conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
@@ -74,6 +79,7 @@ npm run test:dev-cache # Concurrent development servers and stylesheet fallback
 npm run test:prompts   # Prompt UI with a simulated provider; no model charges
 npm run test:extensions # Custom properties/rules through the browser
 npm run test:resources  # Mana transfers, stock totals, and daily balance
+npm run test:checkpoints # Checkpoint/restore, branches, portable worlds
 npm run world -- create my-world amber
 npm run world -- step my-world 10
 npm run world -- inspect my-world

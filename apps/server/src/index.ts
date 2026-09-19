@@ -7,8 +7,10 @@ import { hostname, networkInterfaces, tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { createWorld } from '../../../packages/worldgen/src/index.js';
-import { advance, applyProposal } from '../../../packages/engine/src/index.js';
-import { CreateWorldSchema, ProposalSchema, type World } from '../../../packages/contracts/src/index.js';
+import { advance, applyProposal, validateWorld } from '../../../packages/engine/src/index.js';
+import { CreateWorldSchema, ProposalSchema, Id, type World } from '../../../packages/contracts/src/index.js';
+import { MAX_ARCHIVE_BYTES } from '../../../packages/contracts/src/checkpoints.js';
+import { archiveWorld, unpackWorld, copyWorld, worldSummary } from './world-management.js';
 import { WorldStore } from './store.js';
 import { PromptService, configuredProvider, forecast } from './prompts.js';
 import type { ModelProvider } from '../../../packages/agent-bridge/src/context.js';
@@ -20,9 +22,10 @@ export async function startServer(options:{port?:number; host?:string; root?:str
   const bindHost=options.host??process.env.HOST??'0.0.0.0';
   const allowedHosts=['localhost',hostname(),`${hostname()}.local`,...(process.env.ALLOWED_HOSTS??'').split(',').map(h=>h.trim()).filter(Boolean)];
   let world:World;
-  try {world=await store.load('first-world');}
+  const activeId=await store.activeWorldId();
+  try {world=await store.load(activeId);}
   catch(error) {
-    if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error;
+    if((error as NodeJS.ErrnoException).code!=='ENOENT'||activeId!=='first-world') throw error;
     world=createWorld({id:'first-world',name:'Aethra',seed:'aethra-01',frequency:12});
     await store.save(world);
   }
@@ -51,11 +54,13 @@ export async function startServer(options:{port?:number; host?:string; root?:str
     res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
     res.end(JSON.stringify(value));
   }
-  async function body(req:IncomingMessage):Promise<unknown> {
+  async function body(req:IncomingMessage,limit=64000):Promise<unknown> {
     if(!req.headers['content-type']?.startsWith('application/json')) throw Error('Expected JSON');
-    let buffer=''; for await(const chunk of req) {buffer+=chunk; if(buffer.length>64000) throw Error('Request too large');}
-    return JSON.parse(buffer);
+    const chunks:Buffer[]=[];let size=0;for await(const chunk of req){const bytes=Buffer.from(chunk);size+=bytes.length;if(size>limit)throw Error('Request too large');chunks.push(bytes);}
+    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
   }
+  function revision(expected:number) {if(expected!==world.revision)throw Error('Stale revision; refresh first');}
+  async function activate(next:World) {await store.selectWorld(next.id);world=next;}
   async function commit(next:World) {await store.save(next);world=next;}
   async function handle(req:IncomingMessage,res:ServerResponse) {
     const host=req.headers.host??'';
@@ -67,12 +72,14 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(req.method==='GET' && pathname==='/api/session') return json(res,200,{token});
       if(req.headers.authorization!==`Bearer ${token}`) return json(res,401,{error:'Session required'});
       if(req.method==='GET' && pathname==='/api/world') return json(res,200,world);
+      if(req.method==='GET' && pathname==='/api/checkpoints') return json(res,200,await store.checkpoints(world.id));
+      if(req.method==='GET' && pathname==='/api/worlds/export') return json(res,200,archiveWorld(world));
       if(req.method==='GET' && pathname==='/api/worlds') return json(res,200,await store.list());
       if(req.method==='GET' && pathname==='/api/prompts/config')return json(res,200,prompts.configuration);
       if(req.method==='GET' && pathname==='/api/prompts/history')return json(res,200,await prompts.history(world));
       if(req.method==='GET' && pathname.startsWith('/api/prompts/jobs/'))return json(res,200,await prompts.get(world,pathname.slice('/api/prompts/jobs/'.length)));
       if(req.method!=='POST') return json(res,404,{error:'Unknown route'});
-      const input=await body(req);
+      const input=await body(req,['/api/worlds/import','/api/worlds/import/preview'].includes(pathname)?MAX_ARCHIVE_BYTES:64000);
       if(pathname==='/api/prompts')return json(res,202,await prompts.start(world,input));
       if(pathname==='/api/prompts/export')return json(res,200,await prompts.export(world,input));
       if(pathname==='/api/prompts/import')return json(res,200,await prompts.import(world,input));
@@ -81,22 +88,42 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(pathname==='/api/step') {
         const p=z.object({expectedRevision:z.number().int(),days:z.number().int().min(1).max(10).default(1)}).strict().parse(input);
         if(p.expectedRevision!==world.revision) throw Error('Stale revision; refresh first');
-        let next=world; for(let i=0;i<p.days;i++) next=advance(next); await commit(next); return json(res,200,world);
+        let next=world; for(let i=0;i<p.days;i++) next=advance(next); await store.automaticCheckpoint(world,next);await commit(next); return json(res,200,world);
       }
       if(pathname==='/api/proposals/preview') {
         const p=ProposalSchema.parse(input);
         return json(res,200,forecast(world,p));
       }
       if(pathname==='/api/proposals/apply') {await commit(applyProposal(world,input));return json(res,200,world);}
+      if(pathname==='/api/checkpoints') {
+        const p=z.object({label:z.string().min(1).max(80),expectedRevision:z.number().int()}).strict().parse(input);revision(p.expectedRevision);
+        return json(res,200,await store.checkpoint(world,p.label));
+      }
+      if(pathname==='/api/checkpoints/preview'||pathname==='/api/checkpoints/restore') {
+        const p=z.object({id:Id,expectedRevision:z.number().int()}).strict().parse(input);revision(p.expectedRevision);
+        const saved=await store.readCheckpoint(world.id,p.id);
+        if(pathname.endsWith('/preview'))return json(res,200,{checkpoint:saved.checkpoint,summary:worldSummary(saved.world)});
+        const next=validateWorld({...saved.world,revision:world.revision+1});
+        await store.checkpoint(world,`Before restore · day ${world.tick}`,'before-restore');
+        await commit(next);return json(res,200,world);
+      }
+      if(pathname==='/api/worlds/branch') {
+        const p=z.object({id:Id,name:z.string().min(1).max(80),expectedRevision:z.number().int(),checkpointId:Id.optional()}).strict().parse(input);revision(p.expectedRevision);
+        const source=p.checkpointId?(await store.readCheckpoint(world.id,p.checkpointId)).world:world;
+        const next=copyWorld(source,p.id,p.name);await store.createNew(next);await activate(next);return json(res,200,world);
+      }
+      if(pathname==='/api/worlds/import/preview'||pathname==='/api/worlds/import') {
+        const p=z.object({archive:z.unknown(),id:Id,name:z.string().min(1).max(80)}).strict().parse(input);
+        if(await store.exists(p.id))throw Error('World already exists');
+        const next=copyWorld(unpackWorld(p.archive),p.id,p.name);
+        if(pathname.endsWith('/preview'))return json(res,200,worldSummary(next));
+        await store.createNew(next);await activate(next);return json(res,200,world);
+      }
       if(pathname==='/api/worlds/create') {
-        const p=CreateWorldSchema.parse(input);
-        // Refuse overwrite even if an existing save is corrupt.
-        try {await store.load(p.id);throw Error('World already exists');}
-        catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error;}
-        await commit(createWorld(p));return json(res,200,world);
+        const next=createWorld(CreateWorldSchema.parse(input));await store.createNew(next);await activate(next);return json(res,200,world);
       }
       if(pathname==='/api/worlds/open') {
-        const p=z.object({id:z.string()}).strict().parse(input);world=await store.load(p.id);return json(res,200,world);
+        const p=z.object({id:Id}).strict().parse(input);await activate(await store.load(p.id));return json(res,200,world);
       }
       return json(res,404,{error:'Unknown route'});
     }
