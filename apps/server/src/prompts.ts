@@ -7,6 +7,7 @@ import { ClaudeCodeProvider } from '../../../packages/agent-bridge/src/claude.js
 import { AnthropicProvider } from '../../../packages/agent-bridge/src/anthropic.js';
 import { advance, applyProposal, depthMm } from '../../../packages/engine/src/index.js';
 import { WorldStore } from './store.js';
+import {pluginTargets,PluginExecutionError} from '../../../packages/engine/src/plugins.js';
 import { resourceTotals } from '../../../packages/engine/src/resources.js';
 import { ruleAffectedTargets, fieldValue } from '../../../packages/engine/src/extensions.js';
 
@@ -68,6 +69,7 @@ export class PromptService {
   const ids=job.request.scope==='world'?world.tiles.map(t=>t.id):job.request.scope==='neighbors'?[job.request.tileId,...world.cells[job.request.tileId].neighbors]:[job.request.tileId];
   if(reply.operations.some(op=>!ids.includes(op.tileId)))throw Error('Model attempted to edit outside the selected scope');
   for(const op of reply.operations) {
+   if((op.kind==='plugin-define'||op.kind==='plugin-toggle'||op.kind==='plugin-remove')&&job.request.scope!=='world')throw Error('Plugin changes require Entire world scope');
    if(op.kind==='field-transfer'&&!ids.includes(op.toTileId))throw Error('Transfer destination is outside the selected scope');
    if((op.kind==='field-define'||op.kind==='field-remove')&&job.request.scope!=='world')throw Error('Property definitions require Entire world scope');
    if(op.kind==='rule-define'||op.kind==='rule-remove') {
@@ -114,10 +116,12 @@ export class PromptService {
  }
 }
 export function forecast(world:World,proposal:Proposal) {
- let baseline=structuredClone(world),candidate=applyProposal(world,proposal);
- for(let i=0;i<5;i++){baseline=advance(baseline);candidate=advance(candidate);}
+ let baseline=structuredClone(world),candidate=applyProposal(world,proposal),baselineError:string|null=null;
+ for(let i=0;i<5;i++){if(!baselineError)try{baseline=advance(baseline);}catch(error){if(!(error instanceof PluginExecutionError))throw error;baselineError=error.message;}candidate=advance(candidate);}
  const ids=new Set(proposal.operations.flatMap(o=>[o.tileId,...world.cells[o.tileId].neighbors]));
  for(const op of proposal.operations) {
+  if(op.kind==='plugin-define')for(const id of pluginTargets(candidate,op.definition))ids.add(id);
+  if(op.kind==='plugin-define'||op.kind==='plugin-toggle'||op.kind==='plugin-remove'){const old=world.plugins.find(p=>p.definition.id===(op.kind==='plugin-define'?op.definition.id:op.pluginId));if(old)for(const id of pluginTargets(world,old.definition))ids.add(id);}
   if(op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='rule-define')for(const id of ruleAffectedTargets(world,op.rule))ids.add(id);
   if(op.kind==='rule-define'||op.kind==='rule-remove') {
@@ -130,5 +134,5 @@ export function forecast(world:World,proposal:Proposal) {
  const totalTiles=ids.size,shown=[...ids].slice(0,24);
  const before=resourceTotals(world),base=resourceTotals(baseline);
  const resources=resourceTotals(candidate).map(r=>({...r,beforeMilli:before.find(b=>b.fieldId===r.fieldId)?.totalMilli??null,baselineMilli:base.find(b=>b.fieldId===r.fieldId)?.totalMilli??null}));
- return {tick:candidate.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
+ return {tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
 }

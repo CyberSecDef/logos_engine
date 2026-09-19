@@ -36,6 +36,6 @@ export function createWorld(input:unknown):World {
       vegetation:elevationM>0 ? Math.round((0.25+random(options.seed,'forest',cell.id)*0.6)*100)/100:0,
       population:0, communication:true,properties:{}};
   });
-  return {schemaVersion:3,engineVersion:ENGINE_VERSION,...options,radiusM:100000,tick:0,revision:0,cells,tiles,
-    rules:[],definitions:{fields:[],rules:[]},resourceLedger:{tick:0,revision:0,entries:[]},history:[],events:[],accounting:{rainL:0,evaporationL:0,oceanDrainL:0}};
+  return {schemaVersion:4,engineVersion:ENGINE_VERSION,...options,radiusM:100000,tick:0,revision:0,cells,tiles,
+    rules:[],definitions:{fields:[],rules:[]},resourceLedger:{tick:0,revision:0,entries:[]},plugins:[],history:[],events:[],accounting:{rainL:0,evaporationL:0,oceanDrainL:0}};
 }

@@ -7,7 +7,7 @@ export function fieldValue(world:World,tileId:number,id:string):number {
  const field=world.definitions.fields.find(f=>f.id===id);if(!field)throw Error(`Unknown property: ${id}`);
  return Object.hasOwn(world.tiles[tileId].properties,id)?world.tiles[tileId].properties[id]:field.defaultValue;
 }
-export function ruleTargets(world:World,rule:CustomRule):number[] {
+export function ruleTargets(world:World,rule:Pick<CustomRule,'tileId'|'scope'>):number[] {
  if(!world.tiles[rule.tileId])throw Error('Unknown rule origin');
  return rule.scope==='world'?world.tiles.map(t=>t.id):rule.scope==='neighbors'?[rule.tileId,...world.cells[rule.tileId].neighbors]:[rule.tileId];
 }
@@ -107,18 +107,19 @@ export function applyExtension(world:World,op:Operation):void {
   world.definitions.rules=world.definitions.rules.filter(r=>r.id!==op.ruleId);
  }
 }
-function readValue(world:World,tileId:number,read:Read):number {
+export function readValue(world:World,tileId:number,read:Read):number {
  const at=(id:number)=>read.source==='custom'?fieldValue(world,id,read.fieldId!):read.source==='waterMm'?world.tiles[id].waterL/world.cells[id].areaM2:world.tiles[id][read.source];
  if(read.sample==='self')return at(tileId);
  const ids=[...world.cells[tileId].neighbors].sort((a,b)=>a-b),values=ids.map(at);
  return read.sample==='neighbors-min'?Math.min(...values):read.sample==='neighbors-max'?Math.max(...values):values.reduce((sum,n)=>sum+n,0)/ids.length;
 }
-export function advanceExtensions(world:World):void {
+export function advanceExtensions(world:World,pluginChanges:{tileId:number;fieldId:string;value:number;kind:'add'|'set'}[]=[]):void {
  // Rules read the completed built-in phase and one common custom-state snapshot.
  // Aggregate writes before committing: no rule can observe another rule's writes.
  const before=new Map(world.definitions.fields.filter(f=>f.quantity==='stock').map(f=>[f.id,world.tiles.map(t=>stockUnits(world,t.id,f))]));
  const transfers:TransferRequest[]=[];
  const changes=new Map<string,{tileId:number;fieldId:string;value:number;kind:'add'|'set'}>();
+ for(const change of pluginChanges){const key=`${change.tileId}:${change.fieldId}`,prior=changes.get(key);changes.set(key,{...change,value:change.value+(prior?.value??0)});}
  for(const rule of [...world.definitions.rules].sort((a,b)=>a.id<b.id?-1:1)) {
   if(!rule.enabled||world.tick%rule.everyDays!==0)continue;
   for(const tileId of ruleTargets(world,rule)) {
@@ -146,6 +147,7 @@ export function advanceExtensions(world:World):void {
  }
  for(const change of changes.values()) {
   const field=world.definitions.fields.find(f=>f.id===change.fieldId)!;
+  if(!Number.isFinite(change.value))throw Error('Non-finite combined custom output');
   const value=change.kind==='add'?fieldValue(world,change.tileId,change.fieldId)+change.value:change.value;
   world.tiles[change.tileId].properties[change.fieldId]=round(Math.max(field.min,Math.min(field.max,value)));
  }

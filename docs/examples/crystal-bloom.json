@@ -1,0 +1,132 @@
+{
+  "id": "example-crystal-bloom",
+  "worldId": "first-world",
+  "expectedRevision": 0,
+  "summary": "Add crystal stock and a plugin that grows 5 shards after 3 consecutive days above 10 C; cold days reset its warm-day counter.",
+  "operations": [
+    {
+      "kind": "field-define",
+      "tileId": 0,
+      "migration": "preserve",
+      "definition": {
+        "id": "crystal",
+        "version": 1,
+        "label": "Crystal",
+        "unit": "shards",
+        "description": "Crystal stock produced by the warm-day bloom plugin.",
+        "quantity": "stock",
+        "min": 0,
+        "max": 1000,
+        "defaultValue": 0
+      }
+    },
+    {
+      "kind": "plugin-define",
+      "tileId": 0,
+      "migration": "preserve",
+      "definition": {
+        "id": "crystal-bloom",
+        "version": 1,
+        "abi": "logos-stack-v1",
+        "label": "Crystal bloom",
+        "description": "After 3 consecutive days above 10 C, produce 5 crystal shards and reset the warm-day counter. Cold days also reset it.",
+        "tileId": 0,
+        "scope": "tile",
+        "enabled": true,
+        "everyDays": 1,
+        "stateFields": [
+          {
+            "id": "warm-days",
+            "min": 0,
+            "max": 3,
+            "initial": 0
+          }
+        ],
+        "program": [
+          {
+            "op": "read",
+            "read": {
+              "source": "temperatureC",
+              "sample": "self"
+            }
+          },
+          {
+            "op": "constant",
+            "value": 10
+          },
+          {
+            "op": "greater"
+          },
+          {
+            "op": "jump-zero",
+            "target": 18
+          },
+          {
+            "op": "state-get",
+            "key": "warm-days"
+          },
+          {
+            "op": "constant",
+            "value": 1
+          },
+          {
+            "op": "add"
+          },
+          {
+            "op": "state-set",
+            "key": "warm-days"
+          },
+          {
+            "op": "state-get",
+            "key": "warm-days"
+          },
+          {
+            "op": "constant",
+            "value": 3
+          },
+          {
+            "op": "less"
+          },
+          {
+            "op": "jump-zero",
+            "target": 13
+          },
+          {
+            "op": "stop"
+          },
+          {
+            "op": "constant",
+            "value": 5
+          },
+          {
+            "op": "emit",
+            "fieldId": "crystal",
+            "mode": "add"
+          },
+          {
+            "op": "constant",
+            "value": 0
+          },
+          {
+            "op": "state-set",
+            "key": "warm-days"
+          },
+          {
+            "op": "stop"
+          },
+          {
+            "op": "constant",
+            "value": 0
+          },
+          {
+            "op": "state-set",
+            "key": "warm-days"
+          },
+          {
+            "op": "stop"
+          }
+        ]
+      }
+    }
+  ]
+}

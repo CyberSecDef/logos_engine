@@ -12,7 +12,10 @@ conserved custom resources, daily accounting, formula clamps, and neighbor extre
 Phase 4e is complete and live: immutable checkpoints, 100-day automatic
 checkpoints (ten retained), reviewed restore with backup, independent branches,
 portable world import/export, and persistent world selection. Published as
-`b4b38e0`. Plugin isolation, general migrations, and artwork remain pending.
+`b4b38e0`. Phase 4c restricted plugins are implemented and live: deterministic
+instruction budgets, saved per-tile state, reviewed installation/update, and
+failure recovery. Verification is complete; publication is in progress. General entity
+migrations, artwork, and a complete replay journal remain pending.
 
 ## Completed
 
@@ -417,8 +420,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   clamps and neighbor extrema — complete. General definition/entity migrations
   remain pending. Immutable checkpoint snapshots/definitions are implemented;
   a complete append-only history remains pending.
-- 4c: isolated world-plugin runtime feasibility, deterministic budgets, staged
-  artifacts, execution and failure recovery. No plugin execution is enabled yet.
+- 4c: restricted JSON plugin runtime, deterministic budgets, saved state, staged
+  proposals, immutable artifacts, execution and failure recovery — implemented;
+  verified and live; publication in progress. JavaScript/native plugins are not enabled.
 - 4d: forest/city artwork packs and actual texture rendering.
 - 4e: world checkpoints, branches, restore, and portable state import/export —
   complete, live, and published. Plugin/texture bundles
@@ -541,3 +545,58 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Reload and open Worlds for named checkpoints, reviewed restore, independent
   branches, and portable JSON import/export. Automatic checkpoints retain the
   latest ten at the user-requested 100-day cadence.
+
+### 2026-09-19 — Phase 4c started
+
+- User selected sandboxed world plugins as the next milestone.
+- Reviewing the fixed engine interface, model proposal validation, custom-field
+  accounting, and checkpoint persistence before selecting the execution format.
+- Asked whether the first runtime should use a restricted JSON instruction
+  format or separately sandboxed JavaScript.
+- Required guarantees: explicit saved state, deterministic computation limits,
+  scoped validated outputs, no ambient host capabilities, and atomic tick failure.
+
+### 2026-09-19 — Restricted plugin implementation
+
+- User selected the restricted program format first. No JavaScript execution.
+- Implemented a flat stack instruction set with arithmetic, comparisons, jumps,
+  weather/custom reads, per-tile saved state, and validated custom-field outputs.
+- Added static world budgets and runtime instruction/stack/output bounds; failures
+  abort the uncommitted tick. Outputs participate in existing resource accounting.
+- Connecting explicit define/update/toggle/remove proposals, inspector state and
+  recovery controls, schema-4 migration backups, and immutable world artifacts.
+- Crystal-bloom example tracks consecutive warm days and produces crystal stock.
+- Verification and browser/real-provider acceptance remain in progress.
+
+### 2026-09-19 — Plugin engine checks passed
+
+- All 49 tests pass, including deterministic crystal production, stock accounting,
+  saved state, instruction/stack/output limits, invalid instructions/dependencies,
+  writer conflicts, migration/reset, scope authority, checkpoints and archive replay.
+- Fixed schema-4 serialization order so validating a newly generated world does
+  not unexpectedly change its hash. Legacy schema-1/2/3 backups remain supported.
+- Browser acceptance, native Claude schema compatibility, documentation and
+  live deployment remain in progress.
+
+### 2026-09-19 — Plugin acceptance and deployment
+
+- Plugin browser passed proposal/forecast/Apply, crystal stock accounting, visible
+  state counters, disable/re-enable, reload, and desktop/mobile layouts.
+- Native Claude generated a valid plugin-only proposal from the new contract.
+  Its five-day forecast produced exactly five crystal shards in a temporary world.
+- Both existing local worlds passed read-only schema-4 migration with no disk
+  changes. Restart preserved first-world at day 308/revision 316.
+- Restricted programs and their state travel in checkpoint/branch/archive copies;
+  arbitrary JavaScript/native execution remains unsupported.
+- Added the program/ABI guide, example, budgets, recovery instructions, and
+  schema-4 migration/storage documentation. Final regressions/publication ongoing.
+
+### 2026-09-19 — Restricted plugin milestone verified
+
+- Final `npm run check` passed (49 tests, typecheck, production build).
+- Plugin, checkpoint, and mana browser suites all passed.
+- Live schema-4 world and plugin capabilities verified at `0.0.0.0:5180`;
+  first-world remains day 308, with no plugins installed automatically.
+- Corrected conversation history to label Entire world authority accurately.
+- Publishing the restricted-runtime milestone. General entity migrations,
+  selective replay, texture rendering, and JavaScript/native runtimes remain future work.

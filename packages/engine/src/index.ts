@@ -1,5 +1,6 @@
 import { ProposalSchema, WorldSchema, type World, type Proposal, type WorldEvent } from '../../contracts/src/index.js';
 import { random } from '../../worldgen/src/index.js';
+import {validatePlugins,applyPlugin,advancePlugins} from './plugins.js';
 import { advanceTemperature, climateTemperatureC } from './temperature.js';
 import { validateExtensions, applyExtension, advanceExtensions } from './extensions.js';
 
@@ -21,7 +22,7 @@ export function validateWorld(input:unknown):World {
     if(p.worldId!==w.id || commands.has(p.id) || p.operations.some(o=>!w.tiles[o.tileId]||(o.kind==='field-transfer'&&!w.tiles[o.toTileId]))) throw Error('Invalid command history');
     commands.add(p.id);
   }
-  validateExtensions(w);
+  validateExtensions(w);validatePlugins(w);
   return w;
 }
 function event(w:World,e:WorldEvent) { w.events.push(e); if(w.events.length>200) w.events.shift(); }
@@ -34,7 +35,7 @@ export function applyProposal(world:World,input:unknown):World {
   for(const op of p.operations) {
     const tile=next.tiles[op.tileId];
     if(!tile) throw Error('Unknown tile');
-    applyExtension(next,op);
+    applyExtension(next,op);applyPlugin(next,op);
     if(op.kind==='elevation') tile.elevationM+=op.deltaM;
     if(op.kind==='communication') tile.communication=op.enabled;
     if(op.kind==='rainfall') {
@@ -102,7 +103,7 @@ export function advance(world:World):World {
     if(tile.elevationM>0) tile.vegetation=Math.max(0,Math.min(1,Math.round((tile.vegetation+(flooded ? -0.005 : tile.temperatureC>45 ? -0.005 : tile.rainMm>2 && tile.temperatureC>0 ? 0.001:-0.001))*1000)/1000));
     else tile.vegetation=0;
   }
-  advanceExtensions(next);
+  advanceExtensions(next,advancePlugins(next));
   return validateWorld(next);
 }
 export function preview(world:World,p:Proposal,ticks=5):World {

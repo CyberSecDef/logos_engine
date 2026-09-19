@@ -77,10 +77,10 @@ test('ledger accounts for net local creation/removal separately from conserved t
 test('schema-2 fertility saves migrate without mutation and preserve their own versioned backup',async()=>{
  const root=await mkdtemp(join(tmpdir(),'logos-resource-migration-')),store=new WorldStore(root),world=make();
  const fertility=ProposalSchema.parse(JSON.parse(await readFile('docs/examples/soil-fertility.json','utf8')));
- const current=applyProposal(world,proposal(world,fertility.operations)),{resourceLedger:_,...data}=current;
+ const current=applyProposal(world,proposal(world,fertility.operations)),{resourceLedger:_,plugins:__,...data}=current;
  const legacy={...data,schemaVersion:2,engineVersion:'0.2.0'},hash=createHash('sha256').update(JSON.stringify(legacy)).digest('hex');
  const dir=join(root,world.id),path=join(dir,'state.json'),source=JSON.stringify({hash,world:legacy});await mkdir(dir);await writeFile(path,source);
- try{const loaded=await store.load(world.id);assert.equal(loaded.schemaVersion,3);assert.deepEqual(loaded.definitions,current.definitions);assert.equal(await readFile(path,'utf8'),source);await store.save(advance(loaded));assert.equal(await readFile(join(dir,'state.v2.backup.json'),'utf8'),source);assert.deepEqual(advance(await store.load(world.id)),advance(advance(current)));}finally{await rm(root,{recursive:true,force:true});}
+ try{const loaded=await store.load(world.id);assert.equal(loaded.schemaVersion,4);assert.deepEqual(loaded.definitions,current.definitions);assert.equal(await readFile(path,'utf8'),source);await store.save(advance(loaded));assert.equal(await readFile(join(dir,'state.v2.backup.json'),'utf8'),source);assert.deepEqual(advance(await store.load(world.id)),advance(advance(current)));}finally{await rm(root,{recursive:true,force:true});}
 });
 
 test('prompt authority covers transfer recipients and previews compare whole-world stock totals',async()=>{

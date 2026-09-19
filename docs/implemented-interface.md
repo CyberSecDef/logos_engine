@@ -1,4 +1,4 @@
-# Implemented world interface (engine 0.3.0, save schema 3)
+# Implemented world interface (engine 0.4.0, save schema 4)
 
 This describes the running code. [world-interface.md](world-interface.md) remains
 the broader target; it is not a claim that all its capabilities exist yet.
@@ -56,7 +56,7 @@ anchors its absolute temperature to the final elevation, regardless of operation
 order. Each tile tracks `temperatureC` and optional `temperatureAnomalyC`: introduced
 heat/cold relative to the seasonal/elevation climate. Old saves omit the anomaly
 and load as zero without rewriting their checksum. The field is populated on ticks
-or temperature edits. Schema-1 saves are now migrated into schema 3 with empty extension state; see
+or temperature edits. Schema-1 saves are now migrated into schema 4 with empty extension/plugin state; see
 [save migration](world-extensibility.md#persistence-and-migration).
 
 Every day, each neighboring pair exchanges anomaly from a simultaneous snapshot:
@@ -139,16 +139,31 @@ with file/directory sync. It contains definitions currently represented by the
 schemas, state, rainfall/temperature rules, custom definitions/rules, and accepted transactions. Checkpoints now store immutable snapshot and definition artifacts; see
 [storage and restore behavior](world-checkpoints.md). Automatic server checkpoints
 run every 100 days and retain ten; manual checkpoints and restore backups persist.
-An append-only journal, general artifact migrations, and plugin artifacts remain
-future milestones. Run one server/writer against a world directory; do not
+An append-only journal and general artifact migrations remain future milestones. Restricted plugin definitions/state are embedded in
+schema-4 saves and recorded as immutable world artifacts. Run one server/writer against a world directory; do not
 run the CLI against a world being edited by the server.
 
 Local Claude Code and optional Anthropic API adapters implement the
 [prompt workflow](prompt-workflow.md). Conversations are separate atomic JSON
 records at `worlds/<id>/conversations/<requestId>.json`. These are not an event
-journal. Executable world plugins remain pending. External agents receive scoped
+journal. Restricted JSON programs are implemented in the
+[world-plugin interface](world-plugins.md); JavaScript/native execution remains unsupported. External agents receive scoped
 JSON packets and return responses for validation; they do not need repository access.
 
 Appearance has a catalog and tile-top UVs for hexagons and pentagons. Image IDs
 are reserved after birth but the renderer still uses colors for every tile.
 Actual image packs, texture loading/compositing, and settlements remain pending.
+
+## Restricted plugins
+
+`plugin-define`, `plugin-toggle`, and `plugin-remove` use existing proposal routes.
+Model changes require Entire world authority. `logos-stack-v1` programs read
+weather/custom snapshots, keep bounded per-tile numeric state, and emit validated
+custom-field effects with existing resource accounting. Runtime failures abort
+the uncommitted tick and pause play; repair requires explicit user action.
+See [program format, budgets, storage and migration](world-plugins.md).
+
+Forecasts now include `baselineError` (nullable) and `baselineTick`. A failed
+unchanged-world plugin stops its baseline forecast, while a valid recovery
+candidate can still complete five days. Comparisons use the reported last
+successful baseline day, and the browser displays that limitation.

@@ -60,7 +60,11 @@ home network; this milestone has no user login.
   reviewed restore with a backup, world branching, and portable JSON import/export.
   See [checkpoints and branches](docs/world-checkpoints.md).
 
-**Still planned:** automatic Cursor CLI launching, texture images, sandboxed world plugins, richer erosion, trade,
+- Restricted world plugins with saved per-tile state, deterministic instruction
+  limits, reviewed installation, and failure recovery. Try
+  [crystal bloom](docs/world-plugins.md).
+
+**Still planned:** automatic Cursor CLI launching, texture images, JavaScript/native plugins, richer erosion, trade,
 population, conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 
@@ -80,6 +84,7 @@ npm run test:prompts   # Prompt UI with a simulated provider; no model charges
 npm run test:extensions # Custom properties/rules through the browser
 npm run test:resources  # Mana transfers, stock totals, and daily balance
 npm run test:checkpoints # Checkpoint/restore, branches, portable worlds
+npm run test:plugins    # Stateful plugin proposal, execution, pause/resume
 npm run world -- create my-world amber
 npm run world -- step my-world 10
 npm run world -- inspect my-world

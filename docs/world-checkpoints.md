@@ -46,10 +46,12 @@ rules, and state before creating files. Supported older save versions migrate
 through the existing migration pipeline.
 
 Archives include the current simulated state and its recorded changes, not
-conversation records, checkpoint collections, credentials, or executable files.
+conversation records, checkpoint collections, credentials, or arbitrary executable files. Restricted JSON plugin programs and their internal
+state are included with the simulated state.
 The limit is 32 MiB including the request envelope. The SHA-256 checksum detects
 accidental modification; it is not a signature proving who authored an archive.
-Texture/plugin files are not bundled because those runtimes are not implemented.
+Texture packs and external JavaScript/native plugin files are not bundled.
+Restricted plugin artifacts are recreated from the embedded definitions on save.
 
 ## Storage and guarantees
 
@@ -61,6 +63,7 @@ worlds/
     checkpoints/<checkpoint-id>.json
     snapshots/<sha256>.json
     definitions/<sha256>.json
+    plugins/<plugin-id>/<version>/<sha256>.json
     conversations/<request-id>.json
 ```
 
@@ -79,7 +82,8 @@ replace the active state. Checkpoints are recovery points, not a complete
 append-only event journal or selective replay system. Automatic checkpointing is
 part of the server's step workflow; the developer CLI does not create checkpoints.
 Run only one server/writer for a world directory. General entity migrations,
-world-plugin execution, and texture packs remain separate Phase 4 work.
+JavaScript/native plugin execution, and texture packs remain separate work.
+[Restricted world plugins](world-plugins.md) now preserve state through this workflow.
 
 Run `npm run test:checkpoints` for the browser acceptance flow. Integration tests
 also cover immutable artifacts, corruption rejection, retention, deterministic

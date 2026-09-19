@@ -2,7 +2,7 @@ import type { Checkpoint } from '../../../packages/contracts/src/checkpoints.js'
 import { WorldGlobe } from './globe.js';
 import { appearance, type Overlay } from '../../../packages/globe/src/appearance.js';
 import type { PromptJob, PromptRequest } from '../../../packages/contracts/src/prompts.js';
-import { ruleAffectedTargets } from '../../../packages/engine/src/extensions.js';
+import { ruleAffectedTargets,ruleTargets as pluginTargets } from '../../../packages/engine/src/extensions.js';
 import type { CustomRule, Read } from '../../../packages/contracts/src/extensions.js';
 import type { World, Operation, Proposal } from '../../../packages/contracts/src/index.js';
 // getRandomValues also works on ordinary LAN HTTP, unlike randomUUID.
@@ -45,6 +45,7 @@ function selectTile(id:number) {
  $<HTMLButtonElement>('temperature-reset').disabled=!!promptJobId||!world.rules.some(r=>r.tileId===id&&r.kind==='temperature');
  for(const field of world.definitions.fields){const row=document.createElement('div');row.className='stat';row.title=field.description;const label=document.createElement('span'),value=document.createElement('strong');label.textContent=field.label;value.textContent=`${t.properties[field.id]??field.defaultValue}${field.quantity==='stock'?` / ${field.max}`:''} ${field.unit}`;row.append(label,value);container.append(row);}
  for(const rule of world.definitions.rules.filter(r=>ruleAffectedTargets(world,r).includes(id))){const note=document.createElement('p');note.className='rule-note';note.textContent=`${rule.label} · v${rule.version}${rule.enabled?'':' · paused'}: ${describeRule(rule)}`;container.append(note);}
+ for(const plugin of world.plugins.filter(p=>pluginTargets(world,p.definition).includes(id))){const p=document.createElement('p');p.className='plugin-note rule-note';const def=plugin.definition,values=plugin.state.find(s=>s.tileId===id)?.values??def.stateFields.map(f=>f.initial);p.textContent=`Plugin: ${def.label} v${def.version} · ${def.enabled?'active':'paused'} · ${def.stateFields.map((f,i)=>`${f.id}: ${values[i]}`).join(', ')}`;const b=document.createElement('button');b.textContent=def.enabled?'Review disable plugin':'Review enable plugin';b.disabled=!!promptJobId;b.onclick=()=>void propose({kind:'plugin-toggle',tileId:def.tileId,pluginId:def.id,enabled:!def.enabled},`${def.enabled?'Disable':'Enable'} ${def.label}. Saved plugin state is retained.`);container.append(p,b);}
  for(const entry of world.resourceLedger?.entries??[]){if(!world.definitions.fields.some(f=>f.id===entry.fieldId&&f.quantity==='stock'))continue;const note=document.createElement('p');note.className='resource-note muted';note.textContent=`Day ${world.resourceLedger.tick} world balance · ${entry.label}: ${(entry.afterMilli/1000).toLocaleString()} ${entry.unit}; net added ${entry.createdMilli/1000}, net removed ${entry.removedMilli/1000}, transferred ${entry.transferredMilli/1000}. Transfers leave the world total unchanged.`;container.append(note);}
  const events=world.events.filter(e=>e.tileId===id).slice(-2);for(const e of events){const p=document.createElement('p');p.className='muted';p.textContent=`Day ${e.tick} · ${e.message}`;container.append(p);}
  text('communication-change',t.communication?'Isolate communication':'Restore communication');
@@ -75,7 +76,7 @@ $('apply-proposal').onclick=()=>void action(async()=>{if(!pending)return;setWorl
 $('proposal').addEventListener('keydown',e=>{if(e.key==='Escape')$('cancel-proposal').click();if(e.key==='Tab'){const first=$('cancel-proposal'),last=$('apply-proposal');if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
 const layers:{id:Overlay;label:string;legend:string}[]=[{id:'terrain',label:'Terrain',legend:'Ocean / grassland / forest / alpine'},{id:'water',label:'Water',legend:'Dry land / retained water / flooding above 100 mm'},{id:'rain',label:'Rainfall',legend:'Dark → light · 0–100+ mm per day'},{id:'temperature',label:'Temperature',legend:'Blue: cold · red: warm · darker: extreme temperatures'},{id:'communication',label:'Connections',legend:'Green: connected · amber: isolated'}];
 for(const l of layers){const b=document.createElement('button');b.textContent=l.label;b.classList.toggle('active',l.id==='terrain');b.onclick=()=>{globe.overlay=l.id;$<HTMLSelectElement>('custom-layer').value='';globe.update();text('legend',l.legend);for(const x of Array.from($('layer-buttons').children))x.classList.toggle('active',x===b);};$('layer-buttons').append(b);}
-type WorldSummary={name:string;tick:number;tiles:number;fields:number;rules:number;interventions:number};
+type WorldSummary={name:string;tick:number;tiles:number;fields:number;plugins:number;rules:number;interventions:number};
 let worldReview:{path:string;body:unknown}|null=null;
 function finishWorldReview() {
  worldReview=null;$('world-review').hidden=true;
@@ -84,7 +85,7 @@ function finishWorldReview() {
 }
 function reviewWorld(title:string,summary:WorldSummary,note:string,label:string,path:string,body:unknown) {
  setPlaying(false);worldReview={path,body};text('world-review-title',title);
- text('world-review-summary',`${summary.name} · day ${summary.tick} · ${summary.tiles} zones · ${summary.fields} custom properties · ${summary.rules} custom rules · ${summary.interventions} recorded changes.`);
+ text('world-review-summary',`${summary.name} · day ${summary.tick} · ${summary.tiles} zones · ${summary.fields} custom properties · ${summary.rules} custom rules · ${summary.plugins} plugins · ${summary.interventions} recorded changes.`);
  text('world-review-note',note);text('apply-world-review',label);$('world-review').hidden=false;
  for(const child of Array.from(document.body.children))if(child instanceof HTMLElement&&child.id!=='world-review'&&child.id!=='toast')child.inert=true;
  document.body.classList.add('world-review-open');$('cancel-world-review').focus();
@@ -141,6 +142,9 @@ function describeRule(rule:CustomRule):string {
 }
 function describeOperation(o:Operation):string {
  switch(o.kind){
+  case 'plugin-define':return `World plugin: ${o.definition.label} v${o.definition.version} · ${o.definition.scope} · ${o.definition.program.length} instructions · ${o.definition.stateFields.length} saved state values per tile. ${o.definition.description} State migration: ${o.migration}.`;
+  case 'plugin-toggle':return `${o.enabled?'Enable':'Disable'} plugin ${o.pluginId}; saved state is retained.`;
+  case 'plugin-remove':return `Remove plugin ${o.pluginId} and its saved state; output properties remain.`;
   case 'rainfall':return `Zone ${o.tileId}: ${o.mmPerDay} mm rain/day`;
   case 'elevation':return `Zone ${o.tileId}: ${o.deltaM>=0?'+':''}${o.deltaM} m elevation`;
   case 'temperature':return `Zone ${o.tileId}: ${o.celsius} °C (${o.mode==='pulse'?'one-time event':'sustained'})`;
@@ -165,11 +169,12 @@ function updateCustomLayers() {
 }
 $('custom-layer').onchange=()=>{const value=$<HTMLSelectElement>('custom-layer').value;if(!value)return;globe.overlay=value as Overlay;globe.update();updateCustomLayers();for(const button of Array.from($('layer-buttons').children))button.classList.remove('active');};
 async function reviewProposal(proposal:Proposal) {
- const result=await api<{tick:number;totalTiles:number;resources:{fieldId:string;label:string;unit:string;totalMilli:number;beforeMilli:number|null;baselineMilli:number|null}[];tiles:{properties:{id:string;label:string;unit:string;after:number;baseline:number|null}[];id:number;after:World['tiles'][number];baseline:World['tiles'][number];waterMm:number;baselineWaterMm:number}[]}>('proposals/preview',proposal);
+ const result=await api<{tick:number;baselineError:string|null;baselineTick:number;totalTiles:number;resources:{fieldId:string;label:string;unit:string;totalMilli:number;beforeMilli:number|null;baselineMilli:number|null}[];tiles:{properties:{id:string;label:string;unit:string;after:number;baseline:number|null}[];id:number;after:World['tiles'][number];baseline:World['tiles'][number];waterMm:number;baselineWaterMm:number}[]}>('proposals/preview',proposal);
  pending=proposal;text('proposal-summary',proposal.summary);
  const container=$('preview-results');container.replaceChildren();
+ if(result.baselineError){const note=document.createElement('p');note.className='baseline-error';note.textContent=`The unchanged world could not finish its forecast: ${result.baselineError} Baseline comparisons below use its last successful day (${result.baselineTick}); the proposed world reached day ${result.tick}.`;container.append(note);}
  for(const resource of result.resources??[]){const p=document.createElement('p');p.className='resource-preview';p.textContent=`World total · ${resource.label}: ${resource.totalMilli/1000} ${resource.unit} on day ${result.tick} (${resource.baselineMilli===null?'not previously a stock resource':`${resource.baselineMilli/1000} without this change`}).`;container.append(p);}
- for(const operation of proposal.operations){const p=document.createElement('p');p.textContent=describeOperation(operation);container.append(p);}
+ for(const operation of proposal.operations){const p=document.createElement('p');p.textContent=describeOperation(operation);container.append(p);if(operation.kind==='plugin-define'){const details=document.createElement('details'),summary=document.createElement('summary'),code=document.createElement('pre');summary.textContent='Inspect plugin program';code.textContent=JSON.stringify(operation.definition,null,2);details.append(summary,code);container.append(details);}}
  if(result.totalTiles>result.tiles.length){const note=document.createElement('p');note.textContent=`Showing ${result.tiles.length} of ${result.totalTiles} potentially affected zones.`;container.append(note);}
  for(const tile of result.tiles){
   const customChanged=tile.properties.some(f=>f.baseline===null||f.after!==f.baseline);
@@ -205,7 +210,7 @@ async function loadChat() {
   $('chat-history').replaceChildren();
   for(const job of jobs.filter(j=>j.request.tileId===selected)) {
    const article=document.createElement('article');article.className='chat-entry';
-   const label=document.createElement('small');label.textContent=`${job.request.mode==='discuss'?'DISCUSS':'PROPOSE'} · ${job.request.scope==='tile'?'SELECTED TILE':'TILE + NEIGHBORS'}`;
+   const label=document.createElement('small');label.textContent=`${job.request.mode==='discuss'?'DISCUSS':'PROPOSE'} · ${job.request.scope==='world'?'ENTIRE WORLD':job.request.scope==='tile'?'SELECTED TILE':'TILE + NEIGHBORS'}`;
    const user=document.createElement('p');user.className='chat-user';user.textContent=job.request.message;article.append(label,user);
    const reply=document.createElement('p');reply.textContent=job.reply?.message??job.error??(job.status==='awaiting-import'?'Waiting for an imported response.':'Considering this place…');article.append(reply);
    if(job.reply?.assumptions.length){const p=document.createElement('p');p.className='muted';p.textContent='Assumptions: '+job.reply.assumptions.join(' ');article.append(p);}

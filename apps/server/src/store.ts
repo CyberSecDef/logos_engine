@@ -26,12 +26,12 @@ export class WorldStore {
   }
   async save(input:World):Promise<void> {
     const world=validateWorld(input), dir=await this.directory(world.id);
-    // Preserve the prior save format before the first schema-3 commit. Reads never rewrite it.
+    // Preserve the prior save format before the first schema-4 commit. Reads never rewrite it.
     try {
       const current=join(dir,'state.json');
       if((await lstat(current)).isSymbolicLink())throw Error('Save cannot be a symlink');
       const source=await readFile(current,'utf8'),old=JSON.parse(source);
-      if(old.world?.schemaVersion===1||old.world?.schemaVersion===2) {
+      if(old.world?.schemaVersion===1||old.world?.schemaVersion===2||old.world?.schemaVersion===3) {
         if(stateHash(old.world)!==old.hash)throw Error('Legacy save integrity check failed');
         const backup=join(dir,`state.v${old.world.schemaVersion}.backup.json`);
         const temporary=join(dir,`.legacy-${randomUUID()}.tmp`);
@@ -48,6 +48,7 @@ export class WorldStore {
 
       }
     }catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
+    await this.pluginArtifacts(world);
     const serialized=JSON.stringify({hash:stateHash(world),world});
     const tmp=join(dir,`.state-${randomUUID()}.tmp`);
     const file=await open(tmp,'wx',0o600);
@@ -73,7 +74,7 @@ export class WorldStore {
     const world=validateWorld(input),dir=await this.directory(world.id,true);
     try{await this.save(world);}catch(error){await rm(dir,{recursive:true,force:true});throw error;}
   }
-  private async artifactDirectory(worldId:string,name:'snapshots'|'definitions'|'checkpoints'):Promise<string> {
+  private async artifactDirectory(worldId:string,name:'snapshots'|'definitions'|'checkpoints'|'plugins'):Promise<string> {
     const dir=join(await this.directory(worldId),name);await mkdir(dir,{recursive:true});
     if((await lstat(dir)).isSymbolicLink())throw Error('Artifact directory cannot be a symlink');return dir;
   }
@@ -89,8 +90,18 @@ export class WorldStore {
       const directory=await open(dir,'r');try{await directory.sync();}finally{await directory.close();}
     }finally{await unlink(tmp).catch(()=>{});}
   }
+  private async pluginArtifacts(world:World):Promise<void> {
+    const definitions=[...world.plugins.map(p=>p.definition),...world.history.flatMap(h=>h.operations).flatMap(op=>op.kind==='plugin-define'?[op.definition]:[])];
+    if(!definitions.length)return;
+    const root=await this.artifactDirectory(world.id,'plugins');
+    for(const definition of definitions) {
+      let dir=root;for(const part of [definition.id,String(definition.version)]){dir=join(dir,part);await mkdir(dir,{recursive:true});if((await lstat(dir)).isSymbolicLink())throw Error('Plugin artifact directory cannot be a symlink');}
+      const hash=digest(definition);await this.immutable(dir,`${hash}.json`,{hash,definition});
+    }
+  }
   async checkpoint(input:World,label:string,kind:Checkpoint['kind']='manual'):Promise<Checkpoint> {
     const world=validateWorld(input),hash=stateHash(world),definitionsHash=digest(world.definitions);
+    await this.pluginArtifacts(world);
     const record=CheckpointSchema.parse({id:`checkpoint-${randomUUID()}`,worldId:world.id,label:label.trim(),kind,tick:world.tick,revision:world.revision,hash,definitionsHash,createdAt:new Date().toISOString()});
     await this.immutable(await this.artifactDirectory(world.id,'definitions'),`${definitionsHash}.json`,{hash:definitionsHash,definitions:world.definitions});
     await this.immutable(await this.artifactDirectory(world.id,'snapshots'),`${hash}.json`,{hash,world});

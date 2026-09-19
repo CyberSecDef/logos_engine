@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { pluginOperations } from './plugins.js';
 import { extensionOperations } from './extensions.js';
 import { modelSchema } from './model-schema.js';
 import { Id, OperationSchema, ProposalSchema } from './index.js';
@@ -29,6 +30,7 @@ export const modelReplyJsonSchema={
   assumptions:{type:'array',items:{type:'string'}},
   operations:{type:'array',items:{anyOf:[
    ...extensionOperations.map(modelSchema),
+   ...pluginOperations.map(modelSchema),
    {type:'object',additionalProperties:false,required:['kind','tileId','deltaM'],properties:{kind:{const:'elevation'},tileId:{type:'integer'},deltaM:{type:'integer',minimum:-2000,maximum:2000}}},
    {type:'object',additionalProperties:false,required:['kind','tileId','mmPerDay'],properties:{kind:{const:'rainfall'},tileId:{type:'integer'},mmPerDay:{type:'integer',minimum:0,maximum:500}}},
    {type:'object',additionalProperties:false,required:['kind','tileId','enabled'],properties:{kind:{const:'communication'},tileId:{type:'integer'},enabled:{type:'boolean'}}},

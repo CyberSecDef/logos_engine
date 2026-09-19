@@ -123,7 +123,8 @@ Read-only migration was verified against the existing local worlds.
 Definitions and current rules are embedded in the checksummed `state.json`;
 accepted transactions retain their versioned definitions in history. A complete
 append-only journal and general entity migrations remain pending. [Checkpoints and branches](world-checkpoints.md)
-now provide immutable snapshots/definitions, reviewed restore, and portable import/export. Older engine builds cannot load schema 3;
+now provide immutable snapshots/definitions, reviewed restore, and portable import/export. The current runtime adds [restricted plugins](world-plugins.md) in schema 4;
+older engine builds cannot load it;
 keep the backup when moving between versions. Run one writer per world directory.
 
 Executable schemas: `packages/contracts/src/extensions.ts`; evaluator and

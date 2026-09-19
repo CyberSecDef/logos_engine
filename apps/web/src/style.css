@@ -16,3 +16,5 @@ button:disabled{cursor:wait;opacity:.45;pointer-events:none}textarea{font:inheri
 #custom-layer{width:100%;margin-top:10px;background:#101d23;color:inherit;border:1px solid var(--line);border-radius:5px;padding:8px;font-size:11px}.rule-note{overflow-wrap:anywhere}
 
 #world-review-summary{font-size:13px;line-height:1.8;overflow-wrap:anywhere}#worlds{width:min(360px,calc(100vw - 28px))}#worlds button{font-size:11px}#save-checkpoint button,#branch-world,#export-world{margin-top:12px;width:100%}.checkpoint-row{border-top:1px solid var(--line);padding:10px 0}.checkpoint-row p{font-size:11px;line-height:1.6;overflow-wrap:anywhere}.checkpoint-row button{margin:0 6px 4px 0;padding:7px}.world-review-open header,.world-review-open aside,.world-review-open footer{pointer-events:none}
+
+#preview-results pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:10px}#preview-results summary{cursor:pointer}.baseline-error{color:#f2b6a2}
