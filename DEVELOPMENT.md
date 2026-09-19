@@ -9,7 +9,7 @@ before each milestone commit. Never mark unverified functionality complete.
 Temperature interventions are complete, published, and live on the LAN server.
 Phase 4 is in progress. Milestone 4a is complete and live: versioned custom numeric
 properties, bounded declarative rules, save migrations, prompt integration, and
-generic UI. Publication is the final checkpoint; later Phase 4 tasks are listed below.
+generic UI. Milestone 4a is published; later Phase 4 tasks are listed below.
 
 ## Completed
 
@@ -432,3 +432,11 @@ runoff with sediment conservation, and checksummed storage/path validation.
   their state; no fertility rules were automatically installed in user saves.
 - Publishing this first Phase 4 milestone. Remaining Phase 4 work is still pending
   and is not represented as implemented.
+
+### 2026-09-19 — Phase 4a publication checkpoint
+
+- Pushed `65a2404` to public `CyberSecDef/logos_engine` on `main`.
+- Live LAN browser verified the migrated world loads with no page errors and
+  Entire world prompt scope is available. The check made no model call or edit.
+- Reload the game to use custom definitions and rules. Soil-fertility walkthrough
+  is documented; further Phase 4 milestones remain pending.
