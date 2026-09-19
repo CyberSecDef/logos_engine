@@ -6,8 +6,8 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Temperature interventions are complete and verified. Restart/publication checks
-are the current checkpoint; broader Phase 4 extensibility remains pending.
+Temperature interventions are complete, published, and live on the LAN server.
+No implementation task is active; broader Phase 4 extensibility remains pending.
 
 ## Completed
 
@@ -339,3 +339,10 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Limits: no freezing/melting, steam/fire, or full asteroid physics; requests are
   bounded to −100 through 200 °C. Preview lists edited tiles and immediate neighbors.
 - Preparing the temperature milestone commit/push.
+
+### 2026-09-19 — Temperature publication checkpoint
+
+- Pushed milestone `dd09bc1` to public `CyberSecDef/logos_engine` on `main`.
+- Live LAN verification confirmed temperature controls and updated model
+  capabilities at `http://192.168.0.10:5180`. Reload the page to use them.
+- Existing saves and selected world were preserved.
