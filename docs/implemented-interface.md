@@ -40,8 +40,10 @@ atomic, revision-checked, and rejected if its ID has already been applied.
 
 ## HTTP
 
-The server binds to `127.0.0.1` (default port 5180), rejects foreign browser origins,
-and expects JSON POST bodies. GET `/api/session` returns a session bearer token;
+The server binds to `0.0.0.0` (default port 5180), rejects foreign browser origins,
+and expects JSON POST bodies. Access it using the server IP or hostname; additional
+DNS names can be listed in `ALLOWED_HOSTS`. `HOST` overrides the bind address.
+This is a trusted-home-network deployment without user login. GET `/api/session` returns a session bearer token;
 all other API routes require `Authorization: Bearer <token>`.
 
 | Route | Behavior |

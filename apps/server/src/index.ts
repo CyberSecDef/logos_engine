@@ -2,6 +2,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { isIP } from 'node:net';
+import { hostname, networkInterfaces } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { createWorld } from '../../../packages/worldgen/src/index.js';
@@ -9,9 +11,11 @@ import { advance, applyProposal, preview } from '../../../packages/engine/src/in
 import { CreateWorldSchema, ProposalSchema, type World } from '../../../packages/contracts/src/index.js';
 import { WorldStore } from './store.js';
 
-export async function startServer(options:{port?:number; root?:string; dev?:boolean}={}) {
+export async function startServer(options:{port?:number; host?:string; root?:string; dev?:boolean}={}) {
   const store=new WorldStore(resolve(options.root??'worlds'));
   const token=randomUUID();
+  const bindHost=options.host??process.env.HOST??'0.0.0.0';
+  const allowedHosts=['localhost',hostname(),`${hostname()}.local`,...(process.env.ALLOWED_HOSTS??'').split(',').map(h=>h.trim()).filter(Boolean)];
   let world:World;
   try {world=await store.load('first-world');}
   catch(error) {
@@ -30,7 +34,7 @@ export async function startServer(options:{port?:number; root?:string; dev?:bool
   let vite:Awaited<ReturnType<typeof import('vite')['createServer']>>|undefined;
   if(options.dev) {
     const {createServer:createViteServer}=await import('vite');
-    vite=await createViteServer({configFile:resolve('vite.config.ts'),server:{middlewareMode:true,ws:{server}}});
+    vite=await createViteServer({configFile:resolve('vite.config.ts'),server:{middlewareMode:true,allowedHosts,ws:{server}}});
   }
   function json(res:ServerResponse,status:number,value:unknown) {
     res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
@@ -44,7 +48,8 @@ export async function startServer(options:{port?:number; root?:string; dev?:bool
   async function commit(next:World) {await store.save(next);world=next;}
   async function handle(req:IncomingMessage,res:ServerResponse) {
     const host=req.headers.host??'';
-    if(!/^127\.0\.0\.1(?::\d+)?$/.test(host) && !/^localhost(?::\d+)?$/.test(host)) return json(res,403,{error:'Localhost only'});
+    const hostName=new URL(`http://${host}`).hostname.replace(/^\[|\]$/g,'');
+    if(!isIP(hostName) && !allowedHosts.includes(hostName)) return json(res,403,{error:'Host not allowed; use the server IP or configure ALLOWED_HOSTS'});
     if(req.headers.origin && req.headers.origin!==`http://${host}`) return json(res,403,{error:'Origin not allowed'});
     const pathname=new URL(req.url??'/',`http://${host}`).pathname;
     if(pathname.startsWith('/api/')) {
@@ -84,12 +89,20 @@ export async function startServer(options:{port?:number; root?:string; dev?:bool
     const types:Record<string,string>={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml'};
     res.writeHead(200,{'Content-Type':types[extname(target)]??'application/octet-stream','X-Content-Type-Options':'nosniff'});res.end(content);
   }
-  await new Promise<void>((yes,no)=>{server.once('error',no);server.listen(options.port??Number(process.env.PORT??5180),'127.0.0.1',yes);});
+  await new Promise<void>((yes,no)=>{server.once('error',no);server.listen(options.port??Number(process.env.PORT??5180),bindHost,yes);});
   return {server,close:async()=>{await vite?.close();await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}};
 }
 if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
   try {process.loadEnvFile();} catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error;}
   const app=await startServer({dev:process.argv.includes('--dev')});
-  const address=app.server.address();console.log(`Logos Engine · http://127.0.0.1:${typeof address==='object'?address?.port:5180}`);
+  const address=app.server.address();
+  const port=typeof address==='object'?address?.port:5180;
+  console.log(`Logos Engine listening on ${typeof address==='object'?address?.address:'0.0.0.0'}:${port}`);
+  console.log(`Local · http://localhost:${port}`);
+  if(typeof address==='object' && address?.address==='0.0.0.0') {
+    for(const entries of Object.values(networkInterfaces())) for(const entry of entries??[]) {
+      if(entry.family==='IPv4'&&!entry.internal) console.log(`Network · http://${entry.address}:${port}`);
+    }
+  }
   for(const signal of ['SIGTERM','SIGINT']) process.once(signal,()=>void app.close().then(()=>process.exit(0)));
 }

@@ -6,9 +6,9 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phases 1 and 2 are complete, verified, committed, and pushed. No implementation
-task is running at this checkpoint. Next: Phase 3 user-initiated model
-discussion/proposals and staged local-agent adapters.
+Phases 1 and 2 are complete, verified, committed, and pushed. Home-network access is implemented and verified; the development server is
+running on `0.0.0.0:5180`. Next: Phase 3 user-initiated model discussion/proposals
+and staged local-agent adapters.
 
 ## Completed
 
@@ -167,3 +167,25 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Stopped the temporary verification server; start the app with `npm run dev`.
 - Recording this publication checkpoint in a small documentation commit. Secrets,
   generated saves, dependencies, browser screenshots, and build output are ignored.
+
+### 2026-09-19 — Home-network access in progress
+
+- Requested: access the game from another host, not just localhost.
+- Default server bind changed to `0.0.0.0`; added `HOST` override and printed
+  network URLs. IP addresses and machine hostname pass server/Vite host checks;
+  custom DNS names use `ALLOWED_HOSTS`. Same-origin checks remain enforced.
+- Replaced browser `crypto.randomUUID()` with `getRandomValues()` IDs because
+  ordinary LAN HTTP is not a secure context and lacks `randomUUID()`.
+- Updated startup instructions; verifying network requests and remote browser
+  create/preview/apply flows before committing.
+
+### 2026-09-19 — Home-network access complete
+
+- `npm run check` passed (typecheck, seven tests, production build).
+- `LOGOS_BROWSER_LAN=1 LOGOS_BROWSER_DEV=1 node tests/browser.mjs` passed through
+  a non-loopback IP, explicitly verifying an insecure HTTP browser context.
+  Selection, preview/apply, world creation, persistence, and time controls work.
+- The HTTP regression test covers same-origin IP access and rejects unconfigured
+  DNS hosts. It uses Node HTTP to preserve the explicit Host header in the test.
+- Started `npm run dev` on all IPv4 interfaces at port 5180 and left it running
+  for the user's remote access. Preparing the network-access commit and push.

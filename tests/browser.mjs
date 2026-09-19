@@ -1,18 +1,21 @@
 import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { tmpdir, networkInterfaces } from 'node:os';
 import { join } from 'node:path';
 import { startServer } from '../dist/apps/server/src/index.js';
 const root=await mkdtemp(join(tmpdir(),'logos-browser-'));
 const app=await startServer({root,port:0,dev:process.env.LOGOS_BROWSER_DEV==='1'});
 const address=app.server.address();
-const base=`http://127.0.0.1:${address.port}`;
+const lanAddress=Object.values(networkInterfaces()).flat().find(e=>e?.family==='IPv4'&&!e.internal)?.address;
+if(process.env.LOGOS_BROWSER_LAN==='1'&&!lanAddress)throw Error('No LAN address available for test');
+const base=`http://${process.env.LOGOS_BROWSER_LAN==='1'?lanAddress:'127.0.0.1'}:${address.port}`;
 const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 try {
  const page=await browser.newPage({viewport:{width:1440,height:1000}});
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.goto(base);
+ if(process.env.LOGOS_BROWSER_LAN==='1')assert.equal(await page.evaluate(()=>isSecureContext),false);
  await page.waitForFunction(()=>document.querySelector('#save-status')?.textContent?.includes('Saved locally'));
  await page.locator('#spin').click();
  await page.locator('#globe').click({position:{x:720,y:500}});

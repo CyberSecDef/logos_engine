@@ -2,6 +2,10 @@ import './style.css';
 import { WorldGlobe } from './globe.js';
 import { appearance, type Overlay } from '../../../packages/globe/src/appearance.js';
 import type { World, Operation, Proposal } from '../../../packages/contracts/src/index.js';
+// getRandomValues also works on ordinary LAN HTTP, unlike randomUUID.
+function requestId():string {
+ return Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');
+}
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 let token='',world:World,selected=-1,busy=false,playing=false,pending:Proposal|null=null,timer:ReturnType<typeof setTimeout>|undefined;
 const globe=new WorldGlobe($<HTMLCanvasElement>('globe'),selectTile);
@@ -40,7 +44,7 @@ async function tick() {
 }
 async function propose(operation:Operation,summary:string) {
  setPlaying(false);await action(async()=>{
-  const proposal:Proposal={id:`change-${crypto.randomUUID()}`,worldId:world.id,expectedRevision:world.revision,summary,operations:[operation]};
+  const proposal:Proposal={id:`change-${requestId()}`,worldId:world.id,expectedRevision:world.revision,summary,operations:[operation]};
   const result=await api<{tick:number;tiles:{before:World['tiles'][number];after:World['tiles'][number]}[]}>('proposals/preview',proposal);
   pending=proposal;text('proposal-summary',summary);
   const after=result.tiles[0].after;text('preview-results',`After 5 days: ${after.elevationM} m elevation · ${(after.waterL/world.cells[after.id].areaM2).toFixed(1)} mm standing water · ${after.rainMm} mm daily rain. Neighboring runoff may also change.`);
@@ -65,5 +69,5 @@ $('worlds-toggle').onclick=()=>void action(async()=>{
  const worlds=await api<{id:string;name:string;tick:number}[]>('worlds');$('world-list').replaceChildren();
  for(const w of worlds){const b=document.createElement('button');b.textContent=`${w.name} · day ${w.tick}`;b.onclick=()=>void action(async()=>{setWorld(await api<World>('worlds/open',{id:w.id}));$('worlds').hidden=true;});$('world-list').append(b);}
 });
-$('new-world').onsubmit=e=>{e.preventDefault();void action(async()=>{setWorld(await api<World>('worlds/create',{id:`world-${crypto.randomUUID()}`,name:$<HTMLInputElement>('new-name').value,seed:$<HTMLInputElement>('new-seed').value,frequency:12}));$('worlds').hidden=true;});};
+$('new-world').onsubmit=e=>{e.preventDefault();void action(async()=>{setWorld(await api<World>('worlds/create',{id:`world-${requestId()}`,name:$<HTMLInputElement>('new-name').value,seed:$<HTMLInputElement>('new-seed').value,frequency:12}));$('worlds').hidden=true;});};
 try {token=(await api<{token:string}>('session')).token;setWorld(await api<World>('world'));}catch(e){error(e);text('save-status','Could not open world');}

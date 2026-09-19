@@ -13,7 +13,9 @@ npm install
 npm run dev
 ```
 
-Open **http://127.0.0.1:5180**. For a production build:
+The server binds to **0.0.0.0:5180**. From another machine, open
+**http://<server-ip>:5180** using the Network URL printed at startup. On the server
+itself, http://localhost:5180 also works. For a production build:
 
 ```sh
 npm run build
@@ -27,8 +29,10 @@ arrows to select tiles. The Worlds panel creates and opens seeded worlds.
 
 The game starts paused, pauses when its tab is hidden, and never catches up on
 offline time. Saves are automatic under `worlds/<id>/state.json` and excluded
-from Git. Run only one writer per world directory. Optional `.env` can set `PORT`;
-no provider credentials are needed for this milestone.
+from Git. Run only one writer per world directory. Optional `.env` can set `HOST` (default `0.0.0.0`) and `PORT`;
+no provider credentials are needed for this milestone. For a custom DNS name,
+set `ALLOWED_HOSTS=logos.example.lan`. Network access is intended for your trusted
+home network; this milestone has no user login.
 
 ## What works now
 
