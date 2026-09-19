@@ -7,7 +7,8 @@ before each milestone commit. Never mark unverified functionality complete.
 ## Current work
 
 Temperature interventions are complete, published, and live on the LAN server.
-No implementation task is active; broader Phase 4 extensibility remains pending.
+Future pollution/disease planning is documented; no implementation task is active.
+Broader Phase 4 extensibility and Phase 5 environmental/health systems remain pending.
 
 ## Completed
 
@@ -32,7 +33,7 @@ No implementation task is active; broader Phase 4 extensibility remains pending.
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Pending | Definition migrations; full rule expression language; sandbox feasibility and plugin execution; artwork packs; branches/import/export. |
-| 5. Broader simulation | Pending | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; long-run tuning. |
+| 5. Broader simulation | Pending | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
@@ -346,3 +347,19 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Live LAN verification confirmed temperature controls and updated model
   capabilities at `http://192.168.0.10:5180`. Reload the page to use them.
 - Existing saves and selected world were preserved.
+
+### 2026-09-19 — Future pollution and disease requirements documented
+
+- Requested future properties: air pollution, water contamination, and generic
+  disease, all trackable and capable of affecting other zones. No runtime changes.
+- Added `docs/environment-and-health.md`, linked from the plan and proposed world
+  contract. Tracks wind-driven smoke, actual-flow contamination/wash-off, famine
+  links through sanitation/infrastructure, and illness through contact/travel.
+- Planned dependency order: transport/accounting contracts → wind/air pollution →
+  water contamination → population/food/sanitation/travel → disease and famine links.
+- Defined inspector/overlay/preview expectations, distinct communication/physical
+  channels, cleanup/recovery, persistence defaults, and acceptance scenarios.
+- Detailed units and balancing remain future implementation choices. These fields
+  are not advertised to the live LLM until supported by the engine.
+- Documentation-only review: checked links, consistency, and whitespace; no runtime
+  tests or server restart needed. Preparing the planning commit/push.

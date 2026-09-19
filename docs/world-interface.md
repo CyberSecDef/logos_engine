@@ -57,6 +57,18 @@ Its first concrete effects should include transfer of discoveries and knowledge
 used by research. Trade routes, migration permissions, and water flow remain
 distinct. Show which channels a proposed isolation rule affects.
 
+## Planned environmental and health fields
+
+The [environment and health roadmap](environment-and-health.md) adds future
+contracts for air/water contaminant loads, source/sink rules, wind transport,
+water-quality displays, population health state, and travel-linked illness.
+These are proposed capabilities, not currently accepted operations. Use declared
+units and migrations, stored loads/counts versus derived concentrations/prevalence,
+explicit dry-zone handling, and conserved transfers. Keep source removal separate
+from cleanup/recovery; distinguish direct edit scope from simulated propagation.
+Expose incoming/outgoing effects and provenance through inspector/preview metadata.
+Models discover only the primitives actually supported by the installed engine.
+
 ## Appearance data and image assets
 
 World `appearance/` files map observable state to versioned tile-pack asset IDs.

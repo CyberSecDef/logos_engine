@@ -44,6 +44,10 @@ endgame, victory condition, or constrained player faction.
 - At world birth, render plain colored tiles. Prepare for state-driven image
   textures as the world evolves: forest canopy, city overviews, and a growing
   library of other terrain, settlement, and condition artwork.
+- Track air pollution, water contamination, and generic disease as future world
+  properties. Spread follows wind, actual water flow, and population contact/travel,
+  including routes between distant lands. See the
+  [environment and health roadmap](docs/environment-and-health.md).
 
 ## Implementation choices still to settle
 
@@ -216,6 +220,20 @@ substeps where needed rather than allowing a large tick to destabilize flow.
 Communication, trade, migration, and physical water flow are separate channels;
 blocking messages does not silently stop runoff or isolate all other processes.
 
+## Planned pollution and disease
+
+Add distinct air-quality, water-quality, and generic disease systems with
+observable sources, transport, exposure, and recovery. Smoke from fires follows
+airstreams; water contamination follows runoff and wash-off. Famine can affect
+water quality through explicit sanitation/infrastructure rules once those systems
+exist. Disease follows population contact and travel, including distant routes.
+These are future mechanics, not currently supported prompt operations.
+
+The [detailed roadmap](docs/environment-and-health.md) records fields, causal
+chains, dependency order, inspection/overlays, and acceptance scenarios. Physical
+transport stays separate from communication permissions. All spread is
+deterministic and requires no model calls.
+
 ## How prompts become world changes
 
 Provide two explicit interactions: **Discuss** explains current state and likely
@@ -387,7 +405,8 @@ inspector with current stats, trends, neighbors, applicable rules, and recent
 events. Place contextual chat and the change preview alongside it.
 
 Add overlays incrementally: terrain, climate/weather, population, food/resources,
-ownership, trade, conflict, and technology. Provide legends and units. Make
+ownership, trade, conflict, technology, air quality, water quality, and disease.
+Provide legends and units, with wind/flow directions and travel links on demand. Make
 event entries select affected tiles and distinguish actual changes from model
 proposals. Add a world picker with create, open, duplicate/branch, and export.
 
@@ -425,7 +444,10 @@ and a textual inspector independent of hover and color.
    Demonstrate a new world mechanic through a plugin with no engine changes and
    identical replay results. Verify isolation with deliberately invalid plugins.
 7. **Broader simulation.** Add migration, faction policies, conflict, and
-   technology with explicit causal links to production and trade. Record design
+   technology with explicit causal links to production and trade. Add wind-driven
+   air pollution, runoff-driven water contamination, and generic disease after
+   population/contact/travel prerequisites; connect famine to water quality
+   through defined infrastructure and sanitation rules. Record design
    decisions and tune observable scenarios before expanding complexity.
 8. **Scale and polish.** Benchmark approximately 6,762 cells, improve update
    batching and rendering, and complete accessibility, responsive layouts, and
