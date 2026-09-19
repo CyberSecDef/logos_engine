@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+worlds/*
+!worlds/.gitkeep
+.local/
+*.log
+*.tsbuildinfo
+.DS_Store

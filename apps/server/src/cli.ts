@@ -1,0 +1,16 @@
+import { createWorld } from '../../../packages/worldgen/src/index.js';
+import { advance } from '../../../packages/engine/src/index.js';
+import { defaultStore, stateHash } from './store.js';
+const [command,id='first-world',arg='1']=process.argv.slice(2);
+const store=defaultStore();
+if(command==='create') {
+  if((await store.list()).some(w=>w.id===id)) throw Error('World already exists');
+  const world=createWorld({id,name:id,seed:arg,frequency:8}); await store.save(world);
+  console.log(`Created ${id}: ${world.tiles.length} tiles, hash ${stateHash(world)}`);
+} else if(command==='step') {
+  const ticks=Number(arg); if(!Number.isInteger(ticks)||ticks<1||ticks>1000) throw Error('Use 1–1000 ticks');
+  let w=await store.load(id); for(let i=0;i<ticks;i++) w=advance(w); await store.save(w);
+  console.log(`Day ${w.tick}, revision ${w.revision}, hash ${stateHash(w)}`);
+} else if(command==='inspect') {
+  const w=await store.load(id); console.log({id:w.id,tiles:w.tiles.length,tick:w.tick,revision:w.revision,hash:stateHash(w)});
+} else console.log('npm run world -- create <id> <seed> | step <id> <days> | inspect <id>');

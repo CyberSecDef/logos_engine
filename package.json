@@ -1,0 +1,33 @@
+{
+  "name": "logos-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc && node --test dist/tests/*.test.js",
+    "dev": "tsc && node dist/apps/server/src/index.js --dev",
+    "start": "node dist/apps/server/src/index.js",
+    "world": "tsc && node dist/apps/server/src/cli.js",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "three": "0.186.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "22.20.2",
+    "@types/three": "0.183.1",
+    "vite": "8.3.0",
+    "@playwright/test": "1.63.0"
+  }
+}

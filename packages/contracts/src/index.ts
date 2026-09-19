@@ -1,0 +1,53 @@
+import { z } from 'zod';
+
+export const ENGINE_VERSION = '0.1.0';
+export const Id = z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/);
+const uint = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
+export const Vec3 = z.tuple([z.number().finite(), z.number().finite(), z.number().finite()]);
+export const CellSchema = z.object({
+  id: uint, center: Vec3, corners: z.array(Vec3).min(5).max(6),
+  neighbors: z.array(uint).min(5).max(6), areaM2: uint.positive(),
+}).strict();
+export const TileSchema = z.object({
+  id: uint, elevationM: z.number().int().min(-5000).max(5000),
+  waterL: uint, sedimentKg: uint, rainMm: uint.max(1000),
+  temperatureC: z.number().finite(), vegetation: z.number().min(0).max(1),
+  population: uint, communication: z.boolean(),
+}).strict();
+export const RainRuleSchema = z.object({
+  id: Id, kind: z.literal('rainfall'), tileId: uint,
+  mmPerDay: uint.max(500),
+}).strict();
+export const OperationSchema = z.discriminatedUnion('kind', [
+  z.object({kind:z.literal('elevation'), tileId:uint, deltaM:z.number().int().min(-2000).max(2000)}).strict(),
+  z.object({kind:z.literal('rainfall'), tileId:uint, mmPerDay:uint.max(500)}).strict(),
+  z.object({kind:z.literal('communication'), tileId:uint, enabled:z.boolean()}).strict(),
+]);
+export const ProposalSchema = z.object({
+  id: Id, worldId: Id, expectedRevision: uint,
+  summary: z.string().min(1).max(500), operations: z.array(OperationSchema).min(1).max(32),
+}).strict();
+export const EventSchema = z.object({
+  tick:uint, kind:z.enum(['intervention','flood','flow']), tileId:uint,
+  message:z.string(), amount:uint.optional(),
+}).strict();
+export const WorldSchema = z.object({
+  schemaVersion:z.literal(1), engineVersion:z.literal(ENGINE_VERSION), id:Id,
+  name:z.string().min(1).max(80), seed:z.string().min(1).max(120),
+  frequency:z.number().int().min(1).max(26), radiusM:z.literal(100000),
+  tick:uint, revision:uint, cells:z.array(CellSchema).min(12).max(6774),
+  tiles:z.array(TileSchema).min(12).max(6774), rules:z.array(RainRuleSchema),
+  history:z.array(ProposalSchema), events:z.array(EventSchema).max(200),
+  accounting:z.object({rainL:uint, evaporationL:uint, oceanDrainL:uint}).strict(),
+}).strict();
+export const CreateWorldSchema = z.object({
+  id:Id, name:z.string().min(1).max(80), seed:z.string().min(1).max(120),
+  frequency:z.number().int().min(1).max(26).default(12),
+}).strict();
+export type World = z.infer<typeof WorldSchema>;
+export type Cell = z.infer<typeof CellSchema>;
+export type Tile = z.infer<typeof TileSchema>;
+export type Proposal = z.infer<typeof ProposalSchema>;
+export type Operation = z.infer<typeof OperationSchema>;
+export type WorldEvent = z.infer<typeof EventSchema>;
+export type Vec = z.infer<typeof Vec3>;

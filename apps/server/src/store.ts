@@ -1,0 +1,55 @@
+import { mkdir, open, readFile, rename, realpath, lstat, readdir, unlink } from 'node:fs/promises';
+import { resolve, join, dirname } from 'node:path';
+import { randomUUID, createHash } from 'node:crypto';
+import { Id, type World } from '../../../packages/contracts/src/index.js';
+import { validateWorld } from '../../../packages/engine/src/index.js';
+
+export function stateHash(world:World):string {
+  return createHash('sha256').update(JSON.stringify(world)).digest('hex');
+}
+// A single local server is the supported writer. Every revision is self-contained;
+// state.json is replaced atomically only after its complete content is durable.
+export class WorldStore {
+  constructor(readonly root:string) {}
+  private async directory(id:string):Promise<string> {
+    Id.parse(id);
+    await mkdir(this.root,{recursive:true});
+    if((await lstat(this.root)).isSymbolicLink()) throw Error('World root cannot be a symlink');
+    const root=await realpath(this.root);
+    const path=join(root,id);
+    await mkdir(path,{recursive:true});
+    if((await lstat(path)).isSymbolicLink() || dirname(await realpath(path))!==root) throw Error('World path escapes storage');
+    return path;
+  }
+  async save(input:World):Promise<void> {
+    const world=validateWorld(input), dir=await this.directory(world.id);
+    const serialized=JSON.stringify({hash:stateHash(world),world});
+    const tmp=join(dir,`.state-${randomUUID()}.tmp`);
+    const file=await open(tmp,'wx',0o600);
+    try {await file.writeFile(serialized); await file.sync();} finally {await file.close();}
+    try {
+      await rename(tmp,join(dir,'state.json'));
+      const handle=await open(dir,'r'); try {await handle.sync();} finally {await handle.close();}
+    } catch(error) {await unlink(tmp).catch(()=>{}); throw error;}
+  }
+  async load(id:string):Promise<World> {
+    const dir=await this.directory(id), file=join(dir,'state.json');
+    if((await lstat(file)).isSymbolicLink()) throw Error('Save cannot be a symlink');
+    const envelope=JSON.parse(await readFile(file,'utf8'));
+    const world=validateWorld(envelope.world);
+    if(world.id!==id || stateHash(world)!==envelope.hash) throw Error('Save integrity check failed');
+    return world;
+  }
+  async list():Promise<{id:string; name:string; tick:number}[]> {
+    await mkdir(this.root,{recursive:true});
+    const results=[];
+    for(const e of await readdir(this.root,{withFileTypes:true})) {
+      if(e.isDirectory() && Id.safeParse(e.name).success) {
+        try {const w=await this.load(e.name); results.push({id:w.id,name:w.name,tick:w.tick});}
+        catch { /* Corrupt saves are not silently overwritten; explicit open reports error. */ }
+      }
+    }
+    return results.sort((a,b)=>a.id.localeCompare(b.id));
+  }
+}
+export const defaultStore=()=>new WorldStore(resolve('worlds'));
