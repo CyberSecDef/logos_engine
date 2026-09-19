@@ -6,15 +6,16 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 2 final verification and milestone publishing. Next development phase:
-user-initiated model discussion/proposals and staged local-agent adapters.
+Phases 1 and 2 are complete, verified, committed, and pushed. No implementation
+task is running at this checkpoint. Next: Phase 3 user-initiated model
+discussion/proposals and staged local-agent adapters.
 
 ## Completed
 
 - Phase 1: deterministic engine, validated edits, persistence, CLI, five tests.
 - Phase 2: playable local globe, inspection, overlays, world picker, time controls,
   preview/apply, appearance foundation, and two additional integration tests.
-- Public GitHub repository created; Phase 1 pushed.
+- Public GitHub repository created; Phases 1 and 2 pushed.
 
 - Reviewed the reference globe source and documented the product decisions.
 - Wrote the implementation plan and proposed engine–world interface.
@@ -39,6 +40,7 @@ user-initiated model discussion/proposals and staged local-agent adapters.
 - Published: https://github.com/CyberSecDef/logos_engine (public).
 - User renewed GitHub authentication; milestone 1 was pushed successfully.
 - Milestone 1 commit: `98319c7` — deterministic world engine and development log.
+- Milestone 2 commit: `81298f4` — playable globe and creator previews, pushed to `main`.
 - Push each completed major milestone once authentication is available. Never
   include `.env`, credentials, generated saves, or local agent transcripts.
 
@@ -157,3 +159,11 @@ runoff with sediment conservation, and checksummed storage/path validation.
   have no simulation systems yet. Texture art references are not loaded images.
 - The browser receives full snapshots. Streaming deltas, full accessibility
   review, GPU profiling, and long-run simulation tuning remain pending.
+
+### 2026-09-19 — Publication checkpoint
+
+- Pushed the playable globe milestone (`81298f4`) to the public repository.
+- Final development-mode browser check passed after the websocket update.
+- Stopped the temporary verification server; start the app with `npm run dev`.
+- Recording this publication checkpoint in a small documentation commit. Secrets,
+  generated saves, dependencies, browser screenshots, and build output are ignored.
