@@ -11,8 +11,8 @@ The Phase 4b resource-transfer milestone is complete and running locally:
 conserved custom resources, daily accounting, formula clamps, and neighbor extrema.
 Phase 4e is complete and live: immutable checkpoints, 100-day automatic
 checkpoints (ten retained), reviewed restore with backup, independent branches,
-portable world import/export, and persistent world selection. Publication is in
-progress. Plugin isolation, general migrations, and artwork remain pending.
+portable world import/export, and persistent world selection. Published as
+`b4b38e0`. Plugin isolation, general migrations, and artwork remain pending.
 
 ## Completed
 
@@ -421,7 +421,7 @@ runoff with sediment conservation, and checksummed storage/path validation.
   artifacts, execution and failure recovery. No plugin execution is enabled yet.
 - 4d: forest/city artwork packs and actual texture rendering.
 - 4e: world checkpoints, branches, restore, and portable state import/export —
-  complete and live; publication in progress. Plugin/texture bundles
+  complete, live, and published. Plugin/texture bundles
   and selective event replay remain future work.
 - Pollution/disease transport remains future broader-simulation work; custom
   numeric fields alone do not implement those physical/population systems.
@@ -533,3 +533,11 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Live browser verified 100-day controls and no page errors, without advancing time.
 - Publishing this milestone; plugins, texture rendering, general migrations and
   a full append-only replay journal are still pending.
+
+### 2026-09-19 — Checkpoint milestone publication
+
+- Pushed `b4b38e0` to public `CyberSecDef/logos_engine` on `main`.
+- Live game and read-only browser verification passed with the same selected world.
+- Reload and open Worlds for named checkpoints, reviewed restore, independent
+  branches, and portable JSON import/export. Automatic checkpoints retain the
+  latest ten at the user-requested 100-day cadence.
