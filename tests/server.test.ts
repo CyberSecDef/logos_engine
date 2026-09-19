@@ -45,7 +45,7 @@ test('HTTP flow: authenticated local commands, preview isolation, apply, step, p
   const base=`http://127.0.0.1:${address.port}/api/`;
   const {token}=await (await fetch(base+'session')).json() as {token:string};
   const world=await (await fetch(base+'world',{headers:{Authorization:`Bearer ${token}`}})).json() as World;
-  assert.equal(world.tick,1);assert.equal(world.rules[0].mmPerDay,100);
+  assert.equal(world.tick,1);assert.equal(world.rules.find(r=>r.kind==='rainfall')?.mmPerDay,100);
  }finally{await reopened.close();await rm(root,{recursive:true,force:true});}
 });
 

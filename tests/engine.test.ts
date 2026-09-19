@@ -27,7 +27,7 @@ test('100 ticks replay identically with conserved water accounting',()=>{
 });
 test('transactions and previews leave source unchanged; stale and duplicate inputs fail',()=>{
  const w=make(), before=stateHash(w), p=proposal(w), next=applyProposal(w,p);
- assert.equal(next.rules[0].mmPerDay,80); assert.equal(next.revision,1);
+ assert.equal(next.rules.find(r=>r.kind==='rainfall')?.mmPerDay,80); assert.equal(next.revision,1);
  preview(w,p,3); assert.equal(stateHash(w),before);
  assert.throws(()=>applyProposal(next,p),/already/);
  assert.throws(()=>applyProposal(next,{...p,id:'new'}),/Stale/);

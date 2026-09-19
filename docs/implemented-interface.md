@@ -6,7 +6,7 @@ the broader target; it is not a claim that all its capabilities exist yet.
 ## State and rules
 
 The executable schemas are in `packages/contracts/src/index.ts`. A world has a
-seed, fixed topology, per-cell surface areas, tiles, rainfall rules, accepted
+seed, fixed topology, per-cell surface areas, tiles, rainfall/temperature rules, accepted
 proposal history, recent events, revision, and integer water accounting.
 
 Units: elevation in metres; rainfall in mm/day; stored water in litres; sediment
@@ -16,7 +16,7 @@ in kg. One litre per square metre equals one millimetre. Worlds currently use a
 weight, simultaneously. Water reaching ocean tiles is an explicit accounting
 sink. Existing sediment travels with water; erosion does not yet create it.
 
-Three operation types are accepted:
+Five operation kinds are accepted (temperature has two modes):
 
 ```json
 {
@@ -27,7 +27,8 @@ Three operation types are accepted:
   "operations": [
     { "kind": "rainfall", "tileId": 24, "mmPerDay": 80 },
     { "kind": "elevation", "tileId": 24, "deltaM": 100 },
-    { "kind": "communication", "tileId": 24, "enabled": false }
+    { "kind": "communication", "tileId": 24, "enabled": false },
+    { "kind": "temperature", "tileId": 24, "celsius": 150, "mode": "pulse" }
   ]
 }
 ```
@@ -37,6 +38,45 @@ integer delta (−2,000 to +2,000 m), within total terrain bounds of ±5,000 m.
 Communication currently persists a flag; knowledge transfer is not implemented.
 Unknown operations and additional properties are rejected. Every transaction is
 atomic, revision-checked, and rejected if its ID has already been applied.
+
+## Temperature
+
+`temperature` sets an absolute Celsius target (−100 to 200, decimals allowed):
+
+- `mode: "pulse"` changes the temperature immediately, removes any existing
+  sustained temperature rule, and lets introduced heat/cold spread and fade.
+- `mode: "sustained"` also saves `temperature-<tileId>` and holds the target each
+  simulated day, continually influencing neighbors.
+- `{ "kind": "temperature-reset", "tileId": 24 }` removes that sustained source;
+  the current temperature is unchanged until normal simulation resumes.
+
+Rainfall and temperature rules coexist. A combined elevation/temperature proposal
+anchors its absolute temperature to the final elevation, regardless of operation
+order. Each tile tracks `temperatureC` and optional `temperatureAnomalyC`: introduced
+heat/cold relative to the seasonal/elevation climate. Old saves omit the anomaly
+and load as zero without rewriting their checksum. The field is populated on ticks
+or temperature edits. Schema version 1 remains additive; older application builds
+cannot read saves after new temperature fields/operations are written.
+
+Every day, each neighboring pair exchanges anomaly from a simultaneous snapshot:
+`0.2 × min(areaA, areaB) / max(degreeA, degreeB) × (anomalyA − anomalyB)`.
+Divide that exchanged quantity by each tile's area to obtain its temperature delta.
+Mixing is bounded to 20% per tile per day and conserves area-weighted anomaly before
+rounding. The remaining anomaly dissipates by 10% toward local climate, then rounds
+to 0.001 °C. Sustained sources replenish themselves to their exact target. Influence
+travels at most one graph edge per day and crosses land/ocean, elevation differences,
+and communication boundaries. Natural climate differences themselves do not diffuse.
+
+Temperature feeds evaporation (whole mm/day, increasing at 12 °C intervals, limited
+by available water). Land vegetation loses 0.005/day above 45 °C; below or at 0 °C
+it cannot grow. Existing flood/dryness behavior still applies. This is gameplay
+heat transport, not asteroid physics, thermodynamics, ice/melting, steam, or fire.
+
+The inspector tracks current temperature, anomaly, and sustained settings. The
+Temperature overlay distinguishes extreme heat/cold, and the five-day preview
+compares temperature, water, and vegetation with an unchanged-world baseline for
+the directly edited tiles and their immediate neighbors. Later spread is visible
+by advancing the world and inspecting other zones.
 
 ## HTTP
 
@@ -74,7 +114,7 @@ paused. Multiple tabs share one active world; stale commands are rejected.
 
 `worlds/<id>/state.json` is a checksummed self-contained save, replaced atomically
 with file/directory sync. It contains definitions currently represented by the
-schemas, state, rainfall rules, and accepted transactions. The expanded directory
+schemas, state, rainfall/temperature rules, and accepted transactions. The expanded directory
 layout, append-only journal, checkpoint history, migrations, and plugin artifacts
 are future milestones. Run one server/writer against a world directory; do not
 run the CLI against a world being edited by the server.

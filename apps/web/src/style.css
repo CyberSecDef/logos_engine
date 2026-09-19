@@ -10,3 +10,5 @@ button:disabled{cursor:wait;opacity:.45;pointer-events:none}textarea{font:inheri
 @media(max-width:760px){#conversation{left:12px;right:12px;top:95px;width:auto;max-height:calc(100vh - 215px);padding:17px}.chat-open #inspector{visibility:hidden}#chat-history{max-height:25vh}#chat-title{font-size:23px}}
 
 .chat-heading{position:sticky;top:-22px;z-index:2;background:#132228;padding:8px 0}textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+#temperature-mode{display:block;width:100%;margin-top:8px;padding:8px;background:#101d23;color:inherit;border:1px solid var(--line);border-radius:5px;font-size:10px}#proposal{max-height:calc(100dvh - 24px);overflow:auto}

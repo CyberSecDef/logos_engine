@@ -12,16 +12,24 @@ export const TileSchema = z.object({
   id: uint, elevationM: z.number().int().min(-5000).max(5000),
   waterL: uint, sedimentKg: uint, rainMm: uint.max(1000),
   temperatureC: z.number().finite(), vegetation: z.number().min(0).max(1),
+  temperatureAnomalyC: z.number().finite().optional(),
   population: uint, communication: z.boolean(),
 }).strict();
 export const RainRuleSchema = z.object({
   id: Id, kind: z.literal('rainfall'), tileId: uint,
   mmPerDay: uint.max(500),
 }).strict();
+export const TemperatureRuleSchema = z.object({
+  id: Id, kind: z.literal('temperature'), tileId: uint,
+  celsius: z.number().finite().min(-100).max(200),
+}).strict();
+export const RuleSchema = z.discriminatedUnion('kind', [RainRuleSchema, TemperatureRuleSchema]);
 export const OperationSchema = z.discriminatedUnion('kind', [
   z.object({kind:z.literal('elevation'), tileId:uint, deltaM:z.number().int().min(-2000).max(2000)}).strict(),
   z.object({kind:z.literal('rainfall'), tileId:uint, mmPerDay:uint.max(500)}).strict(),
   z.object({kind:z.literal('communication'), tileId:uint, enabled:z.boolean()}).strict(),
+  z.object({kind:z.literal('temperature'), tileId:uint, celsius:z.number().finite().min(-100).max(200), mode:z.enum(['pulse','sustained'])}).strict(),
+  z.object({kind:z.literal('temperature-reset'), tileId:uint}).strict(),
 ]);
 export const ProposalSchema = z.object({
   id: Id, worldId: Id, expectedRevision: uint,
@@ -36,7 +44,7 @@ export const WorldSchema = z.object({
   name:z.string().min(1).max(80), seed:z.string().min(1).max(120),
   frequency:z.number().int().min(1).max(26), radiusM:z.literal(100000),
   tick:uint, revision:uint, cells:z.array(CellSchema).min(12).max(6762),
-  tiles:z.array(TileSchema).min(12).max(6762), rules:z.array(RainRuleSchema),
+  tiles:z.array(TileSchema).min(12).max(6762), rules:z.array(RuleSchema),
   history:z.array(ProposalSchema), events:z.array(EventSchema).max(200),
   accounting:z.object({rainL:uint, evaporationL:uint, oceanDrainL:uint}).strict(),
 }).strict();

@@ -6,8 +6,8 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 3 is complete, published, and running on the LAN server. No implementation
-task is currently active. Next phase: world extensibility and declarative rules.
+Temperature interventions are complete and verified. Restart/publication checks
+are the current checkpoint; broader Phase 4 extensibility remains pending.
 
 ## Completed
 
@@ -287,3 +287,55 @@ runoff with sediment conservation, and checksummed storage/path validation.
   remains available on all IPv4 interfaces at port 5180.
 - Phase 4 and later tasks remain pending; no additional product decisions block
   the completed prompt workflow.
+
+### 2026-09-19 — Temperature interventions started
+
+- Requested: LLM temperature changes with observable effects on neighboring zones.
+- User chose both one-time heat/cold events and sustained temperature settings.
+- Implementing bounded absolute temperature operations and removable sustained
+  rules, area-weighted simultaneous anomaly exchange, daily dissipation, and
+  temperature-driven evaporation/vegetation effects. No model calls during ticks.
+- Existing saves retain compatibility: missing anomaly means zero; rainfall and
+  temperature rules must coexist without replacing one another.
+- Remaining: prompt schema/context, UI and forecasts, regression and compatibility
+  tests, documentation, live restart, milestone commit/push.
+
+### 2026-09-19 — Temperature implementation ready for verification
+
+- Added pulse/sustained temperature and stop-source operations (−100 to 200 °C).
+  Heat/cold anomalies mix one hop per day with area weighting and decay 10% daily;
+  sustained sources replenish their target. Rain and temperature rules coexist.
+- Temperature affects evaporation and vegetation. Updated model capabilities and
+  schemas, creator controls, inspector, extreme-temperature colors, and previews
+  comparing neighbor temperature/water/vegetation against the baseline.
+- Added tests for hot/cold spread, deterministic replay, source removal, combined
+  terrain changes, bounded atomic edits, existing-save checksums, saved thermal
+  replay, and model proposal validation. Extending browser coverage for the UI.
+- Adjusted the evaporation fixture to cross an actual 12 °C evaporation threshold;
+  warming within a single interval correctly leaves its evaporation unchanged.
+
+### 2026-09-19 — Temperature browser and live model checks
+
+- All 23 tests and the production build passed. Extended prompt browser smoke
+  passed pulse proposals, neighbor preview, sustained controls, and source removal.
+- Real Claude returned a valid 150 °C pulse proposal for the asteroid example;
+  validation ran on a copy, without changing user worlds.
+- Read-only validation succeeded for both existing local saves.
+- Screenshot review caught an existing overlay defect: Three.js rejects the
+  space-separated HSL strings used by rainfall/temperature, producing white tiles.
+  Switched to supported comma-separated HSL and added a real Three.js color-parser
+  regression before final restart/publication.
+
+### 2026-09-19 — Temperature feature verified
+
+- `npm run check` passed: typecheck, all 24 tests, and production build.
+- Final prompt/browser regression passed after the overlay fix; desktop screenshot
+  review confirms temperature colors render, including the heated zone.
+- Existing saves validated unchanged; the live server had no active prompt at
+  restart. Restarting on `0.0.0.0:5180` with the same active world.
+- Supported examples: “Heat this tile to 150 °C once,” “Keep this tile at −40 °C,”
+  and “Stop maintaining the temperature here.” Neighbor consequences need no
+  extra model calls and do not require permission to directly edit neighbors.
+- Limits: no freezing/melting, steam/fire, or full asteroid physics; requests are
+  bounded to −100 through 200 °C. Preview lists edited tiles and immediate neighbors.
+- Preparing the temperature milestone commit/push.

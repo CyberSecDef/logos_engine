@@ -29,6 +29,8 @@ export const modelReplyJsonSchema={
    {type:'object',additionalProperties:false,required:['kind','tileId','deltaM'],properties:{kind:{const:'elevation'},tileId:{type:'integer'},deltaM:{type:'integer',minimum:-2000,maximum:2000}}},
    {type:'object',additionalProperties:false,required:['kind','tileId','mmPerDay'],properties:{kind:{const:'rainfall'},tileId:{type:'integer'},mmPerDay:{type:'integer',minimum:0,maximum:500}}},
    {type:'object',additionalProperties:false,required:['kind','tileId','enabled'],properties:{kind:{const:'communication'},tileId:{type:'integer'},enabled:{type:'boolean'}}},
+   {type:'object',additionalProperties:false,required:['kind','tileId','celsius','mode'],properties:{kind:{const:'temperature'},tileId:{type:'integer'},celsius:{type:'number',minimum:-100,maximum:200},mode:{type:'string',enum:['pulse','sustained']}}},
+   {type:'object',additionalProperties:false,required:['kind','tileId'],properties:{kind:{const:'temperature-reset'},tileId:{type:'integer'}}},
   ]}},
  },
 };

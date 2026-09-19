@@ -16,8 +16,11 @@ export function appearance(w:World,t:Tile,overlay:Overlay='terrain'):Appearance 
  const entry=catalog.find(e=>e.id===id)!;
  let color=entry.color;
  if(overlay==='water') color=t.elevationM<=0?'#174863':depth>100?'#59c1e3':depth>20?'#387e9b':'#aeb28c';
- if(overlay==='rain') color=`hsl(${190+Math.min(t.rainMm,100)/100*35} 55% ${22+Math.min(t.rainMm,100)/100*50}%)`;
- if(overlay==='temperature') color=`hsl(${220-Math.max(0,Math.min(1,(t.temperatureC+30)/65))*210} 45% 55%)`;
+ if(overlay==='rain') color=`hsl(${190+Math.min(t.rainMm,100)/100*35}, 55%, ${22+Math.min(t.rainMm,100)/100*50}%)`;
+ if(overlay==='temperature') {
+  const extreme=t.temperatureC>35?(t.temperatureC-35)/165:t.temperatureC< -30?(-30-t.temperatureC)/70:0;
+  color=`hsl(${220-Math.max(0,Math.min(1,(t.temperatureC+30)/65))*210}, ${45+Math.min(1,extreme)*35}%, ${55-Math.min(1,extreme)*25}%)`;
+ }
  if(overlay==='communication') color=t.communication?'#469783':'#d8956b';
  return {label:entry.label,color,assetId:w.tick>0?entry.id:undefined,variant:Math.imul(t.id+1,2654435761)>>>0};
 }

@@ -37,7 +37,7 @@ test('proposal is scoped, server-versioned, previewed against baseline, and appl
  try{const hash=stateHash(f.world);await f.service.start(f.world,req('propose-1','propose'));const job=await finish(f.service,f.world,'propose-1');
  assert.equal(job.status,'complete');assert.ok(job.proposal);assert.equal(job.proposal.worldId,f.world.id);assert.equal(job.proposal.expectedRevision,0);
  const forecasted=forecast(f.world,job.proposal);assert.equal(forecasted.tick,5);assert.equal(stateHash(f.world),hash);
- const changed=applyProposal(f.world,job.proposal);assert.equal(changed.rules[0].mmPerDay,80);assert.equal(changed.tick,0);
+ const changed=applyProposal(f.world,job.proposal);assert.equal(changed.rules.find(r=>r.kind==='rainfall')?.mmPerDay,80);assert.equal(changed.tick,0);
  assert.throws(()=>applyProposal(advance(f.world),job.proposal!),/Stale/);
  }finally{await f.close();}
 });

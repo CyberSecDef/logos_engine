@@ -26,7 +26,7 @@ npm run dev
 Development/test servers use separate temporary Vite dependency caches, cleaned
 up when each server stops.
 
-Select a tile, inspect its conditions, preview a rainfall/elevation/communication
+Select a tile, inspect its conditions, preview a rainfall/elevation/temperature/communication
 change, then Apply. Use **+1 day** or **Let time flow** to observe consequences.
 Drag to orbit, scroll to zoom; when the globe has keyboard focus, use left/right
 arrows to select tiles. The Worlds panel creates and opens seeded worlds.
@@ -43,6 +43,8 @@ home network; this milestone has no user login.
 - Seeded fictional globe with stable tiles, terrain relief, picking, and overlays.
 - Deterministic daily weather, evaporation, runoff, sediment transport, and
   vegetation response, with explicit water accounting.
+- One-time or sustained heat/cold, deterministic neighbor influence, evaporation
+  and vegetation effects, temperature overlay and inspector tracking.
 - Validated creator transactions, five-day previews, saved rules, and reload.
 - Responsive inspector, time controls, world creation, and appearance/UV foundation.
 - Local Claude Code conversations: Discuss, Propose, review, Apply; cancellation

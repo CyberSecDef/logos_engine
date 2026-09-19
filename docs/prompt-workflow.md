@@ -7,10 +7,22 @@ five-day forecast against the unchanged-world baseline, then explicitly Apply.
 Neither discussion nor preview changes the saved world. Unsupported mechanics can
 receive an explanation or clarification instead of a proposal.
 
-The implemented operations are recurring rainfall, elevation delta, and a stored
+The implemented operations are recurring rainfall, elevation delta, one-time or
+sustained temperature, stopping a sustained temperature source, and a stored
 communication flag. The flag does not yet simulate knowledge exchange. New engine
 mechanics, arbitrary rule expressions, and executable world plugins are future work.
 Models cannot extend application code through this interface.
+
+Example prompts:
+
+- “An asteroid impact heats this tile to 150 °C once. Let the heat fade.”
+- “Keep this zone at −40 °C.”
+- “Stop maintaining this zone's temperature and let it recover naturally.”
+
+Temperature requests currently accept −100 to 200 °C. Heat/cold spreads to
+neighbors during deterministic ticks even with scope set to the selected tile;
+neighbor scope controls direct edits, not physical consequences. See the
+[temperature rules](implemented-interface.md#temperature) for mechanics and limits.
 
 ## Local Claude Code
 

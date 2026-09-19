@@ -7,6 +7,7 @@ const root=await mkdtemp(join(tmpdir(),'logos-prompt-browser-'));let calls=0;
 const provider={name:'Browser test provider',async generate(context,signal){
  calls++;
  if(context.message.includes('slow'))await new Promise((_r,reject)=>signal.addEventListener('abort',()=>reject(Error('cancelled')),{once:true}));
+ if(context.message.includes('temperature'))return {kind:'proposal',message:'One-time temperature event at 150 °C.',assumptions:[],operations:[{kind:'temperature',tileId:context.selectedTileId,celsius:150,mode:'pulse'}]};
  if(context.message.includes('dragon'))return {kind:'unsupported',message:'Dragons are not supported by this engine yet.',assumptions:[],operations:[]};
  if(context.mode==='discuss')return {kind:'discussion',message:'More rain can increase runoff into lower neighbors. This discussion changes nothing.',assumptions:[],operations:[]};
  return {kind:'proposal',message:'Set daily rainfall to 80 mm on the selected tile.',assumptions:[],operations:[{kind:'rainfall',tileId:context.selectedTileId,mmPerDay:80}]};
@@ -39,5 +40,22 @@ try {
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'.local/screenshots/prompt-mobile.png'});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
  await page.locator('#chat-close').click();await page.locator('#step').click();await page.waitForFunction(()=>document.querySelector('#day')?.textContent==='DAY 1');assert.equal(calls,4);
  await page.reload();await page.waitForFunction(()=>document.querySelector('#save-status')?.textContent?.includes('Saved locally'));await page.locator('#globe').focus();await page.keyboard.press('ArrowRight');await page.locator('#chat-open').click();await page.getByText('An imported response for this tile.').waitFor();assert.equal(calls,4);
- assert.deepEqual(errors,[]);console.log('Prompt browser passed: discuss/propose/review/apply, unsupported, cancel, external exchange, persistence, no autonomous calls, desktop/mobile.');
+ await page.setViewportSize({width:1440,height:1000});
+ await page.locator('#chat-message').fill('Set temperature to 150 C as a one-time impact');await page.locator('#chat-propose').click();
+ await page.getByRole('button',{name:'Review five-day preview'}).waitFor();await page.locator('#chat-progress').waitFor({state:'hidden'});
+ await page.getByRole('button',{name:'Review five-day preview'}).click();await page.locator('#proposal').waitFor({state:'visible'});
+ assert.match(await page.locator('#preview-results').textContent(),/150 °C \(one-time event\)/);
+ assert.ok(await page.locator('#preview-results p').count()>2);assert.match(await page.locator('#preview-results').textContent(),/°C without this change/);
+ await page.locator('#apply-proposal').click();await page.locator('#proposal').waitFor({state:'hidden'});await page.locator('#chat-close').click();
+ assert.match(await page.locator('#tile-details').textContent(),/150.0 °C/);
+ await page.locator('#temperature').fill('90');await page.locator('#temperature-mode').selectOption('sustained');await page.locator('#temperature-change').click();await page.locator('#proposal').waitFor({state:'visible'});await page.locator('#apply-proposal').click();await page.locator('#proposal').waitFor({state:'hidden'});
+ await page.locator('#step').click();await page.waitForFunction(()=>document.querySelector('#day')?.textContent==='DAY 2');
+ assert.match(await page.locator('#tile-details').textContent(),/Sustained temperature: 90 °C/);
+ await page.locator('#temperature-reset').click();await page.locator('#proposal').waitFor({state:'visible'});await page.locator('#apply-proposal').click();await page.locator('#proposal').waitFor({state:'hidden'});
+ assert.ok(await page.locator('#temperature-reset').isDisabled());assert.doesNotMatch(await page.locator('#tile-details').textContent(),/Sustained temperature/);
+ await page.getByRole('button',{name:'Temperature',exact:true}).click();
+ await page.screenshot({path:'.local/screenshots/temperature-desktop.png'});
+ await page.setViewportSize({width:390,height:844});await page.screenshot({path:'.local/screenshots/temperature-mobile.png'});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.equal(calls,5);
+ assert.deepEqual(errors,[]);console.log('Prompt browser passed: discuss/propose/review/apply, unsupported, cancel, external exchange, persistence, no autonomous calls, temperature pulse/sustained/reset and neighbor preview, desktop/mobile.');
 }finally{await browser.close();await app.close();await rm(root,{recursive:true,force:true});}
