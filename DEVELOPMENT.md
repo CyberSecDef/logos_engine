@@ -7,9 +7,9 @@ before each milestone commit. Never mark unverified functionality complete.
 ## Current work
 
 Temperature interventions are complete, published, and live on the LAN server.
-Phase 4 is in progress. Milestone 4a is complete and live: versioned custom numeric
-properties, bounded declarative rules, save migrations, prompt integration, and
-generic UI. Milestone 4a is published; later Phase 4 tasks are listed below.
+The Phase 4b resource-transfer milestone is complete and running locally:
+conserved custom resources, daily accounting, formula clamps, and neighbor extrema.
+Publication is the current checkpoint; remaining Phase 4 work is listed below.
 
 ## Completed
 
@@ -410,8 +410,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - 4a: numeric definitions, conditional rules, explicit field migrations, generic
   inspector/overlays, model authority — complete.
-- 4b: richer expressions and conserved custom-resource transfers; general
-  definition/entity migrations and immutable artifact/history storage.
+- 4b: conserved custom-resource transfers, daily accounting, bounded formula
+  clamps and neighbor extrema — complete. General definition/entity migrations
+  and immutable artifact/history storage remain pending.
 - 4c: isolated world-plugin runtime feasibility, deterministic budgets, staged
   artifacts, execution and failure recovery. No plugin execution is enabled yet.
 - 4d: forest/city artwork packs and actual texture rendering.
@@ -440,3 +441,44 @@ runoff with sediment conservation, and checksummed storage/path validation.
   Entire world prompt scope is available. The check made no model call or edit.
 - Reload the game to use custom definitions and rules. Soil-fertility walkthrough
   is documented; further Phase 4 milestones remain pending.
+
+### 2026-09-19 — Phase 4b started
+
+- User confirmed the fertility example worked and requested continued Phase 4 work.
+- User chose mana sharing to demonstrate conserved custom-resource transfers.
+- Implementing explicit stock properties, adjacent one-time transfers, recurring
+  sharing rules, capacity/overspending protection, and daily integer-unit accounting.
+- Adding bounded formula clamps and neighbor min/max reads. No trade, wind, water
+  contamination, or plugin execution is implied by generic resource transport.
+- Planned validation: conservation, simultaneous flows, competing requests, scope,
+  old saves/fertility rules, previews, model integration, and browser inspection.
+
+### 2026-09-19 — Resource transfer implementation verified
+
+- Added explicit stock resources, exact adjacent transfers, recurring equal-share
+  budgets, lower-neighbor selection, formula clamps, and neighbor min/max reads.
+- Transfer authority includes both endpoints and every potential rule recipient.
+  Snapshot stock/capacity reservations prevent overspending and same-tick relays.
+- Added a daily resource ledger in integer thousandths: starting stock, net local
+  additions/removals, gross transferred amount, and ending stock. Whole-world
+  totals are compared in previews; inspector shows capacity and last-day balance.
+- Engine 0.3.0 / schema 3 migrates older saves without rewriting on read and
+  backs up their original format on the next save (v1 or v2).
+- All 39 tests passed initially. Refining scarce-stock splitting so the available
+  budget is divided evenly before reservations; browser/model checks are next.
+
+### 2026-09-19 — Phase 4b resource-transfer milestone complete
+
+- `npm run check` passed: typecheck, all 39 tests, and production build.
+- Mana browser smoke passed proposal/review/Apply, world-total preview, source
+  stock/capacity, daily balance, overlay, tick/reload, and desktop/mobile layout.
+- Existing fertility and prompt/temperature browser regressions both passed.
+- Real Claude generated a stock definition, initial grant, and sharing rule. Its
+  five-day deterministic preview retained exactly 120 motes; user saves untouched.
+- Both existing local saves passed read-only schema-3 migration. No active model
+  request was present at restart; same selected world preserved.
+- Restarted the production game at `http://192.168.0.10:5180`. Added the resource
+  guide and example transaction; completing live check and milestone publication.
+- Resource accounting reports net local additions/removals per day, separately
+  from gross transfers. Generic sharing remains distinct from economic trade,
+  wind/water transport, disease, and population movement.

@@ -1,6 +1,7 @@
 import { WorldGlobe } from './globe.js';
 import { appearance, type Overlay } from '../../../packages/globe/src/appearance.js';
 import type { PromptJob, PromptRequest } from '../../../packages/contracts/src/prompts.js';
+import { ruleAffectedTargets } from '../../../packages/engine/src/extensions.js';
 import type { CustomRule, Read } from '../../../packages/contracts/src/extensions.js';
 import type { World, Operation, Proposal } from '../../../packages/contracts/src/index.js';
 // getRandomValues also works on ordinary LAN HTTP, unlike randomUUID.
@@ -41,8 +42,9 @@ function selectTile(id:number) {
  for(const [label,value] of entries){const row=document.createElement('div');row.className='stat';const k=document.createElement('span');k.textContent=label;const v=document.createElement('strong');v.textContent=value;row.append(k,v);container.append(row);}
  for(const rule of world.rules.filter(r=>r.tileId===id)){const p=document.createElement('p');p.className='rule-note';p.textContent=rule.kind==='rainfall'?`Recurring rule: ${rule.mmPerDay} mm of rain / day`:`Sustained temperature: ${rule.celsius} °C`;container.append(p);}
  $<HTMLButtonElement>('temperature-reset').disabled=!!promptJobId||!world.rules.some(r=>r.tileId===id&&r.kind==='temperature');
- for(const field of world.definitions.fields){const row=document.createElement('div');row.className='stat';row.title=field.description;const label=document.createElement('span'),value=document.createElement('strong');label.textContent=field.label;value.textContent=`${t.properties[field.id]??field.defaultValue} ${field.unit}`;row.append(label,value);container.append(row);}
- for(const rule of world.definitions.rules.filter(r=>r.scope==='world'||r.tileId===id||(r.scope==='neighbors'&&world.cells[r.tileId].neighbors.includes(id)))){const note=document.createElement('p');note.className='rule-note';note.textContent=`${rule.label} · v${rule.version}${rule.enabled?'':' · paused'}: ${describeRule(rule)}`;container.append(note);}
+ for(const field of world.definitions.fields){const row=document.createElement('div');row.className='stat';row.title=field.description;const label=document.createElement('span'),value=document.createElement('strong');label.textContent=field.label;value.textContent=`${t.properties[field.id]??field.defaultValue}${field.quantity==='stock'?` / ${field.max}`:''} ${field.unit}`;row.append(label,value);container.append(row);}
+ for(const rule of world.definitions.rules.filter(r=>ruleAffectedTargets(world,r).includes(id))){const note=document.createElement('p');note.className='rule-note';note.textContent=`${rule.label} · v${rule.version}${rule.enabled?'':' · paused'}: ${describeRule(rule)}`;container.append(note);}
+ for(const entry of world.resourceLedger?.entries??[]){if(!world.definitions.fields.some(f=>f.id===entry.fieldId&&f.quantity==='stock'))continue;const note=document.createElement('p');note.className='resource-note muted';note.textContent=`Day ${world.resourceLedger.tick} world balance · ${entry.label}: ${(entry.afterMilli/1000).toLocaleString()} ${entry.unit}; net added ${entry.createdMilli/1000}, net removed ${entry.removedMilli/1000}, transferred ${entry.transferredMilli/1000}. Transfers leave the world total unchanged.`;container.append(note);}
  const events=world.events.filter(e=>e.tileId===id).slice(-2);for(const e of events){const p=document.createElement('p');p.className='muted';p.textContent=`Day ${e.tick} · ${e.message}`;container.append(p);}
  text('communication-change',t.communication?'Isolate communication':'Restore communication');
 }
@@ -78,10 +80,10 @@ $('worlds-toggle').onclick=()=>void action(async()=>{
  for(const w of worlds){const b=document.createElement('button');b.textContent=`${w.name} · day ${w.tick}`;b.onclick=()=>void action(async()=>{setWorld(await api<World>('worlds/open',{id:w.id}));$('worlds').hidden=true;});$('world-list').append(b);}
 });
 $('new-world').onsubmit=e=>{e.preventDefault();void action(async()=>{setWorld(await api<World>('worlds/create',{id:`world-${requestId()}`,name:$<HTMLInputElement>('new-name').value,seed:$<HTMLInputElement>('new-seed').value,frequency:12}));$('worlds').hidden=true;});};
-function describeRead(read:Read):string {const labels={temperatureC:'temperature (°C)',rainMm:'rainfall (mm)',waterMm:'standing water (mm)',vegetation:'vegetation fraction',elevationM:'elevation (m)',population:'population'};return `${read.sample==='neighbors-average'?'neighbor average of ':''}${read.source==='custom'?(world.definitions.fields.find(f=>f.id===read.fieldId)?.label??read.fieldId):labels[read.source]}`;}
+function describeRead(read:Read):string {const labels={temperatureC:'temperature (°C)',rainMm:'rainfall (mm)',waterMm:'standing water (mm)',vegetation:'vegetation fraction',elevationM:'elevation (m)',population:'population'};return `${read.sample==='neighbors-average'?'neighbor average of ':read.sample==='neighbors-min'?'neighbor minimum of ':read.sample==='neighbors-max'?'neighbor maximum of ':''}${read.source==='custom'?(world.definitions.fields.find(f=>f.id===read.fieldId)?.label??read.fieldId):labels[read.source]}`;}
 function describeRule(rule:CustomRule):string {
  const conditions=rule.conditions.map(c=>`${describeRead(c.read)} ${{lt:'<',lte:'≤',eq:'=',gte:'≥',gt:'>'}[c.comparison]} ${c.value}`).join(' and ');
- const effects=rule.effects.map(e=>`${e.fieldId} ${e.kind==='add'?'+=':'='} ${e.value.constant}${e.value.terms.map(t=>` + (${t.coefficient} × ${describeRead(t.read)})`).join('')}`).join('; ');
+ const effects=rule.effects.map(e=>`${e.kind==='transfer'?'share a total of ':''}${e.fieldId} ${e.kind==='add'?'+=':e.kind==='set'?'=':'up to'} ${e.value.constant}${e.value.terms.map(t=>` + (${t.coefficient} × ${describeRead(t.read)})`).join('')}${e.value.min!==undefined?`, at least ${e.value.min}`:''}${e.value.max!==undefined?`, at most ${e.value.max}`:''}${e.kind==='transfer'?` among ${e.destination==='lower-neighbors'?'lower neighbors':'neighbors'} within available stock and capacity`:''}`).join('; ');
  return `Every ${rule.everyDays} day(s), ${rule.scope==='world'?'all zones':rule.scope==='neighbors'?`zone ${rule.tileId} and neighbors`:`zone ${rule.tileId}`}${conditions?`, when ${conditions}`:''}: ${effects}.`;
 }
 function describeOperation(o:Operation):string {
@@ -91,8 +93,9 @@ function describeOperation(o:Operation):string {
   case 'temperature':return `Zone ${o.tileId}: ${o.celsius} °C (${o.mode==='pulse'?'one-time event':'sustained'})`;
   case 'temperature-reset':return `Zone ${o.tileId}: stop sustained temperature; residual heat/cold fades`;
   case 'communication':return `Zone ${o.tileId}: communication ${o.enabled?'connected':'isolated'}`;
+  case 'field-transfer':return `Move exactly ${o.amount} ${o.fieldId} from zone ${o.tileId} to adjacent zone ${o.toTileId}; total stock is unchanged.`;
   case 'field-set':return `Zone ${o.tileId}: ${o.fieldId} = ${o.value}`;
-  case 'field-define':return `World property: ${o.definition.label} (${o.definition.id}) v${o.definition.version}; ${o.definition.min}–${o.definition.max} ${o.definition.unit}; default ${o.definition.defaultValue}. ${o.definition.description} Existing values: ${o.migration==='clamp'?'clamp to new bounds':'preserve, reject if out of bounds'}.`;
+  case 'field-define':return `World property: ${o.definition.label} (${o.definition.id}) v${o.definition.version}; ${o.definition.min}–${o.definition.max} ${o.definition.unit}; default ${o.definition.defaultValue}; ${o.definition.quantity==='stock'?'stock resource':'index'}. ${o.definition.description} Existing values: ${o.migration==='clamp'?'clamp to new bounds':'preserve, reject if out of bounds'}.`;
   case 'field-remove':return `Remove ${o.fieldId} and its values from every zone.`;
   case 'rule-define':return `${o.rule.label} v${o.rule.version}${o.rule.enabled?'':' (paused)'}: ${describeRule(o.rule)}`;
   case 'rule-remove':return `Remove custom rule ${o.ruleId}; existing property values remain.`;
@@ -109,9 +112,10 @@ function updateCustomLayers() {
 }
 $('custom-layer').onchange=()=>{const value=$<HTMLSelectElement>('custom-layer').value;if(!value)return;globe.overlay=value as Overlay;globe.update();updateCustomLayers();for(const button of Array.from($('layer-buttons').children))button.classList.remove('active');};
 async function reviewProposal(proposal:Proposal) {
- const result=await api<{tick:number;totalTiles:number;tiles:{properties:{id:string;label:string;unit:string;after:number;baseline:number|null}[];id:number;after:World['tiles'][number];baseline:World['tiles'][number];waterMm:number;baselineWaterMm:number}[]}>('proposals/preview',proposal);
+ const result=await api<{tick:number;totalTiles:number;resources:{fieldId:string;label:string;unit:string;totalMilli:number;beforeMilli:number|null;baselineMilli:number|null}[];tiles:{properties:{id:string;label:string;unit:string;after:number;baseline:number|null}[];id:number;after:World['tiles'][number];baseline:World['tiles'][number];waterMm:number;baselineWaterMm:number}[]}>('proposals/preview',proposal);
  pending=proposal;text('proposal-summary',proposal.summary);
  const container=$('preview-results');container.replaceChildren();
+ for(const resource of result.resources??[]){const p=document.createElement('p');p.className='resource-preview';p.textContent=`World total · ${resource.label}: ${resource.totalMilli/1000} ${resource.unit} on day ${result.tick} (${resource.baselineMilli===null?'not previously a stock resource':`${resource.baselineMilli/1000} without this change`}).`;container.append(p);}
  for(const operation of proposal.operations){const p=document.createElement('p');p.textContent=describeOperation(operation);container.append(p);}
  if(result.totalTiles>result.tiles.length){const note=document.createElement('p');note.textContent=`Showing ${result.tiles.length} of ${result.totalTiles} potentially affected zones.`;container.append(note);}
  for(const tile of result.tiles){

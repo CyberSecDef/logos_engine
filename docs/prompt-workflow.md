@@ -11,7 +11,9 @@ The implemented operations are recurring rainfall, elevation delta, one-time or
 sustained temperature, stopping a sustained temperature source, and a stored
 communication flag. The flag does not yet simulate knowledge exchange. Custom
 numeric definitions and bounded conditional rules are available through
-[world extensibility](world-extensibility.md). New engine mechanics, arbitrary
+[world extensibility](world-extensibility.md), with
+[conserved stock transfers](resource-transfers.md) for local resource sharing.
+New engine mechanics, arbitrary
 rule expressions, and executable world plugins remain future work.
 Models cannot extend application code through this interface.
 

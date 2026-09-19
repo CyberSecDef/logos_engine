@@ -1,4 +1,4 @@
-# Implemented world interface (engine 0.2.0, save schema 2)
+# Implemented world interface (engine 0.3.0, save schema 3)
 
 This describes the running code. [world-interface.md](world-interface.md) remains
 the broader target; it is not a claim that all its capabilities exist yet.
@@ -17,7 +17,7 @@ weight, simultaneously. Water reaching ocean tiles is an explicit accounting
 sink. Existing sediment travels with water; erosion does not yet create it.
 
 Built-in operation kinds are shown below (temperature has two modes). Phase 4a
-also adds [five custom property/rule operations](world-extensibility.md).
+also adds [custom property/rule operations](world-extensibility.md).
 
 ```json
 {
@@ -56,7 +56,7 @@ anchors its absolute temperature to the final elevation, regardless of operation
 order. Each tile tracks `temperatureC` and optional `temperatureAnomalyC`: introduced
 heat/cold relative to the seasonal/elevation climate. Old saves omit the anomaly
 and load as zero without rewriting their checksum. The field is populated on ticks
-or temperature edits. Schema-1 saves are now migrated into schema 2 with empty extension state; see
+or temperature edits. Schema-1 saves are now migrated into schema 3 with empty extension state; see
 [save migration](world-extensibility.md#persistence-and-migration).
 
 Every day, each neighboring pair exchanges anomaly from a simultaneous snapshot:
@@ -84,6 +84,9 @@ by advancing the world and inspecting other zones.
 Custom numeric properties and bounded declarative rules are implemented in
 [Phase 4a](world-extensibility.md). Models need explicit `world` scope to change
 definitions; rule changes must fit both their old and new target scopes.
+
+Stock resources, exact adjacent transfers, recurring sharing rules, formula clamps,
+and daily accounting are documented in [resource transfers](resource-transfers.md).
 
 ## HTTP
 

@@ -23,14 +23,14 @@ export class WorldStore {
   }
   async save(input:World):Promise<void> {
     const world=validateWorld(input), dir=await this.directory(world.id);
-    // Preserve schema 1 before the first schema-2 commit. Reads never rewrite it.
+    // Preserve the prior save format before the first schema-3 commit. Reads never rewrite it.
     try {
       const current=join(dir,'state.json');
       if((await lstat(current)).isSymbolicLink())throw Error('Save cannot be a symlink');
       const source=await readFile(current,'utf8'),old=JSON.parse(source);
-      if(old.world?.schemaVersion===1) {
+      if(old.world?.schemaVersion===1||old.world?.schemaVersion===2) {
         if(stateHash(old.world)!==old.hash)throw Error('Legacy save integrity check failed');
-        const backup=join(dir,'state.v1.backup.json');
+        const backup=join(dir,`state.v${old.world.schemaVersion}.backup.json`);
         const temporary=join(dir,`.legacy-${randomUUID()}.tmp`);
         try {
           const handle=await open(temporary,'wx',0o600);
@@ -39,7 +39,7 @@ export class WorldStore {
             if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;
             if((await lstat(backup)).isSymbolicLink())throw Error('Legacy backup cannot be a symlink');
             const saved=JSON.parse(await readFile(backup,'utf8'));
-            if(saved.world?.schemaVersion!==1||stateHash(saved.world)!==saved.hash)throw Error('Legacy backup integrity check failed');
+            if(saved.world?.schemaVersion!==old.world.schemaVersion||stateHash(saved.world)!==saved.hash)throw Error('Legacy backup integrity check failed');
           }
         }finally{await unlink(temporary).catch(()=>{});}
 

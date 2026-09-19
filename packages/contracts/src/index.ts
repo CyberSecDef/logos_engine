@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { DefinitionsSchema, extensionOperations } from './extensions.js';
+import { DefinitionsSchema, ResourceLedgerSchema, extensionOperations } from './extensions.js';
 
-export const ENGINE_VERSION = '0.2.0';
+export const ENGINE_VERSION = '0.3.0';
 export const Id = z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/);
 const uint = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 export const Vec3 = z.tuple([z.number().finite(), z.number().finite(), z.number().finite()]);
@@ -43,12 +43,12 @@ export const EventSchema = z.object({
   message:z.string(), amount:uint.optional(),
 }).strict();
 export const WorldSchema = z.object({
-  schemaVersion:z.literal(2), engineVersion:z.literal(ENGINE_VERSION), id:Id,
+  schemaVersion:z.literal(3), engineVersion:z.literal(ENGINE_VERSION), id:Id,
   name:z.string().min(1).max(80), seed:z.string().min(1).max(120),
   frequency:z.number().int().min(1).max(26), radiusM:z.literal(100000),
   tick:uint, revision:uint, cells:z.array(CellSchema).min(12).max(6762),
   tiles:z.array(TileSchema).min(12).max(6762), rules:z.array(RuleSchema),
-  definitions:DefinitionsSchema,
+  definitions:DefinitionsSchema,resourceLedger:ResourceLedgerSchema,
   history:z.array(ProposalSchema), events:z.array(EventSchema).max(200),
   accounting:z.object({rainL:uint, evaporationL:uint, oceanDrainL:uint}).strict(),
 }).strict();
@@ -64,16 +64,22 @@ export type Operation = z.infer<typeof OperationSchema>;
 export type WorldEvent = z.infer<typeof EventSchema>;
 export type Vec = z.infer<typeof Vec3>;
 
-// v1 saves are verified before migration. Missing extension state has no gameplay
-// effect; the next normal commit writes v2. Never overwrite the old save on read.
-export const LegacyWorldSchema=WorldSchema.extend({
+// Verify the raw saved envelope before these pure, non-writing migrations.
+export const LegacyV2WorldSchema=WorldSchema.extend({schemaVersion:z.literal(2),engineVersion:z.literal('0.2.0')}).omit({resourceLedger:true});
+export const LegacyWorldSchema=LegacyV2WorldSchema.extend({
  schemaVersion:z.literal(1),engineVersion:z.literal('0.1.0'),
  tiles:z.array(TileSchema.omit({properties:true})).min(12).max(6762),
 }).omit({definitions:true});
 export function migrateWorld(input:unknown):World {
- if(typeof input==='object'&&input!==null&&'schemaVersion' in input&&input.schemaVersion===1) {
-  const old=LegacyWorldSchema.parse(input);
-  return WorldSchema.parse({...old,schemaVersion:2,engineVersion:ENGINE_VERSION,definitions:{fields:[],rules:[]},tiles:old.tiles.map(t=>({...t,properties:{}}))});
+ if(typeof input==='object'&&input!==null&&'schemaVersion' in input) {
+  if(input.schemaVersion===1) {
+   const old=LegacyWorldSchema.parse(input);
+   return WorldSchema.parse({...old,schemaVersion:3,engineVersion:ENGINE_VERSION,definitions:{fields:[],rules:[]},tiles:old.tiles.map(t=>({...t,properties:{}})),resourceLedger:{tick:old.tick,revision:old.revision,entries:[]}});
+  }
+  if(input.schemaVersion===2) {
+   const old=LegacyV2WorldSchema.parse(input);
+   return WorldSchema.parse({...old,schemaVersion:3,engineVersion:ENGINE_VERSION,resourceLedger:{tick:old.tick,revision:old.revision,entries:[]}});
+  }
  }
  return WorldSchema.parse(input);
 }

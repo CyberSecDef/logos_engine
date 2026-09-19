@@ -1,9 +1,10 @@
 # World extensibility: Phase 4a
 
-Status: implemented first Phase 4 milestone. Worlds can define numeric properties
+Status: Phase 4a and the Phase 4b resource-transfer milestone are implemented. Worlds can define numeric properties
 and bounded declarative rules without changing engine/application code during play.
 The remaining Phase 4 work is listed in `DEVELOPMENT.md`; this is not executable
-plugin support, an arbitrary expression language, or a complete resource economy.
+plugin support, an arbitrary expression language, or a complete resource economy. [Conserved stock transfers](resource-transfers.md)
+are now available as a separate primitive.
 
 ## Try soil fertility
 
@@ -62,14 +63,19 @@ Neighbors includes the origin and its adjacent tiles. The cadence runs when the
 world tick is divisible by `everyDays`, not relative to the installation date.
 A disabled rule stays defined but does not run; updating it increments its version.
 
+A definition may declare `quantity: "stock"` to support
+[conserved adjacent transfers](resource-transfers.md); omitted quantity remains
+an index. Stocks require a zero minimum.
+
 All conditions must match. Each compares a read to a numeric value using `lt`,
 `lte`, `eq`, `gte`, or `gt`. Reads have `source` and `sample` (`self` or
-`neighbors-average`). Sources are `temperatureC`, `rainMm`, `waterMm`, `vegetation`,
+`neighbors-average`, `neighbors-min`, or `neighbors-max`). Sources are `temperatureC`, `rainMm`, `waterMm`, `vegetation`,
 `elevationM`, `population`, and `custom` with a required `fieldId`. A neighbor average
 is the arithmetic mean over adjacent tiles, excluding the origin.
 
 Each effect names a custom property, chooses `add` or `set`, and supplies a formula:
-`constant + sum(coefficient × read)`. There is no code execution, recursion, division,
+`constant + sum(coefficient × read)`, with optional `min`/`max` clamps. Transfer
+effects are described in the resource guide. There is no code execution, recursion, division,
 unbounded query, or implicit built-in-state write. Each rule allows at most eight
 conditions, four effects, and eight terms per formula. Worlds allow up to 64 rules
 and 100,000 enabled rule-target evaluations per tick.
@@ -82,7 +88,8 @@ combine, then clamp once to the definition bounds and round to 0.001. Any overla
 conditions or cadences appear disjoint. Disabled rules do not reserve writes.
 References and conflicts are checked at Apply; failure leaves the live world intact.
 
-These are generic numeric effects, not conserved transfers. A neighbor average
+Local add/set effects do not conserve stock; use explicit transfer effects for
+conserved movement. A neighbor average
 can drive a property but does not implement water, pollution, trade, or population
 transport. Those systems remain on the environmental/broader-simulation roadmap.
 
@@ -103,18 +110,20 @@ the operations. This bounded view is not a list of every later consequence.
 
 ## Persistence and migration
 
-Engine version 0.2.0 uses save schema 2. The server checks the original envelope
-hash before accepting/migrating schema-1 saves, initializes empty definitions and
-property records, and validates the result. Loading does not rewrite the file.
-The first normal save preserves the last schema-1 document as
-`worlds/<id>/state.v1.backup.json`, then atomically commits schema 2. Existing
+Engine version 0.3.0 uses save schema 3. The server checks the original envelope
+hash before accepting/migrating schema-1 or schema-2 saves. Version 1 receives empty
+definitions/property records; existing version-2 definitions are preserved.
+Both receive an empty daily resource ledger, then pass full validation. Loading does not rewrite the file.
+The first normal save preserves the previous document as
+`worlds/<id>/state.v1.backup.json` or `state.v2.backup.json`, then atomically commits
+schema 3. Existing
 compatible backups are not overwritten; corrupt backups stop migration writes.
 Read-only migration was verified against the existing local worlds.
 
 Definitions and current rules are embedded in the checksummed `state.json`;
 accepted transactions retain their versioned definitions in history. This is not
 yet the planned separate immutable artifact store, append-only journal, general
-rollback UI, or branches/import/export. Older engine builds cannot load schema 2;
+rollback UI, or branches/import/export. Older engine builds cannot load schema 3;
 keep the backup when moving between versions. Run one writer per world directory.
 
 Executable schemas: `packages/contracts/src/extensions.ts`; evaluator and

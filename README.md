@@ -52,6 +52,8 @@ home network; this milestone has no user login.
 - Versioned custom numeric properties and weather-driven declarative rules, with
   generic inspectors/overlays and safe migration of existing worlds. See the
   [soil-fertility walkthrough](docs/world-extensibility.md).
+- Conserved adjacent stock-resource sharing, capacity limits, formula clamps,
+  and daily resource accounting. Try [mana sharing](docs/resource-transfers.md).
 
 **Still planned:** automatic Cursor CLI launching, texture images, sandboxed world plugins, richer erosion, trade,
 population, conflict, and technology. The communication flag is persisted but
@@ -71,6 +73,7 @@ npm run test:browser   # Chromium: select, preview, apply, step, reload, layouts
 npm run test:dev-cache # Concurrent development servers and stylesheet fallback
 npm run test:prompts   # Prompt UI with a simulated provider; no model charges
 npm run test:extensions # Custom properties/rules through the browser
+npm run test:resources  # Mana transfers, stock totals, and daily balance
 npm run world -- create my-world amber
 npm run world -- step my-world 10
 npm run world -- inspect my-world

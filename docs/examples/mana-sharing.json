@@ -1,0 +1,9 @@
+{
+ "id":"mana-example","worldId":"first-world","expectedRevision":0,
+ "summary":"Create mana stockpiles with 1,000 motes capacity. Give zone 0 120 motes; it shares up to 12 motes total with adjacent zones each day.",
+ "operations":[
+  {"kind":"field-define","tileId":0,"migration":"preserve","definition":{"id":"mana","version":1,"label":"Mana","unit":"motes","description":"An abstract fantasy resource shared locally; not a trade or magic-spell system.","quantity":"stock","min":0,"max":1000,"defaultValue":0}},
+  {"kind":"field-set","tileId":0,"fieldId":"mana","value":120},
+  {"kind":"rule-define","tileId":0,"rule":{"id":"share-mana","version":1,"label":"Share mana","tileId":0,"scope":"tile","enabled":true,"everyDays":1,"conditions":[],"effects":[{"fieldId":"mana","kind":"transfer","destination":"neighbors","value":{"constant":12,"terms":[]}}]}}
+ ]
+}

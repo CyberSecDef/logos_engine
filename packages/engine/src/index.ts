@@ -18,7 +18,7 @@ export function validateWorld(input:unknown):World {
   }
   const commands=new Set<string>();
   for(const p of w.history) {
-    if(p.worldId!==w.id || commands.has(p.id) || p.operations.some(o=>!w.tiles[o.tileId])) throw Error('Invalid command history');
+    if(p.worldId!==w.id || commands.has(p.id) || p.operations.some(o=>!w.tiles[o.tileId]||(o.kind==='field-transfer'&&!w.tiles[o.toTileId]))) throw Error('Invalid command history');
     commands.add(p.id);
   }
   validateExtensions(w);
@@ -50,6 +50,7 @@ export function applyProposal(world:World,input:unknown):World {
       }
     }
     event(next,{tick:next.tick,kind:'intervention',tileId:op.tileId,message:p.summary});
+    if(op.kind==='field-transfer')event(next,{tick:next.tick,kind:'intervention',tileId:op.toTileId,message:p.summary});
   }
   // A combined terrain/temperature proposal is independent of operation order:
   // requested absolute temperature is anchored to the final elevation.

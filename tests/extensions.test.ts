@@ -71,12 +71,12 @@ test('invalid definitions, unknown reads, conflicting writes and invalid values 
 
 test('legacy save migration verifies original hash, preserves disk on read, and backs up on first commit',async()=>{
  const root=await mkdtemp(join(tmpdir(),'logos-migration-')),store=new WorldStore(root),w=make();
- const {definitions:_,...base}=w;
+ const {definitions:_,resourceLedger:__,...base}=w;
  const legacy={...base,schemaVersion:1,engineVersion:'0.1.0',tiles:w.tiles.map(({properties,...tile})=>tile)};
  const dir=join(root,w.id),path=join(dir,'state.json');await mkdir(dir);
  const hash=createHash('sha256').update(JSON.stringify(legacy)).digest('hex'),source=JSON.stringify({hash,world:legacy});await writeFile(path,source);
  try {
-  const migrated=await store.load(w.id);assert.equal(migrated.schemaVersion,2);assert.deepEqual(migrated.definitions,{fields:[],rules:[]});assert.equal(await readFile(path,'utf8'),source);
+  const migrated=await store.load(w.id);assert.equal(migrated.schemaVersion,3);assert.deepEqual(migrated.definitions,{fields:[],rules:[]});assert.equal(await readFile(path,'utf8'),source);
   assert.deepEqual(migrateWorld(migrated),migrated);
   await store.save(advance(migrated));assert.equal(await readFile(join(dir,'state.v1.backup.json'),'utf8'),source);
   assert.equal((await store.load(w.id)).tick,1);
