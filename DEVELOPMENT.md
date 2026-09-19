@@ -9,7 +9,7 @@ before each milestone commit. Never mark unverified functionality complete.
 Temperature interventions are complete, published, and live on the LAN server.
 The Phase 4b resource-transfer milestone is complete and running locally:
 conserved custom resources, daily accounting, formula clamps, and neighbor extrema.
-Publication is the current checkpoint; remaining Phase 4 work is listed below.
+This milestone is published; remaining Phase 4 work is listed below.
 
 ## Completed
 
@@ -482,3 +482,11 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Resource accounting reports net local additions/removals per day, separately
   from gross transfers. Generic sharing remains distinct from economic trade,
   wind/water transport, disease, and population movement.
+
+### 2026-09-19 — Resource-sharing publication checkpoint
+
+- Pushed `36854ca` to public `CyberSecDef/logos_engine` on `main`.
+- Live LAN verification passed: preserved world loads as schema 3, model transfer
+  capabilities are available, and the browser reports no page errors.
+- Reload the game to use mana sharing. No resources or rules were automatically
+  added to user worlds; the guide uses an explicit creator proposal.
