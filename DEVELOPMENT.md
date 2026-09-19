@@ -7,8 +7,9 @@ before each milestone commit. Never mark unverified functionality complete.
 ## Current work
 
 Temperature interventions are complete, published, and live on the LAN server.
-Future pollution/disease planning is documented; no implementation task is active.
-Broader Phase 4 extensibility and Phase 5 environmental/health systems remain pending.
+Phase 4 is in progress. Milestone 4a is complete and live: versioned custom numeric
+properties, bounded declarative rules, save migrations, prompt integration, and
+generic UI. Publication is the final checkpoint; later Phase 4 tasks are listed below.
 
 ## Completed
 
@@ -32,7 +33,7 @@ Broader Phase 4 extensibility and Phase 5 environmental/health systems remain pe
 | 1. Engine foundation | Complete | npm/TypeScript setup; stable spherical topology; seeded worlds; pure ticks; validated declarative interventions; persistence; deterministic/conservation tests; CLI. |
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
-| 4. World extensibility | Pending | Definition migrations; full rule expression language; sandbox feasibility and plugin execution; artwork packs; branches/import/export. |
+| 4. World extensibility | In progress | Definition migrations; full rule expression language; sandbox feasibility and plugin execution; artwork packs; branches/import/export. |
 | 5. Broader simulation | Pending | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
@@ -363,3 +364,71 @@ runoff with sediment conservation, and checksummed storage/path validation.
   are not advertised to the live LLM until supported by the engine.
 - Documentation-only review: checked links, consistency, and whitespace; no runtime
   tests or server restart needed. Preparing the planning commit/push.
+
+### 2026-09-19 — Phase 4 started
+
+- Implementing the first complete extensibility slice: custom numeric fields and
+  deterministic conditional rules, with versioned definitions and explicit updates.
+- Upgrading saves to schema 2 / engine 0.2.0; verify legacy checksums before a pure
+  migration, and defer disk writes to the next normal world commit.
+- Rule expressions are bounded declarative sums/conditions, not JavaScript. They
+  read built-in/custom state and neighbor averages and update custom fields.
+- Asked which fantasy example to use for acceptance; framework work continues.
+- Remaining in this milestone: engine validation/evaluation, model contract/scope,
+  generic inspector/overlays/previews, regression coverage, docs, publication.
+
+### 2026-09-19 — Phase 4a implementation and first verification
+
+- User selected soil fertility with weather effects as the acceptance example.
+  Added a reviewable example transaction: 0–100 points, land +1 on rainy days,
+  land −2 above 40 °C. These are world rules, not hardcoded fertility behavior.
+- Added versioned numeric definitions, explicit preserve/clamp migrations, scoped
+  property edits, bounded conditional/formula rules, and dependency-aware removal.
+- Rules use one snapshot after built-in systems; additive effects combine before
+  clamping, conflicting set/add targets are rejected, and evaluation is bounded.
+- Added world-scope prompt authority, property/rule context, generic inspector and
+  overlays, and previews capped at 24 zones with total affected count disclosed.
+- All 31 tests pass, including legacy-checksum migration and first-write backup,
+  scope enforcement, simultaneous rules, version updates, and soil-fertility replay.
+- Browser and real Claude acceptance checks are next. Plugins, artwork, branching,
+  import/export, and richer rule primitives remain pending Phase 4 work.
+
+### 2026-09-19 — Phase 4a acceptance checks passed
+
+- Soil-fertility browser test passed: world-scope prompt → exact definition/rule
+  review → bounded preview → Apply → property inspector/overlay → tick → reload.
+  Application source hashes remained unchanged throughout the gameplay workflow.
+- Real Claude returned a valid property definition and two daily weather rules;
+  the service validated and previewed them on a temporary world without changing
+  user saves. The model needed no engine/file tools.
+- Both existing saves passed read-only schema-1 → schema-2 migration, with their
+  file contents unchanged. First subsequent commits create a legacy backup.
+- Restarted production on `0.0.0.0:5180` with the same selected world; no user
+  request was active. Completing docs and final regression/publication checks.
+
+## Phase 4 remaining work
+
+- 4a: numeric definitions, conditional rules, explicit field migrations, generic
+  inspector/overlays, model authority — complete.
+- 4b: richer expressions and conserved custom-resource transfers; general
+  definition/entity migrations and immutable artifact/history storage.
+- 4c: isolated world-plugin runtime feasibility, deterministic budgets, staged
+  artifacts, execution and failure recovery. No plugin execution is enabled yet.
+- 4d: forest/city artwork packs and actual texture rendering.
+- 4e: world branches, rollback, and complete world import/export.
+- Pollution/disease transport remains future broader-simulation work; custom
+  numeric fields alone do not implement those physical/population systems.
+
+### 2026-09-19 — Phase 4a complete
+
+- Final typecheck/build passed; all 32 tests pass, including cadence, simultaneous
+  clamping, retired-definition version reuse, legacy saves, and scoped rules.
+- Both prompt/temperature browser regression and the new extensibility browser
+  test pass on the final UI. Screenshots reviewed; custom overlay renders correctly.
+- Real Claude acceptance passed with the soil-fertility property and two rules.
+- Documented the implemented contract and example in `docs/world-extensibility.md`
+  and `docs/examples/soil-fertility.json`; linked setup and interface references.
+- Restarted the final build at `http://192.168.0.10:5180`. Existing worlds retain
+  their state; no fertility rules were automatically installed in user saves.
+- Publishing this first Phase 4 milestone. Remaining Phase 4 work is still pending
+  and is not represented as implemented.

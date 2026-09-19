@@ -1,4 +1,4 @@
-# Implemented world interface (v0.1)
+# Implemented world interface (engine 0.2.0, save schema 2)
 
 This describes the running code. [world-interface.md](world-interface.md) remains
 the broader target; it is not a claim that all its capabilities exist yet.
@@ -16,7 +16,8 @@ in kg. One litre per square metre equals one millimetre. Worlds currently use a
 weight, simultaneously. Water reaching ocean tiles is an explicit accounting
 sink. Existing sediment travels with water; erosion does not yet create it.
 
-Five operation kinds are accepted (temperature has two modes):
+Built-in operation kinds are shown below (temperature has two modes). Phase 4a
+also adds [five custom property/rule operations](world-extensibility.md).
 
 ```json
 {
@@ -55,8 +56,8 @@ anchors its absolute temperature to the final elevation, regardless of operation
 order. Each tile tracks `temperatureC` and optional `temperatureAnomalyC`: introduced
 heat/cold relative to the seasonal/elevation climate. Old saves omit the anomaly
 and load as zero without rewriting their checksum. The field is populated on ticks
-or temperature edits. Schema version 1 remains additive; older application builds
-cannot read saves after new temperature fields/operations are written.
+or temperature edits. Schema-1 saves are now migrated into schema 2 with empty extension state; see
+[save migration](world-extensibility.md#persistence-and-migration).
 
 Every day, each neighboring pair exchanges anomaly from a simultaneous snapshot:
 `0.2 × min(areaA, areaB) / max(degreeA, degreeB) × (anomalyA − anomalyB)`.
@@ -77,6 +78,12 @@ Temperature overlay distinguishes extreme heat/cold, and the five-day preview
 compares temperature, water, and vegetation with an unchanged-world baseline for
 the directly edited tiles and their immediate neighbors. Later spread is visible
 by advancing the world and inspecting other zones.
+
+## World extensibility
+
+Custom numeric properties and bounded declarative rules are implemented in
+[Phase 4a](world-extensibility.md). Models need explicit `world` scope to change
+definitions; rule changes must fit both their old and new target scopes.
 
 ## HTTP
 
@@ -114,8 +121,8 @@ paused. Multiple tabs share one active world; stale commands are rejected.
 
 `worlds/<id>/state.json` is a checksummed self-contained save, replaced atomically
 with file/directory sync. It contains definitions currently represented by the
-schemas, state, rainfall/temperature rules, and accepted transactions. The expanded directory
-layout, append-only journal, checkpoint history, migrations, and plugin artifacts
+schemas, state, rainfall/temperature rules, custom definitions/rules, and accepted transactions. The expanded directory
+layout, append-only journal, checkpoint history, general artifact migrations, and plugin artifacts
 are future milestones. Run one server/writer against a world directory; do not
 run the CLI against a world being edited by the server.
 

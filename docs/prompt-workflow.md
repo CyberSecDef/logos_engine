@@ -9,8 +9,10 @@ receive an explanation or clarification instead of a proposal.
 
 The implemented operations are recurring rainfall, elevation delta, one-time or
 sustained temperature, stopping a sustained temperature source, and a stored
-communication flag. The flag does not yet simulate knowledge exchange. New engine
-mechanics, arbitrary rule expressions, and executable world plugins are future work.
+communication flag. The flag does not yet simulate knowledge exchange. Custom
+numeric definitions and bounded conditional rules are available through
+[world extensibility](world-extensibility.md). New engine mechanics, arbitrary
+rule expressions, and executable world plugins remain future work.
 Models cannot extend application code through this interface.
 
 Example prompts:
@@ -70,16 +72,16 @@ server validation and requires review/Apply for changes.
 
 The packet includes instructions, capabilities, selected tile and neighbors,
 permitted mutation IDs, current revision, recent events, and bounded conversation
-history. Only the selected tile is editable unless neighbors were explicitly
-included. The authoritative request stays on the server; stale or reused imports
+history. Only the selected tile is editable unless neighbors or the entire world were
+explicitly included. Definition changes require entire-world scope. The authoritative request stays on the server; stale or reused imports
 are rejected. Exporting/importing makes no automatic model call.
 
 ## Engine–model contract
 
 `packages/contracts/src/prompts.ts` defines executable request/reply schemas and
 exports the response JSON Schema. A request includes `id`, `worldId`,
-`expectedRevision`, `tileId`, `mode` (`discuss` or `propose`), `scope` (`tile` or
-`neighbors`), and `message`. A reply contains:
+`expectedRevision`, `tileId`, `mode` (`discuss` or `propose`), `scope` (`tile`,
+`neighbors`, or `world`), and `message`. A reply contains:
 
 ```json
 {

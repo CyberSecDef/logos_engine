@@ -1,6 +1,7 @@
 import { WorldGlobe } from './globe.js';
 import { appearance, type Overlay } from '../../../packages/globe/src/appearance.js';
 import type { PromptJob, PromptRequest } from '../../../packages/contracts/src/prompts.js';
+import type { CustomRule, Read } from '../../../packages/contracts/src/extensions.js';
 import type { World, Operation, Proposal } from '../../../packages/contracts/src/index.js';
 // getRandomValues also works on ordinary LAN HTTP, unlike randomUUID.
 function requestId():string {
@@ -27,7 +28,7 @@ async function action(fn:()=>Promise<void>) {
  try {await fn();}catch(e){setPlaying(false);error(e);try{setWorld(await api<World>('world'));}catch{}}
  finally{busy=false;document.body.classList.remove('busy');$<HTMLInputElement>('chat-import').disabled=!!promptJobId;}
 }
-function setWorld(value:World) {const changed=world?.id!==value.id;world=value;if(changed){selected=-1;$('conversation').hidden=true;document.body.classList.remove('chat-open');$('chat-history').replaceChildren();promptState(promptJobId);}globe.setWorld(world);selectTile(selected);text('world-name',world.name);text('day',`DAY ${world.tick}`);text('save-status',`Saved locally · ${fmt(world.tiles.length)} places`);}
+function setWorld(value:World) {const changed=world?.id!==value.id;world=value;if(changed){selected=-1;$('conversation').hidden=true;document.body.classList.remove('chat-open');$('chat-history').replaceChildren();promptState(promptJobId);}updateCustomLayers();globe.setWorld(world);selectTile(selected);text('world-name',world.name);text('day',`DAY ${world.tick}`);text('save-status',`Saved locally · ${fmt(world.tiles.length)} places`);}
 function selectTile(id:number) {
  if(promptJobId&&id!==selected)return;
  const changed=id!==selected;selected=id;globe.select(id);
@@ -40,6 +41,8 @@ function selectTile(id:number) {
  for(const [label,value] of entries){const row=document.createElement('div');row.className='stat';const k=document.createElement('span');k.textContent=label;const v=document.createElement('strong');v.textContent=value;row.append(k,v);container.append(row);}
  for(const rule of world.rules.filter(r=>r.tileId===id)){const p=document.createElement('p');p.className='rule-note';p.textContent=rule.kind==='rainfall'?`Recurring rule: ${rule.mmPerDay} mm of rain / day`:`Sustained temperature: ${rule.celsius} °C`;container.append(p);}
  $<HTMLButtonElement>('temperature-reset').disabled=!!promptJobId||!world.rules.some(r=>r.tileId===id&&r.kind==='temperature');
+ for(const field of world.definitions.fields){const row=document.createElement('div');row.className='stat';row.title=field.description;const label=document.createElement('span'),value=document.createElement('strong');label.textContent=field.label;value.textContent=`${t.properties[field.id]??field.defaultValue} ${field.unit}`;row.append(label,value);container.append(row);}
+ for(const rule of world.definitions.rules.filter(r=>r.scope==='world'||r.tileId===id||(r.scope==='neighbors'&&world.cells[r.tileId].neighbors.includes(id)))){const note=document.createElement('p');note.className='rule-note';note.textContent=`${rule.label} · v${rule.version}${rule.enabled?'':' · paused'}: ${describeRule(rule)}`;container.append(note);}
  const events=world.events.filter(e=>e.tileId===id).slice(-2);for(const e of events){const p=document.createElement('p');p.className='muted';p.textContent=`Day ${e.tick} · ${e.message}`;container.append(p);}
  text('communication-change',t.communication?'Isolate communication':'Restore communication');
 }
@@ -68,19 +71,55 @@ $('cancel-proposal').onclick=()=>{pending=null;$('proposal').hidden=true;$('rain
 $('apply-proposal').onclick=()=>void action(async()=>{if(!pending)return;setWorld(await api<World>('proposals/apply',pending));pending=null;$('proposal').hidden=true;$('rain-change').focus();if(!$('conversation').hidden)await loadChat();});
 $('proposal').addEventListener('keydown',e=>{if(e.key==='Escape')$('cancel-proposal').click();if(e.key==='Tab'){const first=$('cancel-proposal'),last=$('apply-proposal');if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
 const layers:{id:Overlay;label:string;legend:string}[]=[{id:'terrain',label:'Terrain',legend:'Ocean / grassland / forest / alpine'},{id:'water',label:'Water',legend:'Dry land / retained water / flooding above 100 mm'},{id:'rain',label:'Rainfall',legend:'Dark → light · 0–100+ mm per day'},{id:'temperature',label:'Temperature',legend:'Blue: cold · red: warm · darker: extreme temperatures'},{id:'communication',label:'Connections',legend:'Green: connected · amber: isolated'}];
-for(const l of layers){const b=document.createElement('button');b.textContent=l.label;b.classList.toggle('active',l.id==='terrain');b.onclick=()=>{globe.overlay=l.id;globe.update();text('legend',l.legend);for(const x of Array.from($('layer-buttons').children))x.classList.toggle('active',x===b);};$('layer-buttons').append(b);}
+for(const l of layers){const b=document.createElement('button');b.textContent=l.label;b.classList.toggle('active',l.id==='terrain');b.onclick=()=>{globe.overlay=l.id;$<HTMLSelectElement>('custom-layer').value='';globe.update();text('legend',l.legend);for(const x of Array.from($('layer-buttons').children))x.classList.toggle('active',x===b);};$('layer-buttons').append(b);}
 $('worlds-toggle').onclick=()=>void action(async()=>{
  setPlaying(false);$('worlds').hidden=!$('worlds').hidden;if($('worlds').hidden)return;
  const worlds=await api<{id:string;name:string;tick:number}[]>('worlds');$('world-list').replaceChildren();
  for(const w of worlds){const b=document.createElement('button');b.textContent=`${w.name} · day ${w.tick}`;b.onclick=()=>void action(async()=>{setWorld(await api<World>('worlds/open',{id:w.id}));$('worlds').hidden=true;});$('world-list').append(b);}
 });
 $('new-world').onsubmit=e=>{e.preventDefault();void action(async()=>{setWorld(await api<World>('worlds/create',{id:`world-${requestId()}`,name:$<HTMLInputElement>('new-name').value,seed:$<HTMLInputElement>('new-seed').value,frequency:12}));$('worlds').hidden=true;});};
+function describeRead(read:Read):string {const labels={temperatureC:'temperature (°C)',rainMm:'rainfall (mm)',waterMm:'standing water (mm)',vegetation:'vegetation fraction',elevationM:'elevation (m)',population:'population'};return `${read.sample==='neighbors-average'?'neighbor average of ':''}${read.source==='custom'?(world.definitions.fields.find(f=>f.id===read.fieldId)?.label??read.fieldId):labels[read.source]}`;}
+function describeRule(rule:CustomRule):string {
+ const conditions=rule.conditions.map(c=>`${describeRead(c.read)} ${{lt:'<',lte:'≤',eq:'=',gte:'≥',gt:'>'}[c.comparison]} ${c.value}`).join(' and ');
+ const effects=rule.effects.map(e=>`${e.fieldId} ${e.kind==='add'?'+=':'='} ${e.value.constant}${e.value.terms.map(t=>` + (${t.coefficient} × ${describeRead(t.read)})`).join('')}`).join('; ');
+ return `Every ${rule.everyDays} day(s), ${rule.scope==='world'?'all zones':rule.scope==='neighbors'?`zone ${rule.tileId} and neighbors`:`zone ${rule.tileId}`}${conditions?`, when ${conditions}`:''}: ${effects}.`;
+}
+function describeOperation(o:Operation):string {
+ switch(o.kind){
+  case 'rainfall':return `Zone ${o.tileId}: ${o.mmPerDay} mm rain/day`;
+  case 'elevation':return `Zone ${o.tileId}: ${o.deltaM>=0?'+':''}${o.deltaM} m elevation`;
+  case 'temperature':return `Zone ${o.tileId}: ${o.celsius} °C (${o.mode==='pulse'?'one-time event':'sustained'})`;
+  case 'temperature-reset':return `Zone ${o.tileId}: stop sustained temperature; residual heat/cold fades`;
+  case 'communication':return `Zone ${o.tileId}: communication ${o.enabled?'connected':'isolated'}`;
+  case 'field-set':return `Zone ${o.tileId}: ${o.fieldId} = ${o.value}`;
+  case 'field-define':return `World property: ${o.definition.label} (${o.definition.id}) v${o.definition.version}; ${o.definition.min}–${o.definition.max} ${o.definition.unit}; default ${o.definition.defaultValue}. ${o.definition.description} Existing values: ${o.migration==='clamp'?'clamp to new bounds':'preserve, reject if out of bounds'}.`;
+  case 'field-remove':return `Remove ${o.fieldId} and its values from every zone.`;
+  case 'rule-define':return `${o.rule.label} v${o.rule.version}${o.rule.enabled?'':' (paused)'}: ${describeRule(o.rule)}`;
+  case 'rule-remove':return `Remove custom rule ${o.ruleId}; existing property values remain.`;
+ }
+}
+function updateCustomLayers() {
+ const select=$<HTMLSelectElement>('custom-layer');select.replaceChildren();select.hidden=!world.definitions.fields.length;
+ const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='World property overlay…';select.append(placeholder);
+ for(const field of world.definitions.fields){const option=document.createElement('option');option.value=`custom:${field.id}`;option.textContent=field.label;select.append(option);}
+ if(globe.overlay.startsWith('custom:')) {
+  if(world.definitions.fields.some(f=>`custom:${f.id}`===globe.overlay)){select.value=globe.overlay;const f=world.definitions.fields.find(f=>`custom:${f.id}`===globe.overlay)!;text('legend',`${f.label} · ${f.min}–${f.max} ${f.unit}`);}
+  else {globe.overlay='terrain';text('legend','Terrain · ocean / grassland / forest / alpine');}
+ }
+}
+$('custom-layer').onchange=()=>{const value=$<HTMLSelectElement>('custom-layer').value;if(!value)return;globe.overlay=value as Overlay;globe.update();updateCustomLayers();for(const button of Array.from($('layer-buttons').children))button.classList.remove('active');};
 async function reviewProposal(proposal:Proposal) {
- const result=await api<{tick:number;tiles:{id:number;after:World['tiles'][number];baseline:World['tiles'][number];waterMm:number;baselineWaterMm:number}[]}>('proposals/preview',proposal);
+ const result=await api<{tick:number;totalTiles:number;tiles:{properties:{id:string;label:string;unit:string;after:number;baseline:number|null}[];id:number;after:World['tiles'][number];baseline:World['tiles'][number];waterMm:number;baselineWaterMm:number}[]}>('proposals/preview',proposal);
  pending=proposal;text('proposal-summary',proposal.summary);
  const container=$('preview-results');container.replaceChildren();
- const operations=document.createElement('p');operations.textContent=proposal.operations.map(o=>o.kind==='rainfall'?`Zone ${o.tileId}: ${o.mmPerDay} mm rain/day`:o.kind==='elevation'?`Zone ${o.tileId}: ${o.deltaM>=0?'+':''}${o.deltaM} m elevation`:o.kind==='temperature'?`Zone ${o.tileId}: ${o.celsius} °C (${o.mode==='pulse'?'one-time event':'sustained'})`:o.kind==='temperature-reset'?`Zone ${o.tileId}: stop sustained temperature; residual heat/cold fades`:`Zone ${o.tileId}: communication ${o.enabled?'connected':'isolated'}`).join(' · ');container.append(operations);
- for(const tile of result.tiles){if(!proposal.operations.some(o=>o.tileId===tile.id)&&Math.abs(tile.waterMm-tile.baselineWaterMm)<0.1&&Math.abs(tile.after.temperatureC-tile.baseline.temperatureC)<0.05&&Math.abs(tile.after.vegetation-tile.baseline.vegetation)<0.001)continue;const p=document.createElement('p');p.textContent=`Day ${result.tick}, zone ${tile.id}: ${tile.waterMm.toFixed(1)} mm water (${tile.baselineWaterMm.toFixed(1)} mm without this change), ${tile.after.temperatureC.toFixed(1)} °C (${tile.baseline.temperatureC.toFixed(1)} °C without this change), ${Math.round(tile.after.vegetation*100)}% vegetation (${Math.round(tile.baseline.vegetation*100)}% without this change), ${tile.after.elevationM} m elevation.`;container.append(p);}
+ for(const operation of proposal.operations){const p=document.createElement('p');p.textContent=describeOperation(operation);container.append(p);}
+ if(result.totalTiles>result.tiles.length){const note=document.createElement('p');note.textContent=`Showing ${result.tiles.length} of ${result.totalTiles} potentially affected zones.`;container.append(note);}
+ for(const tile of result.tiles){
+  const customChanged=tile.properties.some(f=>f.baseline===null||f.after!==f.baseline);
+  if(!proposal.operations.some(o=>o.tileId===tile.id)&&Math.abs(tile.waterMm-tile.baselineWaterMm)<0.1&&Math.abs(tile.after.temperatureC-tile.baseline.temperatureC)<0.05&&Math.abs(tile.after.vegetation-tile.baseline.vegetation)<0.001&&!customChanged)continue;
+  const p=document.createElement('p');p.textContent=`Day ${result.tick}, zone ${tile.id}: ${tile.waterMm.toFixed(1)} mm water (${tile.baselineWaterMm.toFixed(1)} mm without this change), ${tile.after.temperatureC.toFixed(1)} °C (${tile.baseline.temperatureC.toFixed(1)} °C without this change), ${Math.round(tile.after.vegetation*100)}% vegetation (${Math.round(tile.baseline.vegetation*100)}% without this change), ${tile.after.elevationM} m elevation.`;container.append(p);
+  for(const field of tile.properties){const row=document.createElement('p');row.textContent=`${field.label}: ${field.after} ${field.unit} (${field.baseline===null?'not previously defined':`${field.baseline} ${field.unit} without this change`})`;container.append(row);}
+ }
  $('proposal').hidden=false;$('apply-proposal').focus();
 }
 function promptState(id:string|null) {
@@ -96,7 +135,7 @@ function chatError(e:unknown) {text('chat-error',e instanceof Error?e.message:St
 function chatRequest(mode:'discuss'|'propose'):PromptRequest {
  if(selected<0)throw Error('Select a tile first');
  const message=$<HTMLTextAreaElement>('chat-message').value.trim();if(!message)throw Error('Write a message first');
- return {id:`request-${requestId()}`,worldId:world.id,expectedRevision:world.revision,tileId:selected,mode,scope:$<HTMLSelectElement>('chat-scope').value as 'tile'|'neighbors',message};
+ return {id:`request-${requestId()}`,worldId:world.id,expectedRevision:world.revision,tileId:selected,mode,scope:$<HTMLSelectElement>('chat-scope').value as 'tile'|'neighbors'|'world',message};
 }
 async function loadChat() {
  if(!world||selected<0)return;

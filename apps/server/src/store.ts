@@ -1,7 +1,7 @@
-import { mkdir, open, readFile, rename, realpath, lstat, readdir, unlink } from 'node:fs/promises';
+import { mkdir, open, readFile, rename, realpath, lstat, readdir, unlink, link } from 'node:fs/promises';
 import { resolve, join, dirname } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
-import { Id, type World } from '../../../packages/contracts/src/index.js';
+import { Id, migrateWorld, type World } from '../../../packages/contracts/src/index.js';
 import { validateWorld } from '../../../packages/engine/src/index.js';
 
 export function stateHash(world:World):string {
@@ -23,6 +23,28 @@ export class WorldStore {
   }
   async save(input:World):Promise<void> {
     const world=validateWorld(input), dir=await this.directory(world.id);
+    // Preserve schema 1 before the first schema-2 commit. Reads never rewrite it.
+    try {
+      const current=join(dir,'state.json');
+      if((await lstat(current)).isSymbolicLink())throw Error('Save cannot be a symlink');
+      const source=await readFile(current,'utf8'),old=JSON.parse(source);
+      if(old.world?.schemaVersion===1) {
+        if(stateHash(old.world)!==old.hash)throw Error('Legacy save integrity check failed');
+        const backup=join(dir,'state.v1.backup.json');
+        const temporary=join(dir,`.legacy-${randomUUID()}.tmp`);
+        try {
+          const handle=await open(temporary,'wx',0o600);
+          try{await handle.writeFile(source);await handle.sync();}finally{await handle.close();}
+          try{await link(temporary,backup);}catch(error){
+            if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;
+            if((await lstat(backup)).isSymbolicLink())throw Error('Legacy backup cannot be a symlink');
+            const saved=JSON.parse(await readFile(backup,'utf8'));
+            if(saved.world?.schemaVersion!==1||stateHash(saved.world)!==saved.hash)throw Error('Legacy backup integrity check failed');
+          }
+        }finally{await unlink(temporary).catch(()=>{});}
+
+      }
+    }catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
     const serialized=JSON.stringify({hash:stateHash(world),world});
     const tmp=join(dir,`.state-${randomUUID()}.tmp`);
     const file=await open(tmp,'wx',0o600);
@@ -36,8 +58,9 @@ export class WorldStore {
     const dir=await this.directory(id), file=join(dir,'state.json');
     if((await lstat(file)).isSymbolicLink()) throw Error('Save cannot be a symlink');
     const envelope=JSON.parse(await readFile(file,'utf8'));
-    const world=validateWorld(envelope.world);
-    if(world.id!==id || stateHash(world)!==envelope.hash) throw Error('Save integrity check failed');
+    if(stateHash(envelope.world)!==envelope.hash) throw Error('Save integrity check failed');
+    const world=validateWorld(migrateWorld(envelope.world));
+    if(world.id!==id) throw Error('Save integrity check failed');
     return world;
   }
   async writePrompt(worldId:string,id:string,value:unknown):Promise<void> {

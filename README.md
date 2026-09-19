@@ -49,6 +49,9 @@ home network; this milestone has no user login.
 - Responsive inspector, time controls, world creation, and appearance/UV foundation.
 - Local Claude Code conversations: Discuss, Propose, review, Apply; cancellation
   and saved history; scoped JSON exchange; optional Anthropic API adapter.
+- Versioned custom numeric properties and weather-driven declarative rules, with
+  generic inspectors/overlays and safe migration of existing worlds. See the
+  [soil-fertility walkthrough](docs/world-extensibility.md).
 
 **Still planned:** automatic Cursor CLI launching, texture images, sandboxed world plugins, richer erosion, trade,
 population, conflict, and technology. The communication flag is persisted but
@@ -67,6 +70,7 @@ npm run check          # types, engine/integration tests, production build
 npm run test:browser   # Chromium: select, preview, apply, step, reload, layouts
 npm run test:dev-cache # Concurrent development servers and stylesheet fallback
 npm run test:prompts   # Prompt UI with a simulated provider; no model charges
+npm run test:extensions # Custom properties/rules through the browser
 npm run world -- create my-world amber
 npm run world -- step my-world 10
 npm run world -- inspect my-world

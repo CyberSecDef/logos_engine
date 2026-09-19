@@ -1,8 +1,10 @@
 import { z } from 'zod';
+import { extensionOperations } from './extensions.js';
+import { modelSchema } from './model-schema.js';
 import { Id, OperationSchema, ProposalSchema } from './index.js';
 export const PromptRequestSchema=z.object({
  id:Id,worldId:Id,expectedRevision:z.number().int().nonnegative(),tileId:z.number().int().nonnegative(),
- mode:z.enum(['discuss','propose']),scope:z.enum(['tile','neighbors']).default('tile'),
+ mode:z.enum(['discuss','propose']),scope:z.enum(['tile','neighbors','world']).default('tile'),
  message:z.string().trim().min(1).max(4000),
 }).strict();
 export const ModelReplySchema=z.object({
@@ -26,6 +28,7 @@ export const modelReplyJsonSchema={
   kind:{type:'string',enum:['discussion','proposal','clarification','unsupported']},message:{type:'string'},
   assumptions:{type:'array',items:{type:'string'}},
   operations:{type:'array',items:{anyOf:[
+   ...extensionOperations.map(modelSchema),
    {type:'object',additionalProperties:false,required:['kind','tileId','deltaM'],properties:{kind:{const:'elevation'},tileId:{type:'integer'},deltaM:{type:'integer',minimum:-2000,maximum:2000}}},
    {type:'object',additionalProperties:false,required:['kind','tileId','mmPerDay'],properties:{kind:{const:'rainfall'},tileId:{type:'integer'},mmPerDay:{type:'integer',minimum:0,maximum:500}}},
    {type:'object',additionalProperties:false,required:['kind','tileId','enabled'],properties:{kind:{const:'communication'},tileId:{type:'integer'},enabled:{type:'boolean'}}},

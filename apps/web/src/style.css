@@ -12,3 +12,5 @@ button:disabled{cursor:wait;opacity:.45;pointer-events:none}textarea{font:inheri
 .chat-heading{position:sticky;top:-22px;z-index:2;background:#132228;padding:8px 0}textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
 #temperature-mode{display:block;width:100%;margin-top:8px;padding:8px;background:#101d23;color:inherit;border:1px solid var(--line);border-radius:5px;font-size:10px}#proposal{max-height:calc(100dvh - 24px);overflow:auto}
+
+#custom-layer{width:100%;margin-top:10px;background:#101d23;color:inherit;border:1px solid var(--line);border-radius:5px;padding:8px;font-size:11px}.rule-note{overflow-wrap:anywhere}

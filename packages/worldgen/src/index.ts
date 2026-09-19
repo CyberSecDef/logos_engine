@@ -34,8 +34,8 @@ export function createWorld(input:unknown):World {
     return {id:cell.id,elevationM,waterL:0,sedimentKg:0,rainMm:0,
       temperatureC:Math.round(28-Math.abs(cell.center[1])*45-Math.max(elevationM,0)*0.005),
       vegetation:elevationM>0 ? Math.round((0.25+random(options.seed,'forest',cell.id)*0.6)*100)/100:0,
-      population:0, communication:true};
+      population:0, communication:true,properties:{}};
   });
-  return {schemaVersion:1,engineVersion:ENGINE_VERSION,...options,radiusM:100000,tick:0,revision:0,cells,tiles,
-    rules:[],history:[],events:[],accounting:{rainL:0,evaporationL:0,oceanDrainL:0}};
+  return {schemaVersion:2,engineVersion:ENGINE_VERSION,...options,radiusM:100000,tick:0,revision:0,cells,tiles,
+    rules:[],definitions:{fields:[],rules:[]},history:[],events:[],accounting:{rainL:0,evaporationL:0,oceanDrainL:0}};
 }

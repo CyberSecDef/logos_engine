@@ -1,0 +1,44 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import {mkdtemp,rm,readFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createHash} from 'node:crypto';
+import {startServer} from '../dist/apps/server/src/index.js';
+import {WorldStore} from '../dist/apps/server/src/store.js';
+import {createWorld} from '../dist/packages/worldgen/src/index.js';
+const root=await mkdtemp(join(tmpdir(),'logos-ext-browser-'));
+const example=JSON.parse(await readFile('docs/examples/soil-fertility.json','utf8'));
+const files=['packages/engine/src/index.ts','packages/engine/src/extensions.ts','apps/web/src/main.ts'];
+const hashes=async()=>Promise.all(files.map(async path=>createHash('sha256').update(await readFile(path)).digest('hex')));
+const before=await hashes();let calls=0;
+await new WorldStore(root).save(createWorld({id:'first-world',name:'Fertility test',seed:'fertility',frequency:2}));
+const app=await startServer({root,port:0,provider:{name:'Rule test provider',async generate(context){
+ calls++;assert.equal(context.scope,'world');
+ return {kind:'proposal',message:example.summary,assumptions:[],operations:example.operations.map(op=>({...op,tileId:context.selectedTileId,...(op.kind==='rule-define'?{rule:{...op.rule,tileId:context.selectedTileId}}:{})}))};
+}}});
+const base=`http://127.0.0.1:${app.server.address().port}`;
+const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+try {
+ const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base);await page.waitForFunction(()=>document.querySelector('#save-status')?.textContent?.includes('Saved locally'));
+ await page.locator('#globe').focus();await page.keyboard.press('ArrowRight');await page.locator('#chat-open').click();
+ await page.locator('#chat-scope').selectOption('world');await page.locator('#chat-message').fill('Add soil fertility with rain replenishment and heat depletion.');await page.locator('#chat-propose').click();
+ await page.getByRole('button',{name:'Review five-day preview'}).waitFor();await page.locator('#chat-progress').waitFor({state:'hidden'});
+ await page.getByRole('button',{name:'Review five-day preview'}).click();await page.locator('#proposal').waitFor({state:'visible'});
+ assert.match(await page.locator('#preview-results').textContent(),/World property: Soil fertility/);
+ assert.match(await page.locator('#preview-results').textContent(),/Showing 24 of 42/);
+ assert.match(await page.locator('#preview-results').textContent(),/not previously defined/);
+ await page.screenshot({path:'.local/screenshots/extensions-preview.png'});
+ await page.locator('#apply-proposal').click();await page.locator('#proposal').waitFor({state:'hidden'});await page.locator('#chat-close').click();
+ assert.match(await page.locator('#tile-details').textContent(),/Soil fertility/);assert.match(await page.locator('#tile-details').textContent(),/Rain replenishes soil/);
+ await page.locator('#custom-layer').selectOption('custom:soil-fertility');await page.locator('#step').click();await page.waitForFunction(()=>document.querySelector('#day')?.textContent==='DAY 1');assert.equal(calls,1);
+ await page.screenshot({path:'.local/screenshots/extensions-desktop.png'});
+ await page.reload();await page.waitForFunction(()=>document.querySelector('#day')?.textContent==='DAY 1');
+ await page.locator('#globe').focus();await page.keyboard.press('ArrowRight');assert.match(await page.locator('#tile-details').textContent(),/Soil fertility/);
+ await page.locator('#custom-layer').selectOption('custom:soil-fertility');await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:'.local/screenshots/extensions-mobile.png'});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ assert.deepEqual(errors,[]);assert.equal(calls,1);assert.deepEqual(await hashes(),before);
+ const saved=await new WorldStore(root).load('first-world');assert.equal(saved.definitions.fields.length,1);assert.equal(saved.definitions.rules.length,2);
+ console.log('Extensibility browser passed: world-scope prompt, full definition review, bounded preview, property/rule inspector, overlay, tick/reload, unchanged application sources.');
+}finally{await browser.close();await app.close();await rm(root,{recursive:true,force:true});}

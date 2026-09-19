@@ -7,6 +7,7 @@ import { ClaudeCodeProvider } from '../../../packages/agent-bridge/src/claude.js
 import { AnthropicProvider } from '../../../packages/agent-bridge/src/anthropic.js';
 import { advance, applyProposal, depthMm } from '../../../packages/engine/src/index.js';
 import { WorldStore } from './store.js';
+import { ruleTargets, fieldValue } from '../../../packages/engine/src/extensions.js';
 
 export function configuredProvider():ModelProvider {
  const name=process.env.LLM_PROVIDER??'claude-code';
@@ -63,8 +64,16 @@ export class PromptService {
  private accept(world:World,job:PromptJob,raw:unknown) {
   const reply=ModelReplySchema.parse(raw);
   if(job.request.mode==='discuss'&&(reply.kind==='proposal'||reply.operations.length))throw Error('Discuss cannot produce executable changes. Use Propose change.');
-  const ids=job.request.scope==='neighbors'?[job.request.tileId,...world.cells[job.request.tileId].neighbors]:[job.request.tileId];
+  const ids=job.request.scope==='world'?world.tiles.map(t=>t.id):job.request.scope==='neighbors'?[job.request.tileId,...world.cells[job.request.tileId].neighbors]:[job.request.tileId];
   if(reply.operations.some(op=>!ids.includes(op.tileId)))throw Error('Model attempted to edit outside the selected scope');
+  for(const op of reply.operations) {
+   if((op.kind==='field-define'||op.kind==='field-remove')&&job.request.scope!=='world')throw Error('Property definitions require Entire world scope');
+   if(op.kind==='rule-define'||op.kind==='rule-remove') {
+    const old=world.definitions.rules.find(r=>r.id===(op.kind==='rule-define'?op.rule.id:op.ruleId));
+    if(old&&ruleTargets(world,old).some(id=>!ids.includes(id)))throw Error('Existing rule affects tiles outside the selected scope');
+    if(op.kind==='rule-define'&&ruleTargets(world,op.rule).some(id=>!ids.includes(id)))throw Error('Rule affects tiles outside the selected scope');
+   }
+  }
   if(reply.kind==='proposal') {
    const proposal:Proposal={id:`prompt-${randomUUID()}`,worldId:world.id,expectedRevision:world.revision,summary:reply.message.slice(0,500),operations:reply.operations};
    applyProposal(world,proposal); // Validate every effect atomically; discard the resulting copy.
@@ -106,5 +115,16 @@ export function forecast(world:World,proposal:Proposal) {
  let baseline=structuredClone(world),candidate=applyProposal(world,proposal);
  for(let i=0;i<5;i++){baseline=advance(baseline);candidate=advance(candidate);}
  const ids=new Set(proposal.operations.flatMap(o=>[o.tileId,...world.cells[o.tileId].neighbors]));
- return {tick:candidate.tick,tiles:[...ids].map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id)})),events:candidate.events.slice(-12)};
+ for(const op of proposal.operations) {
+  if(op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
+  if(op.kind==='rule-define')for(const id of ruleTargets(world,op.rule))ids.add(id);
+  if(op.kind==='rule-define'||op.kind==='rule-remove') {
+   const old=world.definitions.rules.find(r=>r.id===(op.kind==='rule-define'?op.rule.id:op.ruleId));
+   if(old)for(const id of ruleTargets(world,old))ids.add(id);
+  }
+ }
+ // A global definition/rule can affect every tile; preview stays bounded while
+ // reporting its full affected count. Selected neighborhoods remain first.
+ const totalTiles=ids.size,shown=[...ids].slice(0,24);
+ return {tick:candidate.tick,totalTiles,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
 }
