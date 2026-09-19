@@ -6,9 +6,10 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phases 1 and 2 are complete, verified, committed, and pushed. Home-network access is implemented and verified; the development server is
-running on `0.0.0.0:5180`. Next: Phase 3 user-initiated model discussion/proposals
-and staged local-agent adapters.
+Phases 1 and 2 and home-network access are complete. The production application
+is running on `0.0.0.0:5180`; the Vite 504 loading failure is fixed and verified.
+Next: Phase 3 user-initiated model discussion/proposals and staged local-agent
+adapters.
 
 ## Completed
 
@@ -189,3 +190,27 @@ runoff with sediment conservation, and checksummed storage/path validation.
   DNS hosts. It uses Node HTTP to preserve the explicit Host header in the test.
 - Started `npm run dev` on all IPv4 interfaces at port 5180 and left it running
   for the user's remote access. Preparing the network-access commit and push.
+
+### 2026-09-19 — Investigating unstyled page / Vite 504
+
+- Reproduced the reported `three.js?v=0f9b3de1` request returning 504, while the
+  live transformed module still advertised that URL. Its optimizer cache files
+  are absent on disk; this is a server-side failure, not a browser styling setting.
+- Development and test Vite instances currently share the default cache directory.
+  Isolating each server's cache to prevent cross-instance invalidation, moving
+  CSS loading into HTML, and switching the served game to the production build.
+
+### 2026-09-19 — Vite 504 fix verified
+
+- Each development server now owns a temporary optimizer cache. Close/startup
+  failure cleans up only that server's cache; tests cannot replace live deps.
+- Stylesheet moved to an HTML link so styles load even if JS modules fail.
+- Switched the live server to `npm start` with built assets; updated README to
+  use this stable serving mode by default. Saves were preserved.
+- Production build passed. Live LAN Chromium check confirmed CSS, globe, world
+  loading, and zero failed HTTP requests or JavaScript errors.
+- Added `npm run test:dev-cache`: two simultaneous Vite servers get distinct
+  dependency paths; Three.js stays available after the other server closes;
+  reload succeeds; CSS still loads with application JavaScript blocked. Passed.
+- All seven engine/HTTP tests passed. Fix and regression test ready for the
+  milestone commit/push; the production server remains available on port 5180.

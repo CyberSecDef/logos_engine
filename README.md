@@ -10,17 +10,21 @@ Requires Node.js 22.12+ and npm.
 
 ```sh
 npm install
-npm run dev
+npm run build
+npm start
 ```
 
 The server binds to **0.0.0.0:5180**. From another machine, open
 **http://<server-ip>:5180** using the Network URL printed at startup. On the server
-itself, http://localhost:5180 also works. For a production build:
+itself, http://localhost:5180 also works. This serves the built application
+without a development dependency cache. While editing application code, use:
 
 ```sh
-npm run build
-npm start
+npm run dev
 ```
+
+Development/test servers use separate temporary Vite dependency caches, cleaned
+up when each server stops.
 
 Select a tile, inspect its conditions, preview a rainfall/elevation/communication
 change, then Apply. Use **+1 day** or **Let time flow** to observe consequences.
@@ -52,6 +56,7 @@ knowledge exchange is not simulated yet. This is an early playable foundation.
 ```sh
 npm run check          # types, engine/integration tests, production build
 npm run test:browser   # Chromium: select, preview, apply, step, reload, layouts
+npm run test:dev-cache # Concurrent development servers and stylesheet fallback
 npm run world -- create my-world amber
 npm run world -- step my-world 10
 npm run world -- inspect my-world

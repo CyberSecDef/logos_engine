@@ -1,4 +1,3 @@
-import './style.css';
 import { WorldGlobe } from './globe.js';
 import { appearance, type Overlay } from '../../../packages/globe/src/appearance.js';
 import type { World, Operation, Proposal } from '../../../packages/contracts/src/index.js';
