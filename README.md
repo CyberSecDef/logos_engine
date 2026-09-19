@@ -34,7 +34,7 @@ arrows to select tiles. The Worlds panel creates and opens seeded worlds.
 The game starts paused, pauses when its tab is hidden, and never catches up on
 offline time. Saves are automatic under `worlds/<id>/state.json` and excluded
 from Git. Run only one writer per world directory. Optional `.env` can set `HOST` (default `0.0.0.0`) and `PORT`;
-no provider credentials are needed for this milestone. For a custom DNS name,
+no provider credentials are needed for simulation or manual creator controls. For a custom DNS name,
 set `ALLOWED_HOSTS=logos.example.lan`. Network access is intended for your trusted
 home network; this milestone has no user login.
 
@@ -45,18 +45,26 @@ home network; this milestone has no user login.
   vegetation response, with explicit water accounting.
 - Validated creator transactions, five-day previews, saved rules, and reload.
 - Responsive inspector, time controls, world creation, and appearance/UV foundation.
+- Local Claude Code conversations: Discuss, Propose, review, Apply; cancellation
+  and saved history; scoped JSON exchange; optional Anthropic API adapter.
 
-**Still planned:** LLM discussion and proposals, Cursor/Claude Code workflows,
-API adapters, texture images, sandboxed world plugins, richer erosion, trade,
+**Still planned:** automatic Cursor CLI launching, texture images, sandboxed world plugins, richer erosion, trade,
 population, conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 
 ## Verify and use the CLI
 
+For prompts, install Claude Code and Linux `bubblewrap`, and run `claude auth login`
+as the user running the server. Select a tile → **Talk about this place**. Discuss
+changes nothing; Propose creates a change to review before Apply. Time stays paused
+while the conversation is open. See [prompt setup and exchange](docs/prompt-workflow.md)
+for `.env` configuration, isolation details, and Cursor/manual workflows.
+
 ```sh
 npm run check          # types, engine/integration tests, production build
 npm run test:browser   # Chromium: select, preview, apply, step, reload, layouts
 npm run test:dev-cache # Concurrent development servers and stylesheet fallback
+npm run test:prompts   # Prompt UI with a simulated provider; no model charges
 npm run world -- create my-world amber
 npm run world -- step my-world 10
 npm run world -- inspect my-world

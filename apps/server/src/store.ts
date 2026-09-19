@@ -40,6 +40,30 @@ export class WorldStore {
     if(world.id!==id || stateHash(world)!==envelope.hash) throw Error('Save integrity check failed');
     return world;
   }
+  async writePrompt(worldId:string,id:string,value:unknown):Promise<void> {
+    Id.parse(id);const dir=join(await this.directory(worldId),'conversations');
+    await mkdir(dir,{recursive:true});
+    if((await lstat(dir)).isSymbolicLink())throw Error('Conversation directory cannot be a symlink');
+    const target=join(dir,`${id}.json`),tmp=join(dir,`.${randomUUID()}.tmp`);
+    const handle=await open(tmp,'wx',0o600);
+    try {await handle.writeFile(JSON.stringify(value));await handle.sync();}finally{await handle.close();}
+    try {await rename(tmp,target);}catch(error){await unlink(tmp).catch(()=>{});throw error;}
+  }
+  async readPrompt(worldId:string,id:string):Promise<unknown> {
+    Id.parse(id);const dir=join(await this.directory(worldId),'conversations');
+    if((await lstat(dir)).isSymbolicLink())throw Error('Conversation directory cannot be a symlink');
+    const file=join(dir,`${id}.json`);const stat=await lstat(file);
+    if(!stat.isFile()||stat.isSymbolicLink()||stat.size>128000)throw Error('Invalid conversation file');
+    return JSON.parse(await readFile(file,'utf8'));
+  }
+  async listPrompts(worldId:string):Promise<unknown[]> {
+    const dir=join(await this.directory(worldId),'conversations');
+    try {if((await lstat(dir)).isSymbolicLink())throw Error('Conversation directory cannot be a symlink');}
+    catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return [];throw error;}
+    const files=(await readdir(dir)).filter(f=>f.endsWith('.json')&&Id.safeParse(f.slice(0,-5)).success);
+    const jobs=[];for(const file of files)jobs.push(await this.readPrompt(worldId,file.slice(0,-5)));
+    return jobs;
+  }
   async list():Promise<{id:string; name:string; tick:number}[]> {
     await mkdir(this.root,{recursive:true});
     const results=[];

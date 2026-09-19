@@ -1,0 +1,43 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';import {join} from 'node:path';
+import {startServer} from '../dist/apps/server/src/index.js';
+const root=await mkdtemp(join(tmpdir(),'logos-prompt-browser-'));let calls=0;
+const provider={name:'Browser test provider',async generate(context,signal){
+ calls++;
+ if(context.message.includes('slow'))await new Promise((_r,reject)=>signal.addEventListener('abort',()=>reject(Error('cancelled')),{once:true}));
+ if(context.message.includes('dragon'))return {kind:'unsupported',message:'Dragons are not supported by this engine yet.',assumptions:[],operations:[]};
+ if(context.mode==='discuss')return {kind:'discussion',message:'More rain can increase runoff into lower neighbors. This discussion changes nothing.',assumptions:[],operations:[]};
+ return {kind:'proposal',message:'Set daily rainfall to 80 mm on the selected tile.',assumptions:[],operations:[{kind:'rainfall',tileId:context.selectedTileId,mmPerDay:80}]};
+}};
+const app=await startServer({root,port:0,provider});
+const base=`http://127.0.0.1:${app.server.address().port}`;
+const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+try {
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base);await page.waitForFunction(()=>document.querySelector('#save-status')?.textContent?.includes('Saved locally'));assert.equal(calls,0);
+ await page.locator('#globe').focus();await page.keyboard.press('ArrowRight');await page.locator('#chat-open').click();
+ await page.locator('#chat-message').fill('What happens with more rain?');await page.locator('#chat-discuss').click();
+ await page.getByText('More rain can increase runoff into lower neighbors. This discussion changes nothing.').waitFor();
+ await page.locator('#chat-progress').waitFor({state:'hidden'});assert.equal(await page.locator('#day').textContent(),'DAY 0');assert.equal(calls,1);
+ assert.equal(await page.locator('#chat-history button').count(),0);
+ await page.locator('#chat-message').fill('Set rainfall to 80 mm daily.');await page.locator('#chat-propose').click();
+ await page.getByRole('button',{name:'Review five-day preview'}).waitFor();await page.locator('#chat-progress').waitFor({state:'hidden'});
+ await page.getByRole('button',{name:'Review five-day preview'}).click();await page.locator('#proposal').waitFor({state:'visible'});
+ assert.ok((await page.locator('#preview-results').textContent()).includes('without this change'));
+ await page.locator('#apply-proposal').click();await page.locator('#proposal').waitFor({state:'hidden'});
+ await page.getByText('Applied to this world.',{exact:true}).waitFor();assert.equal(await page.locator('#day').textContent(),'DAY 0');assert.equal(calls,2);
+ await page.locator('#chat-message').fill('Create a dragon');await page.locator('#chat-propose').click();await page.getByText('Dragons are not supported by this engine yet.').waitFor();await page.locator('#chat-progress').waitFor({state:'hidden'});
+ await page.locator('#chat-message').fill('slow discussion');await page.locator('#chat-discuss').click();await page.locator('#chat-progress').waitFor({state:'visible'});await page.locator('#chat-cancel').click();await page.locator('#chat-progress').waitFor({state:'hidden'});assert.equal(calls,4);
+ await page.locator('#chat-message').fill('External discussion');await page.locator('.external-exchange summary').click();
+ const download=page.waitForEvent('download');await page.locator('#chat-export').click();await download;const requestId=await page.locator('#external-request').inputValue();assert.ok(requestId);
+ await page.waitForFunction(()=>!document.querySelector('#chat-import').disabled);
+ await page.locator('#chat-import').setInputFiles({name:'reply.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({kind:'discussion',message:'An imported response for this tile.',assumptions:[],operations:[]}))});
+ await page.getByText('An imported response for this tile.').waitFor();assert.equal(calls,4);
+ await page.screenshot({path:'.local/screenshots/prompt-desktop.png'});
+ await page.setViewportSize({width:390,height:844});await page.screenshot({path:'.local/screenshots/prompt-mobile.png'});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ await page.locator('#chat-close').click();await page.locator('#step').click();await page.waitForFunction(()=>document.querySelector('#day')?.textContent==='DAY 1');assert.equal(calls,4);
+ await page.reload();await page.waitForFunction(()=>document.querySelector('#save-status')?.textContent?.includes('Saved locally'));await page.locator('#globe').focus();await page.keyboard.press('ArrowRight');await page.locator('#chat-open').click();await page.getByText('An imported response for this tile.').waitFor();assert.equal(calls,4);
+ assert.deepEqual(errors,[]);console.log('Prompt browser passed: discuss/propose/review/apply, unsupported, cancel, external exchange, persistence, no autonomous calls, desktop/mobile.');
+}finally{await browser.close();await app.close();await rm(root,{recursive:true,force:true});}

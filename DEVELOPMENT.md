@@ -6,16 +6,16 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phases 1 and 2 and home-network access are complete. The production application
-is running on `0.0.0.0:5180`; the Vite 504 loading failure is fixed and verified.
-Next: Phase 3 user-initiated model discussion/proposals and staged local-agent
-adapters.
+Phase 3 is complete and running on the LAN server. Milestone publication is the
+final checkpoint. Next development phase: world extensibility and declarative rules.
 
 ## Completed
 
 - Phase 1: deterministic engine, validated edits, persistence, CLI, five tests.
 - Phase 2: playable local globe, inspection, overlays, world picker, time controls,
   preview/apply, appearance foundation, and two additional integration tests.
+- Phase 3: validated prompt workflow, native-login Claude adapter, optional API
+  adapter, manual agent exchange, saved conversations, and 18 passing tests.
 - Public GitHub repository created; Phases 1 and 2 pushed.
 
 - Reviewed the reference globe source and documented the product decisions.
@@ -30,7 +30,7 @@ adapters.
 | 0. Planning and tracking | Complete | Product plan, interface proposal, this living log. |
 | 1. Engine foundation | Complete | npm/TypeScript setup; stable spherical topology; seeded worlds; pure ticks; validated declarative interventions; persistence; deterministic/conservation tests; CLI. |
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
-| 3. Prompt workflow | Pending | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
+| 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Pending | Definition migrations; full rule expression language; sandbox feasibility and plugin execution; artwork packs; branches/import/export. |
 | 5. Broader simulation | Pending | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
@@ -138,12 +138,10 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 ## Next tasks
 
-1. Define and publish machine-readable capabilities for the implemented proposal
-   schema; add read-only Discuss and user-reviewed Propose flows.
-2. Choose the first API adapter and verify local Claude Code/Cursor transports;
-   keep credentials server-side and calls tied to explicit user requests.
-3. Implement isolated staging/import before enabling local agents to author world
-   artifacts. Investigate sandbox runtime limits before enabling world plugins.
+1. Phase 4: design definition migrations and the declarative rule expression language.
+2. Investigate sandbox runtime limits before enabling executable world plugins.
+3. Expand the current validated JSON exchange to staged world artifacts; automatic
+   Cursor launching and Bun compatibility remain unverified.
 4. Add actual forest/city artwork packs and texture rendering; the catalog/UV
    foundation currently falls back to solid colors for all tiles.
 5. Expand the simulation with tested erosion, food/trade, and knowledge transfer.
@@ -214,3 +212,70 @@ runoff with sediment conservation, and checksummed storage/path validation.
   reload succeeds; CSS still loads with application JavaScript blocked. Passed.
 - All seven engine/HTTP tests passed. Fix and regression test ready for the
   milestone commit/push; the production server remains available on port 5180.
+
+### 2026-09-19 — Phase 3 started
+
+- Asked which initial model connection to prioritize; continuing the shared
+  workflow while that preference is pending.
+- Confirmed local Claude Code CLI 2.1.273 is installed. Cursor/agent and Bun
+  commands are not on PATH. Inspecting CLI capabilities without making model calls.
+- Building explicit Discuss and Propose requests, bounded tile/neighborhood
+  context, server-assigned proposal IDs/revisions, validation, and review/apply.
+- Provider activity will be asynchronous/cancellable and only user-triggered;
+  simulation ticks and previews will never invoke models.
+
+### 2026-09-19 — Phase 3 provider selected and workflow implemented
+
+- User selected local Claude Code with the existing login as the first provider.
+- Verified bubblewrap can run on this host. Adapter masks host home directories,
+  exposes only a private scratch home/workspace for writing, disables Claude
+  tools/hooks/MCP/skills, and copies login credentials privately for each request.
+  Neither credentials nor provider diagnostic output are sent to the browser.
+- Added bounded context/capability contracts, cancellable asynchronous jobs,
+  saved per-world conversations, strict scope/revision checks, and an explicit
+  external JSON exchange for Cursor/other local sessions.
+- Added Discuss/Propose UI, per-request scope, history, manual export/import, and
+  five-day previews compared with an unchanged-world baseline.
+- Typecheck passed. Beginning real Claude smoke verification and tests for no
+  mutation during discussion, cancellation, invalid/out-of-scope output, stale
+  imports, duplicate IDs, and no calls during ordinary simulation.
+
+### 2026-09-19 — Phase 3 verification and authentication correction
+
+- Real sandboxed Claude discussion succeeded in about ten seconds with zero
+  operations. Fixed DNS inside the sandbox by preserving the host resolver file.
+- Browser prompt smoke passed Discuss, Propose, preview/Apply, unsupported replies,
+  cancellation, external export/import, reload persistence, and desktop/mobile.
+- Found and fixed an import busy-state race and a cancellation status race:
+  completion is now reported only after its conversation record is persisted.
+- The initial credential-copy approach allowed a refreshed OAuth token to remain
+  in disposable scratch storage, apparently leaving the host login out of sync.
+  Replaced it with Claude's native credential store for normal refresh behavior;
+  tools/hooks/MCP remain disabled and the engine repository remains hidden.
+- Asked the user to renew `claude auth login` once. Final live proposal verification
+  is pending renewed authentication; simulated provider tests continue independently.
+- Default providers: local Claude Code, or optional Anthropic API via `.env`.
+  Cursor/other applications use explicit context export and validated reply import;
+  automatic Cursor CLI launching is not claimed as implemented.
+
+### 2026-09-19 — Phase 3 live login verified
+
+- User renewed Claude login. The final native-store adapter returned a real valid
+  proposal in 8.8 seconds: rainfall exactly 80 mm/day on one selected tile.
+  Engine validation succeeded and the source world remained unchanged.
+- `npm run check` passed: typecheck, all 18 tests, and production build. The
+  existing Three.js bundle-size warning remains a later optimization task.
+- Documented prompt setup, current contracts, native-login sandbox exception,
+  manual Cursor exchange, and optional API configuration. The API adapter has
+  mocked HTTP coverage; no live paid API request was made.
+- Final browser regressions and publication are in progress.
+
+### 2026-09-19 — Phase 3 complete
+
+- Final prompt browser smoke passed: discussion, proposal preview/Apply, unsupported
+  replies, cancellation, external exchange, persistence, and desktop/mobile layouts.
+- Existing gameplay browser regression passed using LAN access, with no page errors.
+- Restarted the production server at `http://192.168.0.10:5180`, preserving saves.
+  A read-only live browser check confirmed the globe and Claude Code prompt panel
+  load without JavaScript errors. No live saved-world edits were made by checks.
+- Preparing the Phase 3 milestone commit and public GitHub push.

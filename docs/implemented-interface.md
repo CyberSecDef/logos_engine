@@ -55,9 +55,18 @@ all other API routes require `Authorization: Bearer <token>`.
 | POST `/api/step` | `{expectedRevision, days?}`; 1–10 days, default 1. |
 | POST `/api/proposals/preview` | Proposal envelope; five-day copied-state forecast. |
 | POST `/api/proposals/apply` | Proposal envelope; commits without advancing time. |
+| GET `/api/prompts/config` | Provider name, capabilities, timeout. |
+| GET `/api/prompts/history` | Latest 40 conversation records for the active world. |
+| GET `/api/prompts/jobs/:id` | Request status and validated response. |
+| POST `/api/prompts` | Explicit Discuss/Propose request; returns 202 with a job. |
+| POST `/api/prompts/cancel` | `{id}`; cancels the active request. |
+| POST `/api/prompts/export` | Prompt request; exports scoped context without a model call. |
+| POST `/api/prompts/import` | `{requestId, reply}`; validates an external response. |
 
 The browser sends one step at a time while playing and visible. There is no
-server simulation timer, offline catch-up, model call, or autonomous agent.
+server simulation timer, offline catch-up, or autonomous agent. Model calls occur
+only on explicit prompt requests. An active request blocks world mutations and
+world switching until cancellation or completion; polling never calls a model.
 A tick already accepted when a tab closes may finish and save. Reopening starts
 paused. Multiple tabs share one active world; stale commands are rejected.
 
@@ -70,9 +79,11 @@ layout, append-only journal, checkpoint history, migrations, and plugin artifact
 are future milestones. Run one server/writer against a world directory; do not
 run the CLI against a world being edited by the server.
 
-There are no model adapters or executable plugins yet. Do not point a local
-coding agent at the live engine repository as a gameplay integration. The future
-staged interface must be implemented before advertising isolated agent edits.
+Local Claude Code and optional Anthropic API adapters implement the
+[prompt workflow](prompt-workflow.md). Conversations are separate atomic JSON
+records at `worlds/<id>/conversations/<requestId>.json`. These are not an event
+journal. Executable world plugins remain pending. External agents receive scoped
+JSON packets and return responses for validation; they do not need repository access.
 
 Appearance has a catalog and tile-top UVs for hexagons and pentagons. Image IDs
 are reserved after birth but the renderer still uses colors for every tile.

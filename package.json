@@ -19,7 +19,8 @@
     "world": "tsc && node dist/apps/server/src/cli.js",
     "check": "npm run typecheck && npm test && npm run build",
     "test:browser": "npm run build && node tests/browser.mjs",
-    "test:dev-cache": "tsc && node tests/dev-cache.mjs"
+    "test:dev-cache": "tsc && node tests/dev-cache.mjs",
+    "test:prompts": "npm run build && node tests/prompt-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",

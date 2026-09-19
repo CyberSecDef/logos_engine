@@ -7,13 +7,16 @@ import { hostname, networkInterfaces, tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { createWorld } from '../../../packages/worldgen/src/index.js';
-import { advance, applyProposal, preview } from '../../../packages/engine/src/index.js';
+import { advance, applyProposal } from '../../../packages/engine/src/index.js';
 import { CreateWorldSchema, ProposalSchema, type World } from '../../../packages/contracts/src/index.js';
 import { WorldStore } from './store.js';
+import { PromptService, configuredProvider, forecast } from './prompts.js';
+import type { ModelProvider } from '../../../packages/agent-bridge/src/context.js';
 
-export async function startServer(options:{port?:number; host?:string; root?:string; dev?:boolean}={}) {
+export async function startServer(options:{port?:number; host?:string; root?:string; dev?:boolean; provider?:ModelProvider; promptTimeoutMs?:number}={}) {
   const store=new WorldStore(resolve(options.root??'worlds'));
   const token=randomUUID();
+  const prompts=new PromptService(store,options.provider??configuredProvider(),options.promptTimeoutMs??120000);
   const bindHost=options.host??process.env.HOST??'0.0.0.0';
   const allowedHosts=['localhost',hostname(),`${hostname()}.local`,...(process.env.ALLOWED_HOSTS??'').split(',').map(h=>h.trim()).filter(Boolean)];
   let world:World;
@@ -65,16 +68,24 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(req.headers.authorization!==`Bearer ${token}`) return json(res,401,{error:'Session required'});
       if(req.method==='GET' && pathname==='/api/world') return json(res,200,world);
       if(req.method==='GET' && pathname==='/api/worlds') return json(res,200,await store.list());
+      if(req.method==='GET' && pathname==='/api/prompts/config')return json(res,200,prompts.configuration);
+      if(req.method==='GET' && pathname==='/api/prompts/history')return json(res,200,await prompts.history(world));
+      if(req.method==='GET' && pathname.startsWith('/api/prompts/jobs/'))return json(res,200,await prompts.get(world,pathname.slice('/api/prompts/jobs/'.length)));
       if(req.method!=='POST') return json(res,404,{error:'Unknown route'});
       const input=await body(req);
+      if(pathname==='/api/prompts')return json(res,202,await prompts.start(world,input));
+      if(pathname==='/api/prompts/export')return json(res,200,await prompts.export(world,input));
+      if(pathname==='/api/prompts/import')return json(res,200,await prompts.import(world,input));
+      if(pathname==='/api/prompts/cancel'){const p=z.object({id:z.string()}).strict().parse(input);prompts.cancel(world,p.id);return json(res,200,{cancelled:true});}
+      if(prompts.busy)throw Error('World is paused while the model responds; wait or cancel the request');
       if(pathname==='/api/step') {
         const p=z.object({expectedRevision:z.number().int(),days:z.number().int().min(1).max(10).default(1)}).strict().parse(input);
         if(p.expectedRevision!==world.revision) throw Error('Stale revision; refresh first');
         let next=world; for(let i=0;i<p.days;i++) next=advance(next); await commit(next); return json(res,200,world);
       }
       if(pathname==='/api/proposals/preview') {
-        const p=ProposalSchema.parse(input), result=preview(world,p,5);
-        return json(res,200,{tick:result.tick,tiles:p.operations.map(o=>({before:world.tiles[o.tileId],after:result.tiles[o.tileId]})),events:result.events.slice(-12)});
+        const p=ProposalSchema.parse(input);
+        return json(res,200,forecast(world,p));
       }
       if(pathname==='/api/proposals/apply') {await commit(applyProposal(world,input));return json(res,200,world);}
       if(pathname==='/api/worlds/create') {
@@ -100,7 +111,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
   try {
     await new Promise<void>((yes,no)=>{server.once('error',no);server.listen(options.port??Number(process.env.PORT??5180),bindHost,yes);});
   } catch(error) {await closeVite();throw error;}
-  return {server,close:async()=>{await closeVite();await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}};
+  return {server,close:async()=>{await prompts.close();await closeVite();await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}};
 }
 if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
   try {process.loadEnvFile();} catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error;}

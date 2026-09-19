@@ -48,3 +48,30 @@ test('HTTP flow: authenticated local commands, preview isolation, apply, step, p
   assert.equal(world.tick,1);assert.equal(world.rules[0].mmPerDay,100);
  }finally{await reopened.close();await rm(root,{recursive:true,force:true});}
 });
+
+test('prompt HTTP requests are user-triggered, cancellable, and keep mutations paused until completion',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'logos-http-prompts-'));let calls=0;
+ const provider={name:'HTTP test provider',async generate(context:{message:string;mode:string;selectedTileId:number},signal:AbortSignal){
+  calls++;if(context.message==='wait')await new Promise((_yes,no)=>signal.addEventListener('abort',()=>no(Error('cancelled')),{once:true}));
+  return {kind:context.mode==='discuss'?'discussion':'proposal',message:'Rain may increase runoff.',assumptions:[],operations:context.mode==='discuss'?[]:[{kind:'rainfall',tileId:context.selectedTileId,mmPerDay:80}]};
+ }};
+ const app=await startServer({root,port:0,provider});
+ try {
+  const address=app.server.address();assert.ok(address&&typeof address==='object');const base=`http://127.0.0.1:${address.port}/api/`;
+  const {token}=await (await fetch(base+'session')).json() as {token:string};const headers={Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
+  const post=(path:string,data:unknown)=>fetch(base+path,{method:'POST',headers,body:JSON.stringify(data)});
+  const get=(path:string)=>fetch(base+path,{headers}).then(r=>r.json());
+  const world=await get('world') as World;await get('prompts/config');await get('prompts/history');assert.equal(calls,0);
+  const request={id:'http-discuss',worldId:world.id,expectedRevision:0,tileId:0,mode:'discuss',scope:'tile',message:'wait'};
+  assert.equal((await post('prompts',request)).status,202);
+  assert.equal((await post('step',{expectedRevision:0})).status,400);
+  assert.equal((await post('worlds/open',{id:world.id})).status,400);
+  assert.equal((await post('prompts/cancel',{id:request.id})).status,200);
+  for(let i=0;i<100;i++){const job=await get('prompts/jobs/'+request.id);if(job.status==='cancelled')break;await new Promise(r=>setTimeout(r,5));}
+  assert.equal((await get('prompts/jobs/'+request.id)).status,'cancelled');assert.equal(calls,1);assert.deepEqual(await get('world'),world);
+  const exportResponse=await post('prompts/export',{...request,id:'manual-http',mode:'propose',message:'80 mm rain'});assert.equal(exportResponse.status,200);
+  const importResponse=await post('prompts/import',{requestId:'manual-http',reply:{kind:'proposal',message:'80 mm every day',assumptions:[],operations:[{kind:'rainfall',tileId:0,mmPerDay:80}]}});assert.equal(importResponse.status,200);
+  const job=await importResponse.json() as {proposal:Proposal};assert.deepEqual(await get('world'),world);
+  assert.equal((await post('proposals/apply',job.proposal)).status,200);assert.equal((await get('world')).rules[0].mmPerDay,80);assert.equal(calls,1);
+ }finally{await app.close();await rm(root,{recursive:true,force:true});}
+});
