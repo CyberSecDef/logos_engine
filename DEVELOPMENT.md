@@ -6,8 +6,8 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 3 is complete and running on the LAN server. Milestone publication is the
-final checkpoint. Next development phase: world extensibility and declarative rules.
+Phase 3 is complete, published, and running on the LAN server. No implementation
+task is currently active. Next phase: world extensibility and declarative rules.
 
 ## Completed
 
@@ -279,3 +279,11 @@ runoff with sediment conservation, and checksummed storage/path validation.
   A read-only live browser check confirmed the globe and Claude Code prompt panel
   load without JavaScript errors. No live saved-world edits were made by checks.
 - Preparing the Phase 3 milestone commit and public GitHub push.
+
+### 2026-09-19 — Phase 3 publication checkpoint
+
+- Pushed `b116685` to public `CyberSecDef/logos_engine` on `main`.
+- Claude native-login integration is verified after reauthentication. The server
+  remains available on all IPv4 interfaces at port 5180.
+- Phase 4 and later tasks remain pending; no additional product decisions block
+  the completed prompt workflow.
