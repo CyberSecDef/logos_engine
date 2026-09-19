@@ -35,8 +35,8 @@ export const WorldSchema = z.object({
   schemaVersion:z.literal(1), engineVersion:z.literal(ENGINE_VERSION), id:Id,
   name:z.string().min(1).max(80), seed:z.string().min(1).max(120),
   frequency:z.number().int().min(1).max(26), radiusM:z.literal(100000),
-  tick:uint, revision:uint, cells:z.array(CellSchema).min(12).max(6774),
-  tiles:z.array(TileSchema).min(12).max(6774), rules:z.array(RainRuleSchema),
+  tick:uint, revision:uint, cells:z.array(CellSchema).min(12).max(6762),
+  tiles:z.array(TileSchema).min(12).max(6762), rules:z.array(RainRuleSchema),
   history:z.array(ProposalSchema), events:z.array(EventSchema).max(200),
   accounting:z.object({rainL:uint, evaporationL:uint, oceanDrainL:uint}).strict(),
 }).strict();

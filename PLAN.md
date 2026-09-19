@@ -82,7 +82,7 @@ generation and simulation state. Do not require the reference project's imagery,
 geographical datasets, real-world lookups, Earth radius, or Earth calendar.
 
 The Goldberg sphere has `10 * frequency² + 2` cells, including exactly 12
-pentagons. Frequency 26 gives 6,774 total cells, of which 6,762 are hexagons.
+pentagons. Frequency 26 gives 6,762 total cells, of which 6,750 are hexagons.
 Simulation logic must accept five- and six-neighbor cells and account for their
 different surface areas. Start smaller for development, then benchmark this
 reference resolution. Derive and persist adjacency and stable tile IDs; the
@@ -427,7 +427,7 @@ and a textual inspector independent of hover and color.
 7. **Broader simulation.** Add migration, faction policies, conflict, and
    technology with explicit causal links to production and trade. Record design
    decisions and tune observable scenarios before expanding complexity.
-8. **Scale and polish.** Benchmark approximately 6,774 cells, improve update
+8. **Scale and polish.** Benchmark approximately 6,762 cells, improve update
    batching and rendering, and complete accessibility, responsive layouts, and
    reliable local single-player startup and shutdown.
 

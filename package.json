@@ -11,13 +11,14 @@
     "node": ">=22.12"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && vite build",
     "typecheck": "tsc --noEmit",
     "test": "tsc && node --test dist/tests/*.test.js",
     "dev": "tsc && node dist/apps/server/src/index.js --dev",
     "start": "node dist/apps/server/src/index.js",
     "world": "tsc && node dist/apps/server/src/cli.js",
-    "check": "npm run typecheck && npm test && npm run build"
+    "check": "npm run typecheck && npm test && npm run build",
+    "test:browser": "npm run build && node tests/browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",

@@ -4,7 +4,8 @@ import { defaultStore, stateHash } from './store.js';
 const [command,id='first-world',arg='1']=process.argv.slice(2);
 const store=defaultStore();
 if(command==='create') {
-  if((await store.list()).some(w=>w.id===id)) throw Error('World already exists');
+  try {await store.load(id);throw Error('World already exists');}
+  catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error;}
   const world=createWorld({id,name:id,seed:arg,frequency:8}); await store.save(world);
   console.log(`Created ${id}: ${world.tiles.length} tiles, hash ${stateHash(world)}`);
 } else if(command==='step') {
