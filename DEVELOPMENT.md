@@ -14,7 +14,7 @@ checkpoints (ten retained), reviewed restore with backup, independent branches,
 portable world import/export, and persistent world selection. Published as
 `b4b38e0`. Phase 4c restricted plugins are implemented and live: deterministic
 instruction budgets, saved per-tile state, reviewed installation/update, and
-failure recovery. Verification is complete; publication is in progress. General entity
+failure recovery. Verified, deployed, and published as `b10dbed`. General entity
 migrations, artwork, and a complete replay journal remain pending.
 
 ## Completed
@@ -422,7 +422,7 @@ runoff with sediment conservation, and checksummed storage/path validation.
   a complete append-only history remains pending.
 - 4c: restricted JSON plugin runtime, deterministic budgets, saved state, staged
   proposals, immutable artifacts, execution and failure recovery — implemented;
-  verified and live; publication in progress. JavaScript/native plugins are not enabled.
+  complete, verified, live, and published. JavaScript/native plugins are not enabled.
 - 4d: forest/city artwork packs and actual texture rendering.
 - 4e: world checkpoints, branches, restore, and portable state import/export —
   complete, live, and published. Plugin/texture bundles
@@ -600,3 +600,11 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Corrected conversation history to label Entire world authority accurately.
 - Publishing the restricted-runtime milestone. General entity migrations,
   selective replay, texture rendering, and JavaScript/native runtimes remain future work.
+
+### 2026-09-19 — Restricted plugin publication
+
+- Pushed `b10dbed` to public `CyberSecDef/logos_engine` on `main`.
+- Restricted `logos-stack-v1` plugins are available through the existing prompt
+  workflow, with an explicit crystal-bloom walkthrough in `docs/world-plugins.md`.
+- All 49 tests, three browser suites, and a native Claude acceptance check passed.
+- User worlds were preserved; no automatic plugin installation or time advancement.
