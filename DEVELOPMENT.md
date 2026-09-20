@@ -10,7 +10,7 @@ Phase 5g knowledge and technology is underway. The plan is split into local
 research (5g1), communication-based knowledge exchange (5g2), and broader unlocks
 plus integration (5g3). See [technology plan](docs/technology.md).
 Confirmed: settlements choose projects automatically; improved cultivation first.
-5g1 automatic local research is implemented and deployed; publication is underway.
+5g1 automatic local research is implemented, deployed and published.
 204 tests, three browser workflows and native Claude acceptance passed. Next:
 5g2 communication-gated knowledge exchange.
 
@@ -1746,3 +1746,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
   Evidence `/tmp/logos-technology-deploy.json`; research inactive until review.
 - Existing web bundle size warning remains a Phase 6 task. Next: 5g2 knowledge
   exchange over permitted communication channels; full Phase 5g remains open.
+
+### 2026-09-20 — Phase 5g1 publication
+
+- Published milestone `3c38f73` to public `CyberSecDef/logos_engine` main.
+- Next: 5g2 knowledge exchange; local research is complete, wider Phase 5g remains open.
