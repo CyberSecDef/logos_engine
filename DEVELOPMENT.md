@@ -9,7 +9,7 @@ before each milestone commit. Never mark unverified functionality complete.
 Implementing world-specific appearance rules driven by built-in/custom properties.
 Rules select labels, colors and existing artwork through reviewed proposals.
 All 66 tests, appearance/texture browser checks, and native Claude acceptance
-passed. The milestone is live on the LAN server; publication is in progress.
+passed. The milestone is live on the LAN server and published as `79cd743`.
 
 Plugin saved-state mappings are implemented: rename/reorder counters, convert
 units, add initial values, and explicitly discard retired keys. All 61 tests and
@@ -785,3 +785,11 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - No user world edits, styles or simulation steps were applied by deployment.
 - Publishing the verified milestone with 66 passing tests, two browser suites,
   native Claude acceptance and a documented crystal-appearance example.
+
+### 2026-09-19 — Appearance-rule publication
+
+- Pushed `79cd743` to public `CyberSecDef/logos_engine` on `main`.
+- World properties can now drive versioned cosmetic labels/colors/installed artwork
+  through reviewed prompts. All 66 tests and browser/native-provider checks passed.
+- Remaining Phase 4 work includes full replay history, general entities, external
+  world-local artwork bundles and layered appearance.
