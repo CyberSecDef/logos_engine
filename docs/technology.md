@@ -34,7 +34,7 @@ Implementation requirements:
   reject incomplete proposals atomically. Preserve replay and portable saves.
 - Imported knowledge and new effects must not silently alter earlier completions.
 
-Implemented contracts for the first substep follow below. Phase 5g is not yet complete.
+Phase 5g is implemented. The contracts and tested limits follow below.
 
 ## Implemented: 5g1 automatic local research
 
@@ -58,8 +58,8 @@ research, while explicit manual assignments retain their own worker budget.
 Each immutable definition has a stable lowercase ID, label, `workRequired`
 (1–1 billion worker-days) and `farmBonusPermille` (0–1,000). The cultivation example
 requires 200 worker-days and adds 200 permille (20%) to farm capacity and worker
-productivity. Definition edits/removal and prerequisites are not supported in
-this first milestone. New definitions use new IDs and cannot silently rewrite
+productivity. Definition edits/removal remain unsupported; optional prerequisites
+and treatment efficiency are described in 5g3 below. New definitions use new IDs and cannot silently rewrite
 completed knowledge.
 
 ### Daily selection, labor and food
@@ -110,7 +110,7 @@ Optional tile `research` stores projects (technology ID, progress, completion ti
 assignment, local pause and last daily report. Treat these as local archives:
 progress/knowledge remain when population leaves or a settlement is removed.
 New inhabitants can use the archive; travelers do not carry it elsewhere. Sharing between zones requires the separately activated exchange described below;
-prerequisites remain future work.
+prerequisites are enforced locally as described in 5g3 below.
 
 - `technology-configure`: world scope; `expectedVersion` 0 initially/current later,
   `enabled`, complete `settings`. Increments the shared technology version.
@@ -137,9 +137,9 @@ visits, automatic/manual selection, paused archives, completion timing, immutabl
 IDs, bad progress, world scope, forecast purity and 100-day replay/checkpoint/portable
 saves. `npm run test:technology` checks the full browser flow with isolated saves.
 
-Next: **5g3 broader unlocks/integration**. No water-treatment unlock,
-resource-input cost or custom-rule knowledge read is implied by the current
-cultivation primitive. Knowledge exchange uses its separate opt-in model below.
+Phase 5g3 adds treatment efficiency, prerequisites and knowledge reads below.
+Resource-input construction costs remain outside these efficiency primitives.
+Knowledge exchange uses its separate opt-in model below.
 
 
 ## Implemented: 5g2 adjacent knowledge exchange
@@ -212,4 +212,100 @@ closure/reopening, completion/next-day bonuses, save/replay, desktop/mobile and 
 autonomous model calls. Engine coverage adds two-hop no-relay, both endpoint gates,
 travel independence, source eligibility, local/global/exchange pauses, reserves,
 rounding, no stacking/source tie-breaks, scope/version rejection and portable saves.
-Phase 5g3 remains: broader unlocks and integrated acceptance.
+Phase 5g3 is implemented below, including combined simulation acceptance.
+
+
+## Implemented: 5g3 treatment efficiency, prerequisites and world-rule reads
+
+Confirmed: improved filtration makes **existing** sanitation plants more effective.
+It never creates a plant, repairs condition or grants an instant pollution cleanup.
+Use **Review filtration technology** after activating research, or define a project
+through a reviewed world prompt. The example requires 300 base worker-days,
+`farmBonusPermille:0` and `treatmentBonusPermille:500` (+50%). No prerequisite is
+imposed on this example; creators can define dependent technologies separately.
+
+### Treatment effects
+
+The optional definition field `treatmentBonusPermille` is an integer0–1000. Omitted
+means zero with no migration or changed historical serialization. Sum completed
+local treatment bonuses independently of farming, capped at+100%. The effective
+multiplier is1000 plus that sum, only while the technology model is active.
+
+On the day after completion, before water-pollution treatment:
+
+```
+effectiveCapacity = min(1_000_000_000,
+  floor(installedCapacity * conditionPermille * treatmentMultiplier / 1_000_000))
+```
+
+Exact integer arithmetic preserves rounding and old behavior without a bonus.
+Treatment still requires enabled water quality and a populated land settlement.
+Zero installed capacity or zero condition gives zero treatment. Only available
+pollution is removed, surface first then dissolved, using the existing conservation
+ledger. Existing food-shortage maintenance rules still change tomorrow's condition.
+Base capacity/condition never compound or get rewritten by research.
+
+The water ledger records effective capacity and, when above baseline, optional
+`treatmentTechnologyPermille`. Inspector reports distinguish effective capacity
+from installed capacity and condition. Global technology pause suspends bonuses;
+local research pause retains already learned benefits. A recorded completion
+cannot improve treatment earlier on the same day: water processing precedes
+research, and eligibility requires an earlier completion tick.
+
+### Prerequisite graphs
+
+Optional `prerequisites` contains up to four unique technology IDs. Define those
+IDs first; unknown/duplicate dependencies and cycles reject atomically. Definitions
+remain immutable, so an old project cannot silently gain new requirements.
+Saved/imported graphs and completion chronology are validated as well.
+
+Every prerequisite must be completed in the **same zone before the current day**.
+Automatic selection skips locked projects; manual assignment may select one but
+reports `prerequisites` and spends no workers until eligible. Neighbor knowledge
+assistance cannot bypass a local prerequisite. A completed prerequisite makes its
+dependent project eligible on the following day. Archived knowledge survives
+population changes under the existing tile-archive policy.
+
+### Read-only world interface
+
+Rules, appearance conditions and restricted plugins share two new numeric reads:
+
+| Source | Required identifier | Value |
+| --- | --- | --- |
+| `technologyKnown` | `technologyId` | 1 if locally completed, otherwise0 |
+| `technologyProgress` | `technologyId` | Stored research work, otherwise0 |
+
+The ID must name a defined technology. `fieldId` and `entityTypeId` are not accepted
+for these reads; `technologyId` is not accepted on other read sources. Existing
+self/neighbor-average/min/max sampling works normally. These are observations of
+local archives, including while research is paused. They do not bypass the built-in
+communication gates or grant research: custom outputs still only affect their
+existing custom properties/entities. A rule may deliberately observe neighboring
+knowledge as any other exposed state; that observation has no built-in learning
+effect.
+
+Custom rules/plugins run after research, so they can observe completion today.
+Built-in treatment/farming benefits and prerequisite/knowledge-sharing eligibility
+still use their documented next-day boundary. Plugins cannot write research state,
+change installed treatment capacity or introduce new engine opcodes.
+
+### Costs and integrated acceptance
+
+Resident worker-time and foregone farm production remain the research cost. No
+additional material/currency cost was added for these efficiency improvements;
+physical construction and resource-cost recipes remain future extensions. This
+is a deliberate limit, not an unimplemented requirement for the current effects.
+
+Tests verify next-day treatment, independent bonus caps, no free plants, zero/
+damaged/unpopulated treatment, pause behavior, prerequisite ordering/cycles/forged
+history, strict read validation and actual rule/plugin execution. A deterministic
+200-day scenario combines soil/weather, water pollution/waste/treatment, health/
+contact, visits, migration and a timed journey, food sharing, air transport,
+research and knowledge exchange. Population and pollution ledgers reconcile;
+replay, checkpoints and portable archives preserve the resulting state.
+
+`npm run test:technology-effects` verifies the reviewed filtration definition,
+automatic research, next-day treatment, unchanged installed capacity, zero-capacity
+neighbors, forecasts, replay/reload, responsive layout and zero autonomous calls.
+Phase 5g is complete; Phase 5h factions/conflict is next. Longer whole-world tuning
+across conflict and every other system remains Phase 5i.

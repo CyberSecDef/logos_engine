@@ -112,7 +112,9 @@ arrivals, with new cases attributed to their exposure location.
 [Automatic research](docs/technology.md) lets settlements spend healthy resident
 worker-days on local technologies. Improved cultivation boosts farming after
 completion. Separately enabled neighboring knowledge exchange accelerates local
-research through open communication channels.
+research through open communication channels. Filtration improves installed
+sanitation plants; prerequisite chains and read-only knowledge inputs support
+world-defined progression and custom rules.
 
 **Still planned:** richer erosion, broader trade and movement,
 conflict, and broader technology effects. This is an early playable foundation.

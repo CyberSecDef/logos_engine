@@ -254,3 +254,8 @@ technology version and requires world scope. Both adjacent endpoints must allow
 communication. Prior-day completed archives improve local research efficiency;
 reports attribute bonus work to one source. No same-day relay or teacher labor
 is modeled. See [knowledge exchange](technology.md#implemented-5g2-adjacent-knowledge-exchange).
+
+Technology definitions also accept optional bounded `treatmentBonusPermille` and
+up to four `prerequisites`. Read-only `technologyKnown`/`technologyProgress` require
+a valid `technologyId` and work in rules, appearance conditions and restricted
+plugins. They cannot write built-in research/effects. See [technology effects](technology.md#implemented-5g3-treatment-efficiency-prerequisites-and-world-rule-reads).

@@ -609,3 +609,11 @@ Separately activated neighbor knowledge exchange now accelerates local research
 through open communication channels. Learners supply workers/food; prior-day
 archives, stable source selection and no stacking prevent instant chain learning.
 Phase 5g3 broader unlocks/integration remains. See [technology](docs/technology.md).
+
+### Phase 5g3 completion
+
+Technology now supports installed-treatment efficiency, local prerequisite chains
+and read-only knowledge inputs for world rules/plugins. Combined 200-day simulation
+replay and conservation checks cover environment, population/travel, health, food
+and research. Phase 5g is complete; factions/conflict (5h) and final tuning (5i) follow.
+Construction/material recipes remain future scope; worker-time is the current cost.

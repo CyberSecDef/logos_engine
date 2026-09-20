@@ -139,3 +139,10 @@ Custom rules, appearance conditions and restricted plugins can read `waterPollut
 so check waterMm when distinguishing dry from clean. Outputs cannot edit built-in
 pollution or sanitation through generic custom fields. Dedicated operations enforce
 bounds and atomic scope. Saving, checkpoints, exports and replay preserve all state.
+
+## Learned treatment efficiency
+
+Separately activated [technology](technology.md) can improve an installed plant
+from the day after research completion. Condition still applies; zero installed
+capacity/condition stays zero. Effective capacity uses a bounded additive technology
+factor, does not mutate base capacity, and is reported in the daily treatment ledger.

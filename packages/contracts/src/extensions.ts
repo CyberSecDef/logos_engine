@@ -8,8 +8,8 @@ export const FieldDefinitionSchema=z.object({
  description:z.string().max(300),quantity:z.enum(['index','stock']).optional(),min:scalar,max:scalar,defaultValue:scalar,
 }).strict();
 export const ReadSchema=z.object({
- source:z.enum(['waterPollution','surfacePollution','waterConcentration','sanitationCondition','airLoad','airDensity','windBearingDeg','windPermille','temperatureC','rainMm','waterMm','vegetation','elevationM','population','foodRations','shortageDays','surplusDays','custom','entity-count','entity-sum']),
- fieldId:id.optional(),entityTypeId:id.optional(),sample:z.enum(['self','neighbors-average','neighbors-min','neighbors-max']),
+ source:z.enum(['technologyKnown','technologyProgress','waterPollution','surfacePollution','waterConcentration','sanitationCondition','airLoad','airDensity','windBearingDeg','windPermille','temperatureC','rainMm','waterMm','vegetation','elevationM','population','foodRations','shortageDays','surplusDays','custom','entity-count','entity-sum']),
+ technologyId:id.optional(),fieldId:id.optional(),entityTypeId:id.optional(),sample:z.enum(['self','neighbors-average','neighbors-min','neighbors-max']),
 }).strict();
 export const FormulaSchema=z.object({
  constant:scalar,min:scalar.optional(),max:scalar.optional(),terms:z.array(z.object({read:ReadSchema,coefficient:z.number().finite().min(-1000).max(1000)}).strict()).max(8),

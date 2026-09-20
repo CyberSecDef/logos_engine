@@ -1,3 +1,4 @@
+import {treatmentTechnologyPermille} from './technology.js';
 import type {World,Operation} from '../../contracts/src/index.js';import type {WaterTransportReport} from '../../contracts/src/transport.js';import type {WaterQualityDay} from '../../contracts/src/water-quality.js';import {WATER_POLLUTION_MAX} from '../../contracts/src/water-quality-defaults.js';
 // Exact integer ratios: load*water can exceed Number's safe multiplication range.
 const portion=(load:number,numerator:number,denominator:number)=>denominator?Number(BigInt(load)*BigInt(numerator)/BigInt(denominator)):0;
@@ -32,8 +33,8 @@ export function advanceWaterQuality(w:World,water:WaterTransportReport):void {
  const model=w.waterQuality;if(!model?.enabled)return;
  if(water.tick!==w.tick||water.worldId!==w.id)throw Error('Water pollution requires the current hydrology report');const r=model.settings;
  const d:WaterQualityDay={tick:w.tick,before:0,emitted:0,waste:0,rejectedEmission:0,rejectedWaste:0,treated:0,oceanExport:0,decayed:0,after:0,transferred:0,tiles:[],transfers:[]};
- for(const t of w.tiles){const a=t.waterQuality!,volume=water.tiles[t.id].mixingWaterL;
-  const b:WaterQualityDay['tiles'][number]={tileId:t.id,beforeDissolved:a.dissolved,beforeSurface:a.surface,emitted:0,waste:0,rejectedEmission:0,rejectedWaste:0,treatedDissolved:0,treatedSurface:0,dried:0,washed:0,settled:0,incoming:0,outgoing:0,oceanExport:0,decayedDissolved:0,decayedSurface:0,afterDissolved:0,afterSurface:0,effectiveTreatmentCapacity:t.settlement&&t.population>0&&t.elevationM>0?portion(a.sanitationCapacity,a.sanitationCondition,1000):0};d.tiles.push(b);
+ for(const t of w.tiles){const a=t.waterQuality!,volume=water.tiles[t.id].mixingWaterL,treatmentFactor=treatmentTechnologyPermille(w,t.id);
+  const b:WaterQualityDay['tiles'][number]={...(treatmentFactor>1000?{treatmentTechnologyPermille:treatmentFactor}:{}),tileId:t.id,beforeDissolved:a.dissolved,beforeSurface:a.surface,emitted:0,waste:0,rejectedEmission:0,rejectedWaste:0,treatedDissolved:0,treatedSurface:0,dried:0,washed:0,settled:0,incoming:0,outgoing:0,oceanExport:0,decayedDissolved:0,decayedSurface:0,afterDissolved:0,afterSurface:0,effectiveTreatmentCapacity:t.settlement&&t.population>0&&t.elevationM>0?Math.min(WATER_POLLUTION_MAX,portion(a.sanitationCapacity,a.sanitationCondition*treatmentFactor,1_000_000)):0};d.tiles.push(b);
   b.emitted=Math.min(a.emissionPerDay,WATER_POLLUTION_MAX-a.dissolved-a.surface);b.rejectedEmission=a.emissionPerDay-b.emitted;a.surface+=b.emitted;
   const waste=r.settlementWasteEnabled&&t.settlement?t.population*r.wastePerPerson:0;b.waste=Math.min(waste,WATER_POLLUTION_MAX-a.dissolved-a.surface);b.rejectedWaste=waste-b.waste;a.surface+=b.waste;
   b.treatedSurface=Math.min(a.surface,b.effectiveTreatmentCapacity);a.surface-=b.treatedSurface;b.treatedDissolved=Math.min(a.dissolved,b.effectiveTreatmentCapacity-b.treatedSurface);a.dissolved-=b.treatedDissolved;

@@ -10,7 +10,7 @@ Status: **5a–5e implemented and deployed**, including automatic visits and
 relocation follow-ups. Phase 5e passes engine, browser and native Claude source
 acceptance. Historical provider refusal for the earlier combined air/migration
 request is documented in DEVELOPMENT.md. Phase 5f1 health accounting and 5f2 contact transmission are implemented.
-Current: [5g knowledge and technology](technology.md), beginning with local research.
+Phase 5g [knowledge and technology](technology.md) is implemented. Next: 5h factions and conflict.
 
 ## Sequence and exit criteria
 
@@ -22,7 +22,7 @@ Current: [5g knowledge and technology](technology.md), beginning with local rese
 | 5d. Airflow and air pollution — implemented | Deterministic spherical wind field, emissions, bounded directed transport, mixing and explicit removal. Add creator pulses and sustained sources, wind/air-quality inspection and overlays. | Wind reversal changes the affected neighbors; calm behavior is defined; emissions/transfers/removal balance; stopping emissions does not erase existing load. |
 | 5e. Water contamination and sanitation — implemented | Reuse 5a water volumes for load transfer. Define dissolved load, dry deposits, dilution, wash-off and ocean export. Add explicit sanitation/infrastructure links after 5b; famine affects these through documented rules. | Evaporation does not delete contaminant mass; dry zones avoid division by zero; runoff carries load downstream; sources/sinks and ocean export balance. |
 | 5f. Generic disease — implemented | After 5b/5c: susceptible/ill/immune people, local contact, recovery, no direct disease deaths. Carry health state with travelers. Environmental exposure is separate from infectious spread. | Empty zones cannot gain sick inhabitants spontaneously; distant arrivals spread illness only on arrival; people and health compartments reconcile. |
-| 5g. Knowledge and technology | Tangible research costs, progress and unlocked bounded production/infrastructure effects. Communication permits defined knowledge exchange; completion activates effects at a documented tick boundary. | Knowledge does not teleport across closed channels; costs debit once; unlocks survive saves/replay; no model call is needed for progress. |
+| 5g. Knowledge and technology — implemented | Tangible research costs, progress and unlocked bounded production/infrastructure effects. Communication permits defined knowledge exchange; completion activates effects at a documented tick boundary. | Knowledge does not teleport across closed channels; costs debit once; unlocks survive saves/replay; no model call is needed for progress. |
 | 5h. Factions and conflict | World-defined ownership, explicit relationships and resource-backed conflict over zones/routes. Concrete manpower, supplies, damage and repair rules; no abstract “freedom” settings. | Stable simultaneous resolution, accounted losses/displacement, explicit travel/trade effects, recovery and deterministic replay. |
 | 5i. Integration and tuning | Long-run scenarios combining weather, food, movement, environment, health, knowledge and conflict. Reconcile documentation, overlays and explanations. | Scenario replay, conservation, old-world compatibility, interruption recovery, bounded cost and browser acceptance; publish a final evidence matrix. |
 
@@ -159,7 +159,8 @@ require reviewed health activation; no model calls occur during simulation.
   settlements choose projects automatically; cultivation is the first example.
 - **5g2 implemented:** communication-gated adjacent archive access accelerates
   local research, with frozen prior-day completions and real learner labor.
-- **5g3 pending:** broader bounded unlocks, resource costs/custom reads as needed,
-  and combined-world acceptance. See [technology contracts](technology.md).
+- **5g3 implemented:** installed-treatment efficiency, prerequisites, read-only
+  knowledge inputs and combined 200-day acceptance. Worker-time is the tangible
+  research cost; construction/material recipes remain future extensions. See [technology contracts](technology.md).
 
-The entire 5g milestone is not complete yet.
+Phase 5g is complete within the documented fixed effects. Phase 5h is next.

@@ -4,6 +4,8 @@ const round=(n:number)=>Math.round(n*1000)/1000;
 export function entityProperty(w:World,typeId:string,fieldId:string){return w.entities?.types.find(t=>t.id===typeId)?.properties.find(f=>f.id===fieldId);}
 export function outputProperty(w:World,fieldId:string,entityTypeId?:string){return entityTypeId?entityProperty(w,entityTypeId,fieldId):w.definitions.fields.find(f=>f.id===fieldId);}
 export function validRead(w:World,r:Read):boolean {
+ if(r.source==='technologyKnown'||r.source==='technologyProgress')return r.fieldId===undefined&&r.entityTypeId===undefined&&!!r.technologyId&&!!w.technology?.definitions.some(d=>d.id===r.technologyId);
+ if(r.technologyId!==undefined)return false;
  if(r.source==='entity-count'||r.source==='entity-sum')return !!r.entityTypeId&&!!w.entities?.types.some(t=>t.id===r.entityTypeId)&&(r.source==='entity-count'?r.fieldId===undefined:!!r.fieldId&&!!entityProperty(w,r.entityTypeId,r.fieldId));
  return r.entityTypeId===undefined&&(r.source==='custom'?!!r.fieldId&&w.definitions.fields.some(f=>f.id===r.fieldId):r.fieldId===undefined);
 }

@@ -10,9 +10,11 @@ Phase 5g knowledge and technology is underway. The plan is split into local
 research (5g1), communication-based knowledge exchange (5g2), and broader unlocks
 plus integration (5g3). See [technology plan](docs/technology.md).
 Confirmed: settlements choose projects automatically; improved cultivation first.
-5g2 communication-gated knowledge exchange is implemented, deployed and
-published. Confirmed: neighbor archives accelerate local research,
-with real learner workers and food reserves. Next: 5g3 broader unlocks/integration.
+Phase 5g3 technology effects and integration is implemented and deployed;
+publication is underway. Filtration improves existing plants, as confirmed.
+Phase 5g is complete: automatic research, knowledge exchange, treatment/farm
+improvements, prerequisites and read-only knowledge inputs. Next: Phase 5h
+factions and conflict, followed by Phase 5i full-world tuning.
 
 ## Completed
 
@@ -40,7 +42,7 @@ with real learner workers and food reserves. Next: 5g3 broader unlocks/integrati
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
-| 5. Broader simulation | In progress: 5a–5f implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
+| 5. Broader simulation | In progress: 5a–5g implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
@@ -1801,3 +1803,51 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `4635aba` to public `CyberSecDef/logos_engine` main.
 - Next: Phase 5g3 broader unlocks and integrated research/environment acceptance.
+
+### 2026-09-20 — Phase 5g3 started
+
+- Reviewed sanitation, research ordering, declarative reads and restricted plugins.
+- Planned treatment efficiency, acyclic prerequisite definitions, knowledge reads
+  and combined environment/health/movement/research acceptance.
+- Asked about upgrading installed treatment versus automatic construction.
+
+### 2026-09-20 — Phase 5g3 treatment technology and integrated acceptance
+
+- Confirmed filtration improves installed treatment plants without constructing
+  them. Added optional treatmentBonusPermille; example300 base worker-days/+50%.
+  Independent additive treatment cap+100%, exact next-day effective-capacity
+  arithmetic, absolute capacity1e9, existing condition/occupancy/water activation
+  gates and unchanged base settings. Water budgets retain conservation.
+- Added optional up-to-four prerequisite IDs, existing-definition checks, acyclic
+  graph validation, local prior-day eligibility, locked automatic-project skipping,
+  manual stall reasons and imported completion-history consistency checks.
+- Added strict read-only technologyKnown/technologyProgress with technologyId,
+  shared by world rules, appearance conditions and restricted plugins. Validated
+  identifiers/irrelevant arguments; no new research/built-in write authority.
+- Added filtration definition control, treatment effect/capacity inspection,
+  reviewed effect descriptions, provider capabilities v24 and updated obsolete
+  water/illness text. Updated interface, technology, water and phase documentation.
+- `npm run check`: **215 tests passed**, typecheck/build passed. Tests cover
+  next-day benefits, damaged/zero/empty treatment, independent caps, base-setting
+  preservation, pause, prerequisites/cycles/forged history, actual rule/plugin
+  reads and a deterministic **200-day combined scenario** with soil/weather,
+  pollution/waste/treatment, health/contact, visits/migration/timed travel, food
+  sharing, air, research and knowledge exchange. Population and pollution balance;
+  replay, checkpoints and portable saves preserve the result.
+- Filtration, knowledge-exchange and water-quality browser workflows passed with
+  zero autonomous model calls; reviewed cancel/apply, next-day effects, no free
+  plants, unchanged installed capacity, forecasts, reload/replay and responsive
+  layouts. Inspected desktop/mobile filtration screenshots.
+- Real native Claude proposed the exact filtration definition (work300, treatment
+  bonus500) in a temporary world. Schema/scope/forecast passed and save unchanged.
+- Deployed at `0.0.0.0:5180`, LAN filtration control verified. Preserved first-world
+  day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete save envelope
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  No user-world edits/ticks; technology remains inactive until reviewed activation.
+  Evidence: `/tmp/logos-filtration-deploy.json`.
+- Phase 5g complete. Worker-time is the research cost; construction/material
+  recipes and definition migrations remain future extensions, not implied
+  capabilities. Next5h factions/conflict; whole-world tuning remains5i. Existing
+  large web-bundle warning remains Phase6 performance work.
