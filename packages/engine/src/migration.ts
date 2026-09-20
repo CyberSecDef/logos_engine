@@ -1,3 +1,4 @@
+import {takeHealth} from './disease.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 export function validateMigration(w:World):void {
  const m=w.migration;if(!m)return;const seen=new Set<number>();for(const d of m.lastDepartures){if(!w.tiles[d.tileId]||d.tick>w.tick||seen.has(d.tileId))throw Error('Invalid migration cooldown');seen.add(d.tileId);}
@@ -27,8 +28,9 @@ export function advanceMigration(w:World):void {
    const reason=pressure&&betterFood?'food-pressure':crowded&&lessCrowded?'crowding':'better-reserves';
    const foodRations=Math.min(a.food,population*r.provisionDays,Math.max(0,1e9-b.food-carried[to]));
    let id=`auto-migration-${m.nextSequence}`;while(used.has(id)&&m.nextSequence<Number.MAX_SAFE_INTEGER){m.nextSequence++;id=`auto-migration-${m.nextSequence}`;}if(m.nextSequence>=Number.MAX_SAFE_INTEGER)return;m.nextSequence++;used.add(id);
+   const health=w.disease?takeHealth(t.health!,t.population,population):undefined;
    const s=t.settlement!;t.population-=population;s.foodRations-=foodRations;s.surplusDays=0;delete s.lastDay;
-   w.journeys??={model:'land-journeys-v1',active:[]};w.journeys.active.push({id,label:`Moving from zone ${t.id}`,path:[t.id,to],daysPerHop:r.daysPerHop,index:0,remainingDays:r.daysPerHop,population,foodRations,cargo:[],departedTick:w.tick,shortageDays:0,shortageIntervalDays:s.settings.shortageIntervalDays,lossPermille:s.settings.lossPermille});
+   w.journeys??={model:'land-journeys-v1',active:[]};w.journeys.active.push({...(health?{health}:{}),id,label:`Moving from zone ${t.id}`,path:[t.id,to],daysPerHop:r.daysPerHop,index:0,remainingDays:r.daysPerHop,population,foodRations,cargo:[],departedTick:w.tick,shortageDays:0,shortageIntervalDays:s.settings.shortageIntervalDays,lossPermille:s.settings.lossPermille});
    incoming[to]+=population;carried[to]+=foodRations;receiving.add(to);departing.add(t.id);cooldown.set(t.id,w.tick);m.lastDay.entries.push({from:t.id,to,journeyId:id,population,foodRations,reason});break;
   }
  }

@@ -586,3 +586,10 @@ dry deposits/wetting, settling, finite treatment, decay and ocean export budgets
 Sanitation condition persists through famine counter resets and migration; food
 shortages impair next-day treatment. Added operations, custom reads, overlays,
 read-only diagnostics and five-day forecast comparisons. See docs/water-quality.md.
+
+### Phase 5f1 implementation update
+
+[Health and recovery](docs/disease.md) implements optional susceptible/ill/immune
+accounting, creator intervention, water-caused cases, reduced farm labor and
+health-preserving travel/demographic edits. No direct disease deaths. Phase 5f2
+contact transmission is next; current travel carries health without contagion.

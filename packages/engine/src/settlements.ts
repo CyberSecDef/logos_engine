@@ -1,3 +1,4 @@
+import {takeHealth,illnessLabor} from './disease.js';
 import {visitLabor} from './neighbor-visits.js';
 import {farmConditions} from './farm-conditions.js';
 import type {World,Operation} from '../../contracts/src/index.js';
@@ -24,20 +25,20 @@ export function applySettlement(world:World,op:Operation):void {
   s.settings={...s.settings,...op.settings};if(op.label!==undefined)s.label=op.label;s.rulesVersion++;
  }
  if(op.kind==='settlement-food')s.foodRations+=op.deltaRations;
- if(op.kind==='settlement-population'){tile.population=op.population;s.shortageDays=0;s.surplusDays=0;}
+ if(op.kind==='settlement-population'){if(world.disease&&op.population<tile.population)takeHealth(tile.health!,tile.population,tile.population-op.population);tile.population=op.population;s.shortageDays=0;s.surplusDays=0;}
  if(op.kind==='settlement-remove'){
   if(op.discardPopulation!==tile.population||op.discardFoodRations!==s.foodRations)throw Error('Settlement removal must explicitly discard the exact current inhabitants and food');
-  delete tile.settlement;tile.population=0;return;
+  delete tile.settlement;tile.population=0;if(world.disease)tile.health={ill:0,immune:0};return;
  }
  delete s.lastDay;
 }
 // Pure integer stock/population accounting after weather, before custom rules.
 // Only explicitly activated tiles participate; legacy ticks remain byte-identical.
 export function advanceSettlements(world:World):void {
- const visitors=visitLabor(world);
+ const visitors=visitLabor(world),illWorkers=illnessLabor(world);
  for(const tile of world.tiles){const s=tile.settlement;if(!s)continue;const r=s.settings,pop=tile.population,before=s.foodRations;
   const {land,flooded,temperaturePermille,moisturePermille,fertility,waterQualityPermille}=farmConditions(world,tile.id);
-  const labor=visitors.get(tile.id),workers=pop-(labor?.away??0)+(labor?.incoming??0);
+  const labor=visitors.get(tile.id),workers=pop-(labor?.away??0)+(labor?.incoming??0)-(illWorkers.get(tile.id)??0);
   const potential=Math.min(r.farmRationsPerDay,workers*r.workerRationsPerDay);
   const produced=land&&!flooded?Math.floor((potential*temperaturePermille*moisturePermille/1_000_000)*(world.soilEcology?.enabled?fertility/1000:1)*(world.waterQuality?.enabled?waterQualityPermille/1000:1)):0;
   const overflow=Math.max(0,before+produced-SETTLEMENT_LIMITS.food),available=before+produced-overflow,consumed=Math.min(pop,available),unmet=pop-consumed;
@@ -51,8 +52,9 @@ export function advanceSettlements(world:World):void {
     if(s.surplusDays>=r.growthIntervalDays){births=Math.min(r.capacity-pop,Math.max(1,Math.floor(pop*r.growthPermille/1000)));s.surplusDays=0;}
    }else s.surplusDays=0;
   }
+  if(world.disease&&losses)takeHealth(tile.health!,pop,losses);
   tile.population=pop+births-losses;
-  s.lastDay={...(world.waterQuality?.enabled?{waterQualityPermille}:{}),...(world.neighborVisits?.enabled?{workers,visitorsAway:labor?.away??0,visitingWorkers:labor?.incoming??0}:{}),...(world.soilEcology?.enabled?{fertilityPermille:fertility}:{}),tick:world.tick,beforeFood:before,produced,overflow,consumed,unmet,afterFood:s.foodRations,beforePopulation:pop,births,losses,afterPopulation:tile.population,potential,temperaturePermille,moisturePermille,land,flooded};
+  s.lastDay={...(world.disease?.enabled?{illWorkers:illWorkers.get(tile.id)??0}:{}),...(world.waterQuality?.enabled?{waterQualityPermille}:{}),...(world.neighborVisits?.enabled?{workers,visitorsAway:labor?.away??0,visitingWorkers:labor?.incoming??0}:{}),...(world.soilEcology?.enabled?{fertilityPermille:fertility}:{}),tick:world.tick,beforeFood:before,produced,overflow,consumed,unmet,afterFood:s.foodRations,beforePopulation:pop,births,losses,afterPopulation:tile.population,potential,temperaturePermille,moisturePermille,land,flooded};
   if(births||losses){world.events.push({tick:world.tick,kind:'population',tileId:tile.id,amount:births||losses,message:births?`${s.label}: ${births} inhabitants added after sustained food reserves.`:`${s.label}: ${losses} inhabitants lost after sustained food shortage.`});if(world.events.length>200)world.events.shift();}
  }
 }

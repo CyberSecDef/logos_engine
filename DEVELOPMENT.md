@@ -6,11 +6,10 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5e water contamination/sanitation is implemented, deployed and published
-as `19e084b`. Confirmed water-quality farming damage is active only after reviewed
-world activation; illness remains deferred. 183 tests, three browser scenarios
-and a native Claude source request pass. Current saved world remains unchanged.
-Next: Phase 5f generic disease and travel-linked spread.
+Phase 5f1 health accounting/recovery is implemented and deployed. Publication is
+underway. Next: 5f2 local and travel-contact transmission; no contagion exists yet.
+Confirmed: workforce loss, recovery and temporary immunity, no direct disease
+deaths, and polluted water may introduce initial cases. See [health model](docs/disease.md).
 
 ## Completed
 
@@ -38,7 +37,7 @@ Next: Phase 5f generic disease and travel-linked spread.
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
-| 5. Broader simulation | In progress: 5a–5e implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
+| 5. Broader simulation | In progress: 5a–5e and 5f1 implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
@@ -1616,3 +1615,36 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published Phase 5e milestone `19e084b` to the public repository on main; this
   follow-up records the successful push.
+
+### 2026-09-20 — Phase 5f1 health accounting, recovery and water exposure
+
+- Added optional versioned health activation; existing residents/travelers begin
+  susceptible. Creator introduction/treatment, recovery, temporary immunity and
+  separately enabled polluted-water exposure operate without model calls.
+- Ill residents and visiting workers cannot farm; no direct disease deaths.
+  Existing starvation remains. Exact proportional compartment movement covers
+  departures, arrivals, docking, automatic migration, demographic edits and losses.
+  Temporary visits sample a shared origin pool; births/additions are susceptible.
+- Progress occurs before arrivals so travelers recover once per day, even blocked.
+  Pausing preserves demographic accounting while stopping progression/work loss.
+- Added Health and recovery inspector, illness overlay, traveler health summaries,
+  baseline forecasts, validated prompt operations and provider capabilities v20.
+- Verified `npm run check`: **191 tests passed**, typecheck/build passed. Health,
+  water-quality and journey browser workflows passed; desktop/mobile screenshots
+  inspected. Health tests cover rounding/conservation, scope, water cases, labor,
+  migration, starvation, births, activation in transit, replay/checkpoint/portable
+  saves and no preview mutation. Browser ticks made zero autonomous model calls.
+- Real native Claude generated exactly the requested 10-case introduction in an
+  isolated world; schema/scope and read-only forecast passed, fixture unchanged.
+- Documented [health model](docs/disease.md), defaults, phase order, limitations,
+  activation and follow-up in the Phase 5 plan and related world/environment docs.
+- Deployed at `0.0.0.0:5180`; LAN health controls verified. Preserved first-world
+  day **1206**, revision **1235**, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and full save envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Health remains inactive pending reviewed player activation. Evidence:
+  `/tmp/logos-health-deploy.json`; no user-world changes or test ticks.
+- Next **5f2**: local/travel-contact transmission with deterministic snapshots,
+  attribution and no population duplication. Full Phase 5f is not yet complete.
+- Existing ~661 kB web bundle warning remains a Phase 6 performance task.

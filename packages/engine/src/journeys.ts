@@ -1,3 +1,4 @@
+import {takeHealth} from './disease.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 import type {Journey,JourneyStatus} from '../../contracts/src/journeys.js';
 import {fieldValue} from './extensions.js';
@@ -19,7 +20,7 @@ function arrivalBlock(w:World,j:Journey,id:number):JourneyStatus|null {
  if(j.cargo.some(c=>units(fieldValue(w,id,c.fieldId))+units(c.amount)>units(w.definitions.fields.find(f=>f.id===c.fieldId)!.max)))return 'cargo-capacity';return null;
 }
 function unload(w:World,j:Journey,id:number):void {
- const t=w.tiles[id],s=t.settlement!;t.population+=j.population;s.foodRations+=j.foodRations;s.shortageDays=0;s.surplusDays=0;delete s.lastDay;
+ const t=w.tiles[id],s=t.settlement!;if(w.disease){t.health!.ill+=j.health!.ill;t.health!.immune+=j.health!.immune;}t.population+=j.population;s.foodRations+=j.foodRations;s.shortageDays=0;s.surplusDays=0;delete s.lastDay;
  for(const c of j.cargo)t.properties[c.fieldId]=(units(fieldValue(w,id,c.fieldId))+units(c.amount))/1000;
 }
 export function applyJourney(w:World,op:Operation):void {
@@ -31,6 +32,7 @@ export function applyJourney(w:World,op:Operation):void {
   if(op.population>source.population||op.foodRations>s.foodRations)throw Error('Insufficient departure population or food');
   const j:Journey={id:op.journeyId,label:op.label,path:op.path,daysPerHop:op.daysPerHop,index:0,remainingDays:op.daysPerHop,population:op.population,foodRations:op.foodRations,cargo:op.cargo,departedTick:w.tick,shortageDays:0,shortageIntervalDays:s.settings.shortageIntervalDays,lossPermille:s.settings.lossPermille};
   for(const c of op.cargo){const f=w.definitions.fields.find(f=>f.id===c.fieldId);if(!f||f.quantity!=='stock'||fieldValue(w,op.tileId,c.fieldId)<c.amount)throw Error('Insufficient or invalid departure cargo');source.properties[c.fieldId]=(units(fieldValue(w,op.tileId,c.fieldId))-units(c.amount))/1000;}
+  if(w.disease)j.health=takeHealth(source.health!,source.population,op.population);
   source.population-=op.population;s.foodRations-=op.foodRations;s.shortageDays=0;s.surplusDays=0;delete s.lastDay;
   w.journeys??={model:'land-journeys-v1',active:[]};w.journeys.active.push(j);w.journeys.active.sort((a,b)=>a.id<b.id?-1:1);
  }else if(op.kind==='journey-redirect'||op.kind==='journey-provision'||op.kind==='journey-dock'){
@@ -52,7 +54,7 @@ export function advanceJourneys(w:World):void {
     else{j.index++;j.remainingDays=j.daysPerHop;}}
   }
   if(!arrived){consumed=Math.min(j.population,j.foodRations);unmet=j.population-consumed;j.foodRations-=consumed;
-   if(unmet){j.shortageDays++;if(j.shortageDays>=j.shortageIntervalDays){losses=j.lossPermille?Math.min(j.population,Math.max(1,Math.ceil(j.population*j.lossPermille/1000))):0;j.population-=losses;j.shortageDays=0;}}else j.shortageDays=0;
+   if(unmet){j.shortageDays++;if(j.shortageDays>=j.shortageIntervalDays){losses=j.lossPermille?Math.min(j.population,Math.max(1,Math.ceil(j.population*j.lossPermille/1000))):0;if(w.disease)takeHealth(j.health!,j.population,losses);j.population-=losses;j.shortageDays=0;}}else j.shortageDays=0;
    if(!j.population)status='no-travelers';remaining.push(j);
   }
   data.lastDay.entries.push({journeyId:j.id,label:j.label,origin:j.path[0],tileId:arrived?j.path.at(-1)!:j.path[j.index],destination:j.path.at(-1)!,status,beforePopulation,afterPopulation:j.population,beforeFood,afterFood:j.foodRations,consumed,unmet,losses});

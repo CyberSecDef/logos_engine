@@ -99,8 +99,10 @@ records this multiplier, and forecasts compare both pollution and food outcomes.
 
 Dry surface deposits do not directly damage crops. With no standing water, the
 water-quality multiplier is one; existing rain/moisture/weather factors still
-apply. No direct illness, population loss or vegetation damage comes from this
-model; consequences through existing food shortages remain possible.
+apply. This model causes no direct population loss or vegetation damage;
+consequences through existing food shortages remain possible. Separately activated
+[health tracking](disease.md) uses the current water-quality factor to introduce
+resident illness after water processing and before journey arrivals.
 
 ## Sanitation and famine
 

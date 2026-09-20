@@ -132,4 +132,7 @@ Creator-placed inhabitants and food reserves now exist; see [settlements](settle
 Shortage, growth, sanitation and water contamination now exist. Visits and timed
 migration also exist. With explicit water-quality activation, settlements emit
 waste and food shortages reduce sanitation condition; pollution can reduce harvest.
-Generic illness and travel-linked disease remain planned.
+[Health accounting](disease.md) now supports recovery, temporary immunity,
+workforce loss and water-caused cases after separate activation. Health travels
+with people; contact transmission remains planned for Phase 5f2.
+The confirmed first disease model has no direct disease deaths.

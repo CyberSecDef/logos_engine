@@ -103,8 +103,10 @@ cleanup and conserved transport, with inspector budgets and air/wind overlays.
 Air currently has no damage effects.
 [Water quality and sanitation](docs/water-quality.md) follows real runoff, keeps
 dry deposits, tracks settlement waste/treatment and reduces farming when standing
-water is contaminated. Activate it through its reviewed inspector control; illness
-is not yet simulated.
+water is contaminated. Activate it through its reviewed inspector control.
+[Health and recovery](docs/disease.md) separately enables illness, temporary immunity,
+water-caused cases and lost farm labor, with health carried by travelers.
+Contact-based transmission is the next milestone.
 
 **Still planned:** richer erosion, broader trade and movement,
 conflict, and technology. The communication flag is persisted but

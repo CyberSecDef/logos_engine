@@ -227,10 +227,15 @@ Versioned optional built-in world models now include
 [airflow/pollution](air-pollution.md). Their dedicated operations, bounds, phase
 ordering, conservation rules and read primitives are specified in those documents
 and exported in the provider response schema. Both evolve without model calls.
-Pollution damage remains unimplemented; air transport does not emit water pollution.
+Air-pollution damage remains unimplemented; air transport does not emit water pollution.
 
 [Water quality and sanitation](water-quality.md) adds versioned activation, bounded
 dissolved/surface pools, actual runoff transport, settlement waste, sanitation
 capacity/condition and a farm-output multiplier. Custom reads are available for
 load, concentration and plant condition; outputs remain dedicated validated
-operations. No direct illness or air-to-water deposition is implemented.
+operations. No air-to-water deposition is implemented.
+
+[Health and recovery](disease.md) adds separately activated `health-state-v1`,
+`disease-configure`, `disease-introduce` and `disease-treat`. It reads water quality
+for resident exposure, tracks health through all population changes and removes
+ill people from available farm labor. Contact transmission remains the next step.
