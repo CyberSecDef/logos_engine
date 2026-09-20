@@ -6,7 +6,7 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5c1 adjacent food sharing is complete and deployed; publishing this milestone.
+Phase 5c1 adjacent food sharing is complete, deployed and published as `2c141ee`.
 Confirmed automatic sharing on reviewed world activation conserves food, protects
 reserves, obeys daily limits and independent zone permissions, and explains routes.
 All 139 tests, four browser checks and native Claude acceptance pass. Settlement
@@ -1356,3 +1356,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   player settlements and all soil/world data are preserved.
 - Phase 5c1 is complete; later resource routing and population movement remain
   open. Publishing code, tests, updated plan and docs/food-sharing.md.
+
+### 2026-09-20 — Phase 5c1 publication
+
+- Published `2c141ee` to public `CyberSecDef/logos_engine` on `main`.
+- Adjacent food sharing is complete. Phase 5c2 resource routes/travel permissions
+  and Phase 5c3 journeys/migration remain planned and are not claimed implemented.
