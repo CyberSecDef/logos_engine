@@ -134,7 +134,8 @@ require a build supporting this feature. New model versions must retain old mode
 semantics for replay. There is no population ticking while the application is closed.
 
 [Adjacent food sharing](food-sharing.md) is available through separate reviewed world
-activation. Migration, sanitation, pollution and disease remain planned. Food aid is
+activation. [Creator-directed migration journeys](journeys.md) are now available. Sanitation,
+pollution and disease remain planned. Food aid is
 explicit creator intervention. Generic entities named farms/towns do not automatically participate. Custom soil
 fertility participates when explicitly bound through [soil ecology](soil-ecology.md).
 

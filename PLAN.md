@@ -551,3 +551,10 @@ local travel gates and per-route reports. Uses the original transfer reservation
 phase so legacy rules and routes cannot double-spend or forward same-phase receipts.
 Food, communication and legacy generic sharing remain separate channels. Timed
 journeys and migration stay in 5c3. See docs/resource-routes.md and DEVELOPMENT.md.
+
+### Phase 5c3 execution — timed land journeys and migration
+
+Creator-directed migration and blocked-arrival waiting are confirmed. Implemented
+saved paths/timers, real inhabitants/food/cargo, shortage losses, capacity gates,
+reviewed provision/redirect/dock recovery, and transit-inclusive totals. No automatic
+famine migration or sea travel. See docs/journeys.md and DEVELOPMENT.md for acceptance.

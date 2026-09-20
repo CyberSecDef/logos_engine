@@ -1,3 +1,4 @@
+import {journeyTotals} from '../../../packages/engine/src/journeys.js';
 import { createHash } from 'node:crypto';
 import { Id, migrateWorld, type World } from '../../../packages/contracts/src/index.js';
 import { ArchiveSchema, MAX_ARCHIVE_BYTES } from '../../../packages/contracts/src/checkpoints.js';
@@ -20,4 +21,4 @@ export function copyWorld(input:World,id:string,name:string):World {
  for(const proposal of world.history)proposal.worldId=id;
  return validateWorld(world);
 }
-export function worldSummary(world:World) {return {id:world.id,name:world.name,tick:world.tick,revision:world.revision,tiles:world.tiles.length,settlements:world.tiles.filter(t=>t.settlement).length,population:world.tiles.reduce((n,t)=>n+t.population,0),fields:world.definitions.fields.length,plugins:world.plugins.length,rules:world.definitions.rules.length,interventions:world.history.length,entityTypes:world.entities?.types.length??0,entities:world.entities?.instances.length??0};}
+export function worldSummary(world:World) {return {id:world.id,name:world.name,tick:world.tick,revision:world.revision,tiles:world.tiles.length,settlements:world.tiles.filter(t=>t.settlement).length,...journeyTotals(world),fields:world.definitions.fields.length,plugins:world.plugins.length,rules:world.definitions.rules.length,interventions:world.history.length,entityTypes:world.entities?.types.length??0,entities:world.entities?.instances.length??0};}

@@ -3,8 +3,8 @@
 The `adjacent-food-v1` model shares actual saved food between neighboring populated
 land settlements. Automatic sharing after world activation was confirmed by the
 player. It is a deterministic surplus-distribution model, with no currency, prices,
-barter, merchant jobs or autonomous LLM calls. Resource routes, timed journeys and
-population migration remain later Phase 5c work.
+barter, merchant jobs or autonomous LLM calls. [Named resource routes](resource-routes.md) and [migration journeys](journeys.md)
+are separate channels with their own travel rules.
 
 ## Use it
 
@@ -116,7 +116,7 @@ the forecast. It does not remove stored food. Last-day routes remain historical 
 permissions, terrain or settlements change after that day.
 
 `world.foodTrade` stores configuration and a bounded last-day report containing
-`tick`, world food before/after sharing, total transferred, and exact `{from,to,rations}`
+`tick`, settlement food before/after sharing, total transferred, and exact `{from,to,rations}`
 edges. The inspector filters these routes to the selected zone. Settlement daily
 `beforeFood` is measured **after sharing**, and its existing harvest/meal ledger
 remains exact. Trade totals are measured before harvest and consumption, so they

@@ -1,3 +1,4 @@
+import {validateJourneys,applyJourney,advanceJourneys} from './journeys.js';
 import {validateRoutes,applyRoute} from './routes.js';
 import {validateFoodTrade,applyFoodTrade,advanceFoodTrade} from './food-trade.js';
 import {validateEcology,applyEcology,advanceEcology} from './ecology.js';
@@ -29,7 +30,7 @@ export function validateWorld(input:unknown):World {
     commands.add(p.id);
   }
   if(w.artwork&&new Set(w.artwork.images.map(i=>i.slot)).size!==w.artwork.images.length)throw Error('Duplicate artwork slot');
-  validateRoutes(w);validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
+  validateJourneys(w);validateRoutes(w);validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
   return w;
 }
 function event(w:World,e:WorldEvent) { w.events.push(e); if(w.events.length>200) w.events.shift(); }
@@ -38,6 +39,7 @@ export function applyProposal(world:World,input:unknown):World {
   if(p.worldId!==world.id) throw Error('Proposal belongs to another world');
   if(world.history.some(h=>h.id===p.id)) throw Error('Proposal has already been applied');
   if(p.expectedRevision!==world.revision) throw Error('Stale proposal: refresh and review again');
+  const departureIds=p.operations.flatMap(op=>op.kind==='journey-depart'?[op.journeyId]:[]);if(new Set(departureIds).size!==departureIds.length)throw Error('Journey IDs cannot be reused within a proposal');
   validateEntityMigrations(world,p.operations);validateConversions(world,p.operations);validateStateMappings(world,p.operations);
   const next=structuredClone(world);
   for(const op of p.operations) {
@@ -49,7 +51,7 @@ export function applyProposal(world:World,input:unknown):World {
       next.artwork=op.pack;
     }
     if(op.kind==='artwork-reset')delete next.artwork;
-    applyRoute(next,op);applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
+    applyJourney(next,op);applyRoute(next,op);applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
     if(op.kind==='elevation') tile.elevationM+=op.deltaM;
     if(op.kind==='communication') tile.communication=op.enabled;
     if(op.kind==='rainfall') {
@@ -79,6 +81,7 @@ function advanceDay(world:World,report?:WaterTransportReport):World {
   const next=structuredClone(world); next.tick++; next.revision++;
   advanceTemperature(world,next);
   advanceHydrology(world,next,event,report);
+  advanceJourneys(next);
   advanceEcology(next);
   advanceFoodTrade(next);
   advanceSettlements(next);

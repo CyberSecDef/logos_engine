@@ -256,3 +256,11 @@ still shows day +5. See [food sharing](food-sharing.md) for bodies and semantics
 retain versioned route definitions and daily reports. The existing stock resolver
 reserves inventory/capacity across generic rules and routes without forwarding.
 See [resource routes](resource-routes.md) for exact operations and limits.
+
+## Timed migration journeys (5c3)
+
+`journey-depart`, `journey-provision`, `journey-redirect` and `journey-dock` manage
+optional versioned world journey state. Departure/redirect scopes cover the paths;
+local recovery uses the current zone. Preview and world summaries include transit
+population; resource totals include cargo. See [journeys](journeys.md) for exact
+operations, timing, food losses, capacity blocking and recovery semantics.

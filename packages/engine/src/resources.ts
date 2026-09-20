@@ -8,7 +8,7 @@ export function stockUnits(world:World,tileId:number,field:FieldDefinition):numb
  return Math.round((Object.hasOwn(properties,field.id)?properties[field.id]:field.defaultValue)*1000);
 }
 export function resourceTotals(world:World) {
- return world.definitions.fields.filter(f=>f.quantity==='stock').map(f=>({fieldId:f.id,label:f.label,unit:f.unit,totalMilli:world.tiles.reduce((sum,t)=>sum+stockUnits(world,t.id,f),0)}));
+ return world.definitions.fields.filter(f=>f.quantity==='stock').map(f=>({fieldId:f.id,label:f.label,unit:f.unit,totalMilli:world.tiles.reduce((sum,t)=>sum+stockUnits(world,t.id,f),0)+(world.journeys?.active.reduce((sum,j)=>sum+j.cargo.filter(c=>c.fieldId===f.id).reduce((n,c)=>n+Math.round(c.amount*1000),0),0)??0)}));
 }
 export function transferOnce(world:World,from:number,to:number,fieldId:string,amount:number):void {
  const field=world.definitions.fields.find(f=>f.id===fieldId);

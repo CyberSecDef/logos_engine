@@ -88,6 +88,7 @@ export function applyExtension(world:World,op:Operation):void {
  }
  if(op.kind==='field-transfer')transferOnce(world,op.tileId,op.toTileId,op.fieldId,op.amount);
  if(op.kind==='field-define') {
+  if(op.transform&&world.journeys?.active.some(j=>j.cargo.some(c=>c.fieldId===op.definition.id)))throw Error('Unload journey cargo before converting its units');
   const old=world.definitions.fields.find(f=>f.id===op.definition.id);
   const recorded=world.history.flatMap(p=>p.operations).filter(o=>o.kind==='field-define'&&o.definition.id===op.definition.id).map(o=>o.kind==='field-define'?o.definition.version:0);
   const previous=recorded.reduce((max,version)=>Math.max(max,version),old?.version??0);
@@ -191,6 +192,7 @@ export function validateConversions(world:World,operations:Operation[]):void {
  for(const op of operations) {
   if(op.kind!=='field-define'||!op.transform)continue;
   const id=op.definition.id;
+  if(world.journeys?.active.some(j=>j.cargo.some(c=>c.fieldId===id)))throw Error('Unload journey cargo before converting its units');
   if(operations.filter(o=>o.kind==='field-define'&&o.definition.id===id).length!==1)throw Error('Convert a property at most once per proposal');
   for(const route of world.resourceRoutes?.routes??[])if(route.fieldId===id&&!operations.some(o=>o.kind==='resource-route-define'&&o.route.id===route.id||o.kind==='resource-route-remove'&&o.routeId===route.id))throw Error(`Conversion requires an explicit update or removal of resource route ${route.id}`);
   for(const rule of world.definitions.rules) {

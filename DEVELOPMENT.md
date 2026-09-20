@@ -6,12 +6,12 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5c2 named resource routes and travel permissions are complete, deployed and
-published as `d813993`. Routes share conserved stock/capacity reservations with
-legacy transfers and expose versioned reserves, targets, cadence and daily reports.
-All 146 tests, four browser checks and native Claude acceptance pass. Land-only is
-the stated first-model default; optional sea-support preference is unanswered.
-Next: Phase 5c3 timed journeys and migration.
+Phase 5c3 timed journeys/migration is complete and deployed; publishing this milestone.
+Creator-directed land departures, carried food/cargo, shortage losses, blocked
+arrivals and reviewed recovery are implemented. Both player preferences are confirmed.
+All 154 tests, five browser checks and native Claude acceptance pass. Phase 5c is
+complete for its documented first scope. Next: 5d airflow and air pollution.
+Automatic famine migration, sea travel and market economies remain future work.
 
 ## Completed
 
@@ -1407,3 +1407,63 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published `d813993` to public `CyberSecDef/logos_engine` on `main`.
 - Verified save-preserving deployment. Resource routes/travel gates are complete;
   Phase 5c3 timed journeys and population migration remain next.
+
+### 2026-09-20 — Phase 5c3 started
+
+- Building versioned journeys over saved adjacent land paths with days per leg,
+  bounded active parties, real inhabitants/food/cargo and explicit conservation.
+- Movement occurs before settlement meals. Travelers eat carried rations while
+  moving/waiting; arrival-day meals are handled by the destination exactly once.
+- Closed/submerged legs or destination capacity block progress without losing
+  cargo. Provision, redirect and dock operations support reviewed recovery.
+- Existing worlds remain unchanged without explicit departures. Tests/UI/provider
+  integration, documentation, deployment and publication remain in progress.
+
+### 2026-09-20 — Phase 5c3 initial acceptance
+
+- Initial full check passes all 153 tests with zero failures/skips. Tests cover
+  timed multi-leg arrival, single daily meals, shortages/extinction, closed/full/
+  submerged/missing arrivals, provision/redirect/dock, cargo protection, scope,
+  checkpoint/portable/replay and no load-time progression.
+- Added transit-inclusive population, food and stock totals; previews distinguish
+  settled inventories from carried stores. Existing daily stock ledger remains
+  explicitly the zone-stock phase ledger.
+- Direct migration controls use deterministic shortest open land paths; provider
+  topology is limited to scope and encoded compactly. Recovery remains reviewed.
+- Creator-directed departures remain the stated default pending optional feedback.
+- Browser/native checks and final docs/deployment/publication remain in progress.
+
+### 2026-09-20 — Phase 5c3 decisions confirmed
+
+- Player confirmed creator-directed migration, with blocked arrivals waiting until
+  resolved or redirected. Also confirmed the earlier land-neighbor route choice.
+- Added competing-arrival priority and partial-progress redirection checks.
+- Documentation covers saved paths, departure/arrival balances, transit provisions,
+  shortage loss, zero-survivor cargo recovery and scope. Browser/native acceptance
+  plus final deployment/publication remain in progress.
+
+### 2026-09-20 — Phase 5c3 browser/provider acceptance and transaction audit
+
+- Journey browser passes departure/cancel/Apply, carried meals, waiting, prompted
+  provisions, reload/replay, reopening and arrival. Mobile screenshot inspected.
+- Route, food-sharing, settlement and resource browser regressions all pass.
+- Native Claude proposed a valid departure whose two-day arrival conserved 200
+  inhabitants; scope/schema/preview passed and saved fixture remained unchanged.
+- Transaction audit added rejection for converting cargo units after a departure
+  earlier in the same proposal, and for reusing a journey ID within one proposal.
+  These protect accounting and identity across combined creator operations.
+- Final validation and save-preserving deployment/publication remain.
+
+### 2026-09-20 — Phase 5c3 final deployment
+
+- Final full check passes 154 tests, zero failures/skips; TypeScript/build pass.
+  Journey, route, food-sharing, settlement and resource browsers pass. Native Claude
+  departure/arrival acceptance and inspected mobile visuals pass.
+- Deployed on 0.0.0.0:5180 with Claude Code selected. Exact saved envelope and active
+  world preserved: first-world day 1170/revision 1190,
+  `5f133309b693ad2e9afe8b16daeb24f94cd422fb8428ccbeca1ee5e6725cf929`.
+- No journeys were started in the player's world during testing/deployment.
+  Journeys and migration controls are available after refresh; all actions require review.
+- Phase 5c3 and the documented first trade/movement scope are complete. Next: 5d
+  airflow and air pollution. Automatic famine migration, sea travel and currency
+  markets are intentionally not claimed implemented.

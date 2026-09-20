@@ -1,3 +1,4 @@
+import {journeyOperations} from './journeys.js';
 import {routeOperations} from './routes.js';
 import {foodTradeOperations} from './food-trade.js';
 import {ecologyOperations} from './ecology.js';
@@ -35,6 +36,7 @@ export const modelReplyJsonSchema={
   kind:{type:'string',enum:['discussion','proposal','clarification','unsupported']},message:{type:'string'},
   assumptions:{type:'array',items:{type:'string'}},
   operations:{type:'array',items:{anyOf:[
+   ...journeyOperations.map(modelSchema),
    ...routeOperations.map(modelSchema),
    ...foodTradeOperations.map(modelSchema),
    ...ecologyOperations.map(modelSchema),

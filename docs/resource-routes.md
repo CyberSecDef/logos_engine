@@ -2,8 +2,9 @@
 
 Named directed routes move custom stock resources between adjacent land zones.
 They extend the existing conserved-stock calculation; food sharing remains its own
-system. This milestone does not add population movement, sea transport, long-distance
-routes, travel time, currency or markets. Those require later explicit models.
+system. This adjacent stock-route model does not itself move people or add travel time.
+[Migration journeys](journeys.md) now support timed land paths with people and cargo;
+sea transport, currency and markets remain future work.
 
 ## Try a route
 
@@ -36,16 +37,15 @@ leaves all inventory where it is; there are no in-transit goods in this model.
 | Automatic food sharing | Its existing `foodTradeAllowed` at both endpoints |
 | Communication | Existing `communication` flag; knowledge exchange remains planned |
 | Existing generic stock rules / creator transfers | Their existing scopes and rules; travel flag does not alter them |
-| People or timed journeys | Not yet simulated; policies will be defined in 5c3 |
+| People / timed land journeys | `travelAllowed` gates legs and arrivals; see [journeys](journeys.md) |
 
-Travel here has a concrete current effect on named resource routes. It is not a
-claim that people already move or that closing it universally blocks every custom
-world mechanic. Creator stock edits still work. The controls explain this distinction.
+Travel permission now gates named resource routes and migration journeys. Generic
+custom transfer rules and creator stock edits retain their own behavior; closing
+travel does not universally block every custom world mechanic.
 
 Both endpoints must be above sea level. Defining a route to submerged terrain is
 allowed, but it reports **endpoint submerged** and moves nothing until both ends
-are land. Flood depth is not a route-closure rule yet. Adjacent sea support was an
-optional design question; land-only is the stated first-model implementation default.
+are land. Flood depth is not a route-closure rule yet. The player confirmed land neighbors first; sea support remains future work.
 
 ## Deterministic transfer rules
 

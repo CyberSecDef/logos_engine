@@ -1,3 +1,4 @@
+import {JourneysSchema,journeyOperations} from './journeys.js';
 import {ResourceRoutesSchema,routeOperations} from './routes.js';
 import {FoodTradeSchema,foodTradeOperations} from './food-trade.js';
 import {SoilEcologySchema,SoilDaySchema,ecologyOperations} from './ecology.js';
@@ -34,6 +35,7 @@ export const TemperatureRuleSchema = z.object({
 }).strict();
 export const RuleSchema = z.discriminatedUnion('kind', [RainRuleSchema, TemperatureRuleSchema]);
 export const OperationSchema = z.discriminatedUnion('kind', [
+  ...journeyOperations,
   ...routeOperations,
   ...foodTradeOperations,
   ...ecologyOperations,
@@ -63,7 +65,7 @@ export const WorldSchema = z.object({
   tick:uint, revision:uint, cells:z.array(CellSchema).min(12).max(6762),
   tiles:z.array(TileSchema).min(12).max(6762), rules:z.array(RuleSchema),
   definitions:DefinitionsSchema,resourceLedger:ResourceLedgerSchema,plugins:z.array(PluginInstanceSchema).max(8),
-  resourceRoutes:ResourceRoutesSchema.optional(),foodTrade:FoodTradeSchema.optional(),soilEcology:SoilEcologySchema.optional(),artwork:ArtworkPackSchema.optional(),entities:EntitiesSchema.optional(),
+  journeys:JourneysSchema.optional(),resourceRoutes:ResourceRoutesSchema.optional(),foodTrade:FoodTradeSchema.optional(),soilEcology:SoilEcologySchema.optional(),artwork:ArtworkPackSchema.optional(),entities:EntitiesSchema.optional(),
   history:z.array(ProposalSchema), events:z.array(EventSchema).max(200),
   accounting:z.object({rainL:uint, evaporationL:uint, oceanDrainL:uint}).strict(),
 }).strict();
