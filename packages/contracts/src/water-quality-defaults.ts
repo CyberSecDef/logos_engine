@@ -1,0 +1,2 @@
+export const WATER_POLLUTION_MAX=1_000_000_000;
+export const DEFAULT_WATER_QUALITY_SETTINGS={washoffPermille:250,settlingPermille:50,decayPermille:0,qualityLimitPerMillionL:100,settlementWasteEnabled:true,wastePerPerson:10,shortageLossPermille:100,recoveryPermille:50};

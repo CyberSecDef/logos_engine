@@ -1,3 +1,4 @@
+import {waterQualityOperations} from './water-quality.js';
 import {airOperations} from './air.js';
 import {migrationOperations} from './migration.js';
 import {visitOperations} from './neighbor-visits.js';
@@ -39,6 +40,7 @@ export const modelReplyJsonSchema={
   kind:{type:'string',enum:['discussion','proposal','clarification','unsupported']},message:{type:'string'},
   assumptions:{type:'array',items:{type:'string'}},
   operations:{type:'array',items:{anyOf:[
+   ...waterQualityOperations.map(modelSchema),
    ...airOperations.map(modelSchema),
    ...migrationOperations.map(modelSchema),
    ...visitOperations.map(modelSchema),

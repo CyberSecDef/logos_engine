@@ -6,10 +6,10 @@ deterministic tests, persistence/replay checks, readable previews and a usable U
 The model is called only for creator prompts. No offline progression, autonomous
 model decisions, arbitrary engine edits during play or automatic provider repair.
 
-Status: **5a–5d implemented and deployed**, including automatic visits and
-relocation follow-ups. Native Claude acceptance for the latest operations is
-unverified due to an external provider refusal; direct controls, schema/engine
-tests and browser acceptance pass. Next: 5e water contamination/sanitation.
+Status: **5a–5e implemented and deployed**, including automatic visits and
+relocation follow-ups. Phase 5e passes engine, browser and native Claude source
+acceptance. Historical provider refusal for the earlier combined air/migration
+request is documented in DEVELOPMENT.md. Next: 5f generic disease/travel spread.
 
 ## Sequence and exit criteria
 
@@ -19,7 +19,7 @@ tests and browser acceptance pass. Next: 5e water contamination/sanitation.
 | 5b. Food and population — complete | Explicitly introduce settlement state, food inventory, bounded production/consumption and tangible weather/flood/heat effects. Define inhabitants, food units, capacity and shortage/surplus counters. Creator placement and actual inhabitants/daily food reserves are confirmed. See [implemented model](settlements.md). | Food sources/sinks balance; inhabitants stay bounded/nonnegative; shortage and recovery are observable; existing worlds do not silently acquire active demographic rules. |
 | 5c. Trade and movement — complete | Begin with adjacent food/resource transfers, capacities and supply/demand. Add explicit travel permissions independent of communication, then timed long-distance routes and migration. | No double spending, lost inventory or duplicated people; stable competition resolution; travel respects duration; world totals include travelers in transit. |
 | 5d. Airflow and air pollution — implemented | Deterministic spherical wind field, emissions, bounded directed transport, mixing and explicit removal. Add creator pulses and sustained sources, wind/air-quality inspection and overlays. | Wind reversal changes the affected neighbors; calm behavior is defined; emissions/transfers/removal balance; stopping emissions does not erase existing load. |
-| 5e. Water contamination and sanitation | Reuse 5a water volumes for load transfer. Define dissolved load, dry deposits, dilution, wash-off and ocean export. Add explicit sanitation/infrastructure links after 5b; famine affects these through documented rules. | Evaporation does not delete contaminant mass; dry zones avoid division by zero; runoff carries load downstream; sources/sinks and ocean export balance. |
+| 5e. Water contamination and sanitation — implemented | Reuse 5a water volumes for load transfer. Define dissolved load, dry deposits, dilution, wash-off and ocean export. Add explicit sanitation/infrastructure links after 5b; famine affects these through documented rules. | Evaporation does not delete contaminant mass; dry zones avoid division by zero; runoff carries load downstream; sources/sinks and ocean export balance. |
 | 5f. Generic disease | After 5b/5c: healthy/ill/recovered people, local contact, recovery and declared losses. Carry health state with travelers. Environmental exposure is separate from infectious spread. | Empty zones cannot gain sick inhabitants spontaneously; distant arrivals spread illness only on arrival; people and health compartments reconcile. |
 | 5g. Knowledge and technology | Tangible research costs, progress and unlocked bounded production/infrastructure effects. Communication permits defined knowledge exchange; completion activates effects at a documented tick boundary. | Knowledge does not teleport across closed channels; costs debit once; unlocks survive saves/replay; no model call is needed for progress. |
 | 5h. Factions and conflict | World-defined ownership, explicit relationships and resource-backed conflict over zones/routes. Concrete manpower, supplies, damage and repair rules; no abstract “freedom” settings. | Stable simultaneous resolution, accounted losses/displacement, explicit travel/trade effects, recovery and deterministic replay. |
@@ -128,3 +128,12 @@ travel closures apply. See [automatic migration](automatic-migration.md).
 Track and spread air pollution first; defer ALL vegetation, farming and health
 damage. The load/wind/source/control/overlay milestone is documented in
 [air pollution](air-pollution.md). Physical transport ignores human travel borders.
+
+### Phase 5e decisions and implementation
+
+Confirmed: polluted water reduces farm output; illness comes later. Settlements
+produce adjustable waste only after explicit water-model activation. Sanitation
+has installed capacity and persistent condition; food shortages impair the next
+day’s treatment and fully-fed days restore it. Actual runoff carries integer load,
+dry pools retain deposits, clean water dilutes, and ocean export is accounted.
+See [water quality](water-quality.md) for activation, conservation, scope and limits.

@@ -100,7 +100,11 @@ over timed land paths, with waiting, shortage accounting and reviewed recovery.
 food or housing without individual player approval.
 [Air pollution](docs/air-pollution.md) adds seeded winds, pulses, recurring emissions,
 cleanup and conserved transport, with inspector budgets and air/wind overlays.
-It currently has no damage effects.
+Air currently has no damage effects.
+[Water quality and sanitation](docs/water-quality.md) follows real runoff, keeps
+dry deposits, tracks settlement waste/treatment and reduces farming when standing
+water is contaminated. Activate it through its reviewed inspector control; illness
+is not yet simulated.
 
 **Still planned:** richer erosion, broader trade and movement,
 conflict, and technology. The communication flag is persisted but

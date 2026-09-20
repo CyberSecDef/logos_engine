@@ -577,3 +577,12 @@ seeded saved spherical wind, whole-unit emission/transport/mixing/removal budget
 scoped creator controls, custom reads, diagnostics and air/wind overlays. Air ignores
 human borders and has no water/vegetation/farming/health consequences yet.
 See docs/automatic-migration.md, docs/air-pollution.md and DEVELOPMENT.md.
+
+### Phase 5e execution — water quality and sanitation
+
+Confirmed water contamination reduces farming now, illness later. Waste generation
+starts only with explicit world activation. Implemented exact runoff entrainment,
+dry deposits/wetting, settling, finite treatment, decay and ocean export budgets.
+Sanitation condition persists through famine counter resets and migration; food
+shortages impair next-day treatment. Added operations, custom reads, overlays,
+read-only diagnostics and five-day forecast comparisons. See docs/water-quality.md.

@@ -1,3 +1,4 @@
+import {previewWaterQuality} from '../../../packages/engine/src/index.js';
 import {previewAir} from '../../../packages/engine/src/air.js';
 import {defaultMigration} from '../../../packages/contracts/src/migration.js';
 import {defaultNeighborVisits} from '../../../packages/contracts/src/neighbor-visits.js';
@@ -99,6 +100,11 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(pathname==='/api/prompts/import')return json(res,200,await prompts.import(world,input));
       if(pathname==='/api/prompts/cancel'){const p=z.object({id:z.string()}).strict().parse(input);prompts.cancel(world,p.id);return json(res,200,{cancelled:true});}
       if(prompts.busy)throw Error('World is paused while the model responds; wait or cancel the request');
+      if(pathname==='/api/water-quality/preview'){
+        const p=z.object({worldId:Id,expectedRevision:z.number().int().nonnegative(),tileId:z.number().int().nonnegative()}).strict().parse(input);
+        if(p.worldId!==world.id)throw Error('Water quality preview belongs to another world');revision(p.expectedRevision);
+        return json(res,200,previewWaterQuality(world,p.tileId));
+      }
       if(pathname==='/api/air/preview'){
         const p=z.object({worldId:Id,expectedRevision:z.number().int().nonnegative(),tileId:z.number().int().nonnegative()}).strict().parse(input);
         if(p.worldId!==world.id)throw Error('Air preview belongs to another world');revision(p.expectedRevision);

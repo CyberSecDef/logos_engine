@@ -228,3 +228,9 @@ Versioned optional built-in world models now include
 ordering, conservation rules and read primitives are specified in those documents
 and exported in the provider response schema. Both evolve without model calls.
 Pollution damage remains unimplemented; air transport does not emit water pollution.
+
+[Water quality and sanitation](water-quality.md) adds versioned activation, bounded
+dissolved/surface pools, actual runoff transport, settlement waste, sanitation
+capacity/condition and a farm-output multiplier. Custom reads are available for
+load, concentration and plant condition; outputs remain dedicated validated
+operations. No direct illness or air-to-water deposition is implemented.

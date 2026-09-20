@@ -111,3 +111,7 @@ unchanged save/journal and zero model calls.
 `npm run test:transport` covers pause/read-only inspection, exact correspondence to
 the next committed day, route labels, stale selection responses, close/reload,
 desktop/mobile layout and zero model calls using a disposable world.
+
+[Water contamination](water-quality.md) now consumes this exact hydrology report
+when activated. It changes no water volumes or sediment flows; it conserves
+separate dissolved/surface pollution pools and accounts for ocean export.

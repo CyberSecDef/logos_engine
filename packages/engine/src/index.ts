@@ -1,3 +1,4 @@
+import {validateWaterQuality,applyWaterQuality,advanceWaterQuality,advanceSanitation,waterQualityMetrics} from './water-quality.js';
 import {validateAir,applyAir,advanceAir} from './air.js';
 import {validateMigration,applyMigration,advanceMigration} from './migration.js';
 import {validateNeighborVisits,applyNeighborVisits,advanceNeighborVisits} from './neighbor-visits.js';
@@ -33,7 +34,7 @@ export function validateWorld(input:unknown):World {
     commands.add(p.id);
   }
   if(w.artwork&&new Set(w.artwork.images.map(i=>i.slot)).size!==w.artwork.images.length)throw Error('Duplicate artwork slot');
-  validateAir(w);validateMigration(w);validateNeighborVisits(w);validateJourneys(w);validateRoutes(w);validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
+  validateWaterQuality(w);validateAir(w);validateMigration(w);validateNeighborVisits(w);validateJourneys(w);validateRoutes(w);validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
   return w;
 }
 function event(w:World,e:WorldEvent) { w.events.push(e); if(w.events.length>200) w.events.shift(); }
@@ -54,7 +55,7 @@ export function applyProposal(world:World,input:unknown):World {
       next.artwork=op.pack;
     }
     if(op.kind==='artwork-reset')delete next.artwork;
-    applyAir(next,op);applyMigration(next,op);applyNeighborVisits(next,op);applyJourney(next,op);applyRoute(next,op);applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
+    applyWaterQuality(next,op);applyAir(next,op);applyMigration(next,op);applyNeighborVisits(next,op);applyJourney(next,op);applyRoute(next,op);applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
     if(op.kind==='elevation') tile.elevationM+=op.deltaM;
     if(op.kind==='communication') tile.communication=op.enabled;
     if(op.kind==='rainfall') {
@@ -83,21 +84,27 @@ export function depthMm(w:World,id:number):number { return w.tiles[id].waterL/w.
 function advanceDay(world:World,report?:WaterTransportReport):World {
   const next=structuredClone(world); next.tick++; next.revision++;
   advanceTemperature(world,next);
-  advanceHydrology(world,next,event,report);
+  const waterReport=report??(next.waterQuality?.enabled?makeWaterReport(world):undefined);
+  advanceHydrology(world,next,event,waterReport);
+  if(next.waterQuality?.enabled)advanceWaterQuality(next,waterReport!);
   advanceAir(next);
   advanceJourneys(next);
   advanceEcology(next);
   advanceFoodTrade(next);
   advanceNeighborVisits(next);
   advanceSettlements(next);
+  advanceSanitation(next);
   advanceMigration(next);
   advanceExtensions(next,advancePlugins(next));
   return validateWorld(next);
 }
 export function advance(world:World):World {return advanceDay(world);}
-export function advanceWithWaterReport(world:World):{world:World;report:WaterTransportReport} {
- const report:WaterTransportReport={worldId:world.id,sourceRevision:world.revision,sourceTick:world.tick,tick:world.tick+1,
+function makeWaterReport(world:World):WaterTransportReport {
+ return {worldId:world.id,sourceRevision:world.revision,sourceTick:world.tick,tick:world.tick+1,
   tiles:world.tiles.map(tile=>({tileId:tile.id,beforeWaterL:tile.waterL,rainL:0,evaporationL:0,mixingWaterL:0,incomingWaterL:0,outgoingWaterL:0,oceanDrainL:0,afterWaterL:0,beforeSedimentKg:tile.sedimentKg,incomingSedimentKg:0,outgoingSedimentKg:0,afterSedimentKg:0})),transfers:[]};
+}
+export function advanceWithWaterReport(world:World):{world:World;report:WaterTransportReport} {
+ const report=makeWaterReport(world);
  return {world:advanceDay(world,report),report};
 }
 export function previewWater(world:World,tileId:number):WaterPreview {
@@ -110,4 +117,9 @@ export function previewWater(world:World,tileId:number):WaterPreview {
 export function preview(world:World,p:Proposal,ticks=5):World {
   if(!Number.isInteger(ticks)||ticks<0||ticks>30) throw Error('Preview must be 0–30 ticks');
   let copy=applyProposal(world,p); for(let i=0;i<ticks;i++) copy=advance(copy); return copy;
+}
+
+export function previewWaterQuality(world:World,tileId:number){
+ if(!Number.isInteger(tileId)||!world.tiles[tileId])throw Error('Unknown tile');if(!world.waterQuality?.enabled)throw Error('Enable water quality to preview contamination');
+ const next=advance(world),day=next.waterQuality!.lastDay!;return {worldId:world.id,sourceRevision:world.revision,tick:next.tick,tileId,budget:day.tiles[tileId],metrics:waterQualityMetrics(next,tileId),incoming:day.transfers.filter(e=>e.to===tileId),outgoing:day.transfers.filter(e=>e.from===tileId),totals:{before:day.before,emitted:day.emitted,waste:day.waste,treated:day.treated,oceanExport:day.oceanExport,decayed:day.decayed,after:day.after}};
 }

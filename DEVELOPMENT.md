@@ -6,13 +6,11 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5c5 automatic relocation and Phase 5d air transport are implemented and
-deployed and published as `837b498`. Automatic relocation is activated in the current
-world after a checkpoint; air transport awaits creator activation in its controls.
-174 tests and three browser scenarios pass. Native Claude acceptance is unverified:
-the provider refused the benign fantasy-world request with a biology safety tag,
-while login and a minimal isolated discussion work. Provider remains unchanged.
-Next: Phase 5e water contamination and sanitation; all air damage remains deferred.
+Phase 5e water contamination/sanitation is implemented and deployed; publication
+pending. Confirmed water-quality farming damage is active only after reviewed
+world activation; illness remains deferred. 183 tests, three browser scenarios
+and a native Claude source request pass. Current saved world remains unchanged.
+Next: Phase 5f generic disease and travel-linked spread.
 
 ## Completed
 
@@ -40,7 +38,7 @@ Next: Phase 5e water contamination and sanitation; all air damage remains deferr
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
-| 5. Broader simulation | In progress: 5a–5d implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
+| 5. Broader simulation | In progress: 5a–5e implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
@@ -1565,3 +1563,53 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `837b498` to the public repository on main. This follow-up
   records the successful push; real-provider acceptance remains explicitly unverified.
+
+### 2026-09-20 — Water quality transport implemented; farming preference integrated
+
+- Added optional versioned water model with integer dissolved/surface pools, actual
+  runoff ratios using exact integer arithmetic, drying/wetting, settling, decay,
+  capacity rejections and explicit ocean export/treatment accounting.
+- Added settlement waste and installed sanitation capacity/condition. Short-food
+  days impair next-day treatment independently of demographic counter resets.
+- Initial transport verification passed 181 tests, typecheck and build.
+- Player confirmed farm-output damage now, illness later; added a water multiplier
+  after existing weather/soil factors, ledger/inspector feedback, and zero-quality
+  farm-visit exclusion. Added combined fertility/weather/water regression coverage.
+- World activation remains reviewed; explicit waste, pollution and farming effects
+  are disclosed. Added scope/preview/diagnostics/overlays and provider contract v19.
+- Documented full model in docs/water-quality.md. Browser/acceptance checks next.
+
+### 2026-09-20 — Phase 5e browser and native-provider checks passed
+
+- Full check after farming integration: 182 tests pass, typecheck/build pass.
+- Browser verified activation/waste disclosure/cancel/apply, release, read-only
+  next-day budget, runoff, farm multiplier, waste/shortage condition, recurring
+  source/stop, sanitation repair/treatment, cleanup, overlays, replay and mobile.
+  No autonomous model calls; mobile screenshot inspected.
+- Native Claude water-source request passed schema/scope, exact 50-unit/day source
+  and read-only forecast in an isolated world. Its saved fixture was unchanged.
+  This new operation is verified; the prior combined air/migration refusal remains
+  historical evidence rather than a current blocker for water-source acceptance.
+- Added migration/plant-condition and zero-quality visiting-worker regressions;
+  renamed the daily capacity field to effectiveTreatmentCapacity to distinguish
+  available treatment from the amount actually removed. Final regression run next.
+
+### 2026-09-20 — Phase 5e verified and deployed
+
+- Final `npm run check`: 183 passed, zero failures/skips; typecheck/build pass.
+  Final browsers pass water quality, ecology/farming, and air/migration scenarios.
+  Native Claude source acceptance also passes; no autonomous model calls occur.
+- Verified large-volume runoff ratios, evaporation/deposit preservation, clean-water
+  dilution, explicit ocean export, capacity rejection, dry wetting, settling/decay,
+  treatment/waste budgets, 100-day replay, exports/checkpoints, atomic edits/scopes,
+  combined weather/soil/water harvest and sanitation persistence through migration.
+- Restarted on 0.0.0.0:5180 and verified LAN controls plus exact world/envelope hashes.
+  Preserved first-world at day 1180, revision 1208. No time advanced or saved-world
+  edits occurred. Water quality awaits explicit reviewed activation as requested.
+- Evidence: /tmp/logos-water-quality-release.log, /tmp/logos-water-quality-browser-final.log,
+  /tmp/logos-water-ecology-regression.log, /tmp/logos-water-air-regression.log,
+  /tmp/logos-water-quality-live.log and /tmp/logos-water-quality-deploy.json.
+  Screenshots are ignored under .local/screenshots. No saves/credentials committed.
+- Documented scope, equations, defaults and limitations in docs/water-quality.md;
+  updated README, PLAN, interface, water transport, settlements and Phase 5 roadmap.
+- Existing Vite large-bundle advisory remains Phase 6 optimization (658 kB).

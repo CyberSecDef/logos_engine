@@ -152,3 +152,8 @@ inspected. LAN deployment preserved the exact active-world and saved-envelope ha
 With [neighbor visits](neighbor-visits.md) enabled, farming uses resident population
 minus outgoing day visitors plus incoming farm workers. Meals and demographic
 counts remain based on residents; visitors eat at home.
+
+[Water quality](water-quality.md), when enabled, multiplies harvest after weather
+and soil fertility. Standing-water contamination can reduce output to zero; dry
+surface deposits have no direct crop effect. Meal shortages reduce next-day
+sanitation condition, independently of shortage-counter resets. Illness is deferred.
