@@ -9,7 +9,7 @@ before each milestone commit. Never mark unverified functionality complete.
 Implementing the Phase 4 replay journal: immutable linked records, atomic saved
 head, compact step/proposal entries, snapshot boundaries, read-only verification
 and recent-history inspection. All 73 tests and checkpoint/history browser
-acceptance pass. Live on the LAN server; publication is in progress.
+acceptance pass. Live on the LAN server and published as `5da7446`.
 
 Implementing world-specific appearance rules driven by built-in/custom properties.
 Rules select labels, colors and existing artwork through reviewed proposals.
@@ -836,3 +836,12 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Live history endpoint reports no records yet, as expected: adoption starts on
   the next save. Deployment did not edit or advance the user world.
 - Publishing the journal, recent-history view and read-only verification CLI.
+
+### 2026-09-19 — Replay journal publication
+
+- Pushed `5da7446` to public `CyberSecDef/logos_engine` on `main`.
+- Future saved steps/proposals are recorded with immutable hashes; recent history
+  and bounded read-only replay verification are available.
+- All 73 tests and browser recovery/history checks passed; user world preserved.
+- Selective replay, portable journal bundles, general entities and external/layered
+  artwork remain future Phase 4 work.
