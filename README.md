@@ -86,7 +86,10 @@ compatibility evidence and limits.
 
 Phase 5 is underway; see the [milestones and agreed decisions](docs/phase-5-plan.md).
 
-**Still planned:** food and population dynamics, richer erosion, trade,
+Creator-placed [settlements](docs/settlements.md) now track food reserves, weather-limited
+harvest, shortage losses and gradual growth, with reviewed prompts and overlays.
+
+**Still planned:** richer erosion, trade,
 conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 

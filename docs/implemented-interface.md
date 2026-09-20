@@ -225,3 +225,11 @@ Authenticated `POST /api/transport/preview` takes
 water/sediment budget and exact neighbor transfers. It runs the existing engine
 on a copy, makes no model call, writes no state/history, and rejects stale or
 wrong-world requests. See [calculation, types and limits](water-transport.md).
+
+## Settlements (Phase 5b)
+
+Optional versioned tile state and `settlement-create`, `settlement-configure`,
+`settlement-food`, `settlement-population`, `settlement-remove` use the existing
+proposal/preview/Apply routes. Preview includes bounded settlement comparison rows.
+Custom reads include food and shortage/surplus counters. See [settlements](settlements.md)
+for exact operation bodies, limits, tick ordering, defaults and compatibility.

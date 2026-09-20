@@ -1,3 +1,4 @@
+import {SettlementSchema,settlementOperations} from './settlements.js';
 import {EntitiesSchema,entityOperations} from './entities.js';
 import {ArtworkPackSchema,artworkOperations} from './artwork.js';
 import { z } from 'zod';
@@ -17,7 +18,7 @@ export const TileSchema = z.object({
   waterL: uint, sedimentKg: uint, rainMm: uint.max(1000),
   temperatureC: z.number().finite(), vegetation: z.number().min(0).max(1),
   temperatureAnomalyC: z.number().finite().optional(),
-  population: uint, communication: z.boolean(),
+  population: uint, settlement:SettlementSchema.optional(), communication: z.boolean(),
   properties:z.record(Id,z.number().finite().min(-1e9).max(1e9)),
 }).strict();
 export const RainRuleSchema = z.object({
@@ -30,6 +31,7 @@ export const TemperatureRuleSchema = z.object({
 }).strict();
 export const RuleSchema = z.discriminatedUnion('kind', [RainRuleSchema, TemperatureRuleSchema]);
 export const OperationSchema = z.discriminatedUnion('kind', [
+  ...settlementOperations,
   ...extensionOperations,
   ...artworkOperations,
   ...entityOperations,
@@ -45,7 +47,7 @@ export const ProposalSchema = z.object({
   summary: z.string().min(1).max(500), operations: z.array(OperationSchema).min(1).max(32),
 }).strict();
 export const EventSchema = z.object({
-  tick:uint, kind:z.enum(['intervention','flood','flow']), tileId:uint,
+  tick:uint, kind:z.enum(['intervention','flood','flow','population']), tileId:uint,
   message:z.string(), amount:uint.optional(),
 }).strict();
 export const WorldSchema = z.object({

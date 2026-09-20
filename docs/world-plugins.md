@@ -52,7 +52,7 @@ requires unchanged scope and state-key order/shape, materializes old defaults,
 and rejects values outside new bounds. `reset` explicitly discards internal state
 and uses the new defaults. These options do not reset emitted world properties.
 
-Plugins run after built-in weather/water/vegetation, alongside custom rules. All
+Plugins run after built-in weather/water/vegetation and activated settlement food/population, alongside custom rules. All
 custom reads observe the same pre-effect snapshot. Reads support the existing
 built-in/custom numeric sources and self/neighbor-average/min/max sampling. Even
 a tile-scoped program may read its neighbors' aggregate conditions. It cannot

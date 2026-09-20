@@ -123,3 +123,10 @@ The [Phase 5 execution plan](phase-5-plan.md) now governs milestone order: actua
 water-transfer accounting first, creator-placed settlements and food/population
 next, then movement and the environmental/health systems with their prerequisites.
 The scenarios and separate-channel requirements above remain the acceptance goals.
+
+### Phase 5b prerequisite update
+
+Creator-placed inhabitants and food reserves now exist; see [settlements](settlements.md).
+Shortage and growth are implemented, but sanitation, travel, contamination and
+health links above remain planned. A shortage currently affects only the local
+food/population model; it does not emit pollution or spread illness.

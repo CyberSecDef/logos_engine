@@ -6,14 +6,14 @@ deterministic tests, persistence/replay checks, readable previews and a usable U
 The model is called only for creator prompts. No offline progression, autonomous
 model decisions, arbitrary engine edits during play or automatic provider repair.
 
-Status: **5a complete and deployed**. Milestones 5b–5i remain planned; 5b is next.
+Status: **5a and 5b complete and deployed**. 5c–5i remain planned; trade and movement are next.
 
 ## Sequence and exit criteria
 
 | Milestone | Scope and dependencies | Acceptance |
 | --- | --- | --- |
 | 5a. Actual water transport and explanations | Extract the current hydrology phase without changing its arithmetic or ordering. Expose exact one-hop water/sediment transfers and per-zone source/sink budgets through a read-only next-day preview. | Old 100-day hashes remain identical; every zone balances; no same-day retransmission of incoming runoff; preview changes neither save nor journal and makes zero model calls. |
-| 5b. Food and population | Explicitly introduce settlement state, food inventory, bounded production/consumption and tangible weather/flood/heat effects. Define inhabitants, food units, capacity and shortage/surplus counters. Decide initial placement and demographic behavior with the player. | Food sources/sinks balance; inhabitants stay bounded/nonnegative; shortage and recovery are observable; existing worlds do not silently acquire active demographic rules. |
+| 5b. Food and population — complete | Explicitly introduce settlement state, food inventory, bounded production/consumption and tangible weather/flood/heat effects. Define inhabitants, food units, capacity and shortage/surplus counters. Creator placement and actual inhabitants/daily food reserves are confirmed. See [implemented model](settlements.md). | Food sources/sinks balance; inhabitants stay bounded/nonnegative; shortage and recovery are observable; existing worlds do not silently acquire active demographic rules. |
 | 5c. Trade and movement | Begin with adjacent food/resource transfers, capacities and supply/demand. Add explicit travel permissions independent of communication, then timed long-distance routes and migration. | No double spending, lost inventory or duplicated people; stable competition resolution; travel respects duration; world totals include travelers in transit. |
 | 5d. Airflow and air pollution | Deterministic spherical wind field, emissions, bounded directed transport, mixing and explicit removal. Add creator pulses and sustained sources, wind/air-quality inspection and overlays. | Wind reversal changes the affected neighbors; calm behavior is defined; emissions/transfers/removal balance; stopping emissions does not erase existing load. |
 | 5e. Water contamination and sanitation | Reuse 5a water volumes for load transfer. Define dissolved load, dry deposits, dilution, wash-off and ocean export. Add explicit sanitation/infrastructure links after 5b; famine affects these through documented rules. | Evaporation does not delete contaminant mass; dry zones avoid division by zero; runoff carries load downstream; sources/sinks and ocean export balance. |
@@ -35,8 +35,8 @@ still apply. Each milestone may be split further if a review would become too la
   unpopulated; existing worlds do not gain settlements on load.
 - Confirmed: track actual inhabitants and daily food reserves. Sustained shortage
   reduces population; sustained surplus allows slow growth.
-- Exact food units, rates, demographic intervals and capacity limits will be
-  documented with the first implementation. They are fantasy gameplay balance,
+- Exact food units, rates, demographic intervals and capacity limits are
+  documented in [settlements](settlements.md). They are fantasy gameplay balance,
   not empirical human nutrition or disease parameters.
 
 ## Compatibility and tick policy
@@ -46,8 +46,7 @@ operations, no new sources/sinks and no change to existing deterministic output.
 Its report is transient data for the same next-day calculation, not fabricated
 history. Reusable edge transfers establish the basis for contamination transport.
 
-Before 5b introduces new evolving state, define opt-in activation and versioned
-parameters. Keep inactive historical worlds on their original behavior. If a
+5b uses explicit settlement activation and the `food-population-v1` marker. Keep inactive historical worlds on their original behavior. If a
 physics change cannot preserve old replay, introduce an explicit versioned model
 and migration/review boundary; do not silently reinterpret committed steps or
 increment an engine version without supporting recorded histories.

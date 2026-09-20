@@ -519,3 +519,11 @@ activation/versioning decisions and acceptance gates. The first implementation
 extracts actual water transfers and exposes read-only next-day budgets while
 preserving Phase 4 simulation outputs. Food/population follows after its initial
 placement and demographic rules are agreed.
+
+### Phase 5b execution — 2026-09-20
+
+Implemented creator-placed settlements with versioned food/population calculation,
+reviewed settings/food/population operations, exact daily ledgers, overlays and
+recovery. See [the complete contract](docs/settlements.md) and DEVELOPMENT.md for
+acceptance/publication evidence. Trade/movement is next (5c); environmental health,
+technology and conflict remain separate planned milestones.

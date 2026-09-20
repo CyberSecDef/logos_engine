@@ -1,3 +1,4 @@
+import {settlementOperations} from './settlements.js';
 import {entityOperations} from './entities.js';
 import {artworkOperations} from './artwork.js';
 import { z } from 'zod';
@@ -31,6 +32,7 @@ export const modelReplyJsonSchema={
   kind:{type:'string',enum:['discussion','proposal','clarification','unsupported']},message:{type:'string'},
   assumptions:{type:'array',items:{type:'string'}},
   operations:{type:'array',items:{anyOf:[
+   ...settlementOperations.map(modelSchema),
    ...extensionOperations.map(modelSchema),
    ...entityOperations.map(modelSchema),
    ...artworkOperations.map(modelSchema),

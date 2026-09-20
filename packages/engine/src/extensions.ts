@@ -138,7 +138,7 @@ export function applyExtension(world:World,op:Operation):void {
  }
 }
 export function readValue(world:World,tileId:number,read:Read):number {
- const at=(id:number)=>read.source==='entity-count'||read.source==='entity-sum'?readEntities(world,id,read):read.source==='custom'?fieldValue(world,id,read.fieldId!):read.source==='waterMm'?world.tiles[id].waterL/world.cells[id].areaM2:world.tiles[id][read.source];
+ const at=(id:number)=>read.source==='foodRations'||read.source==='shortageDays'||read.source==='surplusDays'?(world.tiles[id].settlement?.[read.source]??0):read.source==='entity-count'||read.source==='entity-sum'?readEntities(world,id,read):read.source==='custom'?fieldValue(world,id,read.fieldId!):read.source==='waterMm'?world.tiles[id].waterL/world.cells[id].areaM2:world.tiles[id][read.source];
  if(read.sample==='self')return at(tileId);
  const ids=[...world.cells[tileId].neighbors].sort((a,b)=>a-b),values=ids.map(at);
  return read.sample==='neighbors-min'?Math.min(...values):read.sample==='neighbors-max'?Math.max(...values):values.reduce((sum,n)=>sum+n,0)/ids.length;

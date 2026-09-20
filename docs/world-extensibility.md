@@ -115,7 +115,7 @@ an index. Stocks require a zero minimum.
 All conditions must match. Each compares a read to a numeric value using `lt`,
 `lte`, `eq`, `gte`, or `gt`. Reads have `source` and `sample` (`self` or
 `neighbors-average`, `neighbors-min`, or `neighbors-max`). Sources are `temperatureC`, `rainMm`, `waterMm`, `vegetation`,
-`elevationM`, `population`, and `custom` with a required `fieldId`. A neighbor average
+`elevationM`, `population`, `foodRations`, `shortageDays`, `surplusDays`, and `custom` with a required `fieldId`. Settlement-specific reads return zero on unsettled tiles. A neighbor average
 is the arithmetic mean over adjacent tiles, excluding the origin.
 
 Each effect names a custom property, chooses `add` or `set`, and supplies a formula:
@@ -125,7 +125,7 @@ unbounded query, or implicit built-in-state write. Each rule allows at most eigh
 conditions, four effects, and eight terms per formula. Worlds allow up to 64 rules
 and 100,000 enabled rule-target evaluations per tick.
 
-Rules run after weather, temperature, water flow, and built-in vegetation. All read
+Rules run after weather, temperature, water flow, built-in vegetation, and activated settlement food/population. All read
 the same completed built-in state and the previous custom-property snapshot.
 One rule cannot observe another rule's writes from that tick. Additive effects
 combine, then clamp once to the definition bounds and round to 0.001. Any overlapping

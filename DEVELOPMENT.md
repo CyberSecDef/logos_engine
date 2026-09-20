@@ -13,8 +13,14 @@ water contamination/sanitation, disease, technology, conflict and final tuning.
 **5a is complete and deployed:** actual water transport and next-day explanations.
 It preserves existing physics and save hashes while exposing reusable edge flows
 and per-zone budgets. All 118 tests and water/prompt/selective browser checks pass.
-**Next: 5b food and population**, with no settlement mechanics implemented yet. For 5b the player confirmed creator-placed settlements, actual inhabitants and
-daily food reserves, with sustained shortages/surpluses driving demographic change.
+**5b is complete and deployed; publishing this milestone.**
+Creator-placed settlements now track inhabitants, food, weather-limited harvest,
+shortage losses and sustained-surplus growth. Reviewed prompts and direct controls,
+inspection, overlays and recovery are integrated. All 125 tests and the settlement
+browser check pass, along with five browser regressions and native Claude acceptance.
+Existing settlement-free replay hashes remain unchanged. Next: 5c trade and movement.
+The player confirmed explicit placement and actual inhabitants/daily food reserves.
+Per-settlement balance settings are an implementation default pending feedback.
 
 ## Completed
 
@@ -42,7 +48,7 @@ daily food reserves, with sustained shortages/surpluses driving demographic chan
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
-| 5. Broader simulation | In progress: 5a | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
+| 5. Broader simulation | In progress: 5a–5b complete | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
@@ -1196,3 +1202,54 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published `71464e9` to public `CyberSecDef/logos_engine` on `main`.
 - 118 tests and water/prompt/selective browser acceptance passed; exact live-world
   state preserved. Phase 5a is complete, and Phase 5b food/population is next.
+
+### 2026-09-20 — Phase 5b started
+
+- Implementing explicit creator-placed settlements using the existing inhabitant
+  count plus optional versioned food/settlement state; legacy worlds stay inactive.
+- Drafted exact daily production, consumption, shortage/growth rules and acceptance
+  tasks in docs/settlements.md. Asking whether balance is configurable per settlement.
+- Planned integration: validated prompt operations, direct placement/food aid,
+  before/Apply/day+5 review, inspector/overlays and replay/recovery coverage.
+
+### 2026-09-20 — Phase 5b implementation and initial acceptance
+
+- Added versioned optional settlement state, five validated creator operations,
+  deterministic food/population accounting and detailed daily ledgers.
+- Added direct placement/food aid, provider context and schemas, five-day previews,
+  population/food overlays and readable inspection. Custom programs can read food
+  and demographic counters after the settlement phase.
+- Per-settlement settings are the stated implementation default; the optional
+  question has not received an answer. Previously confirmed decisions are retained.
+- All 125 tests pass, including seven settlement suites and unchanged legacy hashes.
+  Settlement browser acceptance passes placement/cancel/Apply, food aid, loss/growth,
+  prompt configuration, overlays, mobile layout, reload and replay.
+- Remaining: recovery-view polish, documentation, real Claude acceptance, targeted
+  browser regressions, deployment with exact save preservation, commit and push.
+
+### 2026-09-20 — Phase 5b provider and regression acceptance
+
+- Native Claude produced a validated single-operation settlement proposal in a
+  disposable world. Forecast, copy Apply and the next daily ledger passed; the
+  saved fixture stayed unchanged. Corrected the older unsupported-capabilities
+  list to remove population dynamics now that settlements implement it.
+- Prompt, water transport, portable, entity and selective-replay browser checks
+  all pass. Inspected settlement desktop review and mobile screenshots.
+- Selective recovery now explains changed settlement food, counters and settings.
+- Documented exact settings/limits, operation examples, ordering, legacy behavior,
+  preview limits and deferred transport/health systems in docs/settlements.md.
+- Live world remains first-world, day 826/revision 840, with no running prompt.
+
+### 2026-09-20 — Phase 5b final acceptance and deployment
+
+- Final check: 125 passing tests, zero failures/skips; TypeScript and production
+  build pass. The existing ~623 kB frontend bundle warning remains a scale/polish task.
+- Settlement browser rerun passes. Five browser regressions (prompt, transport,
+  portable, entity, selective) and native Claude settlement acceptance pass.
+- Deployed on 0.0.0.0:5180, with Claude Code still the selected provider.
+- Exact saved envelope and live-world hash are unchanged after restart:
+  first-world, day 826/revision 840,
+  `479a9f0f54d17be15070aef9eedb679f3c4652e47ea297dd35351b8bdb37f3ed`.
+  No settlement was placed in the player's world during testing or deployment.
+- Phase 5b is complete. Phase 5c trade/movement remains next; pollution, disease,
+  technology and conflict remain planned in their documented later milestones.
