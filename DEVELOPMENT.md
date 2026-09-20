@@ -6,7 +6,7 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5c4 automatic neighbor visits is complete and deployed; publication pending.
+Phase 5c4 automatic neighbor visits is complete, deployed and published as `ce30c90`.
 Daily food collectors, farm workers and explorers return home without individual
 approvals or model calls. 161 tests, neighbor/migration browser checks and native
 Claude acceptance pass. Activated in the current world after a named checkpoint,
@@ -1504,3 +1504,6 @@ runoff with sediment conservation, and checksummed storage/path validation.
   /tmp/logos-visits-deploy.json; screenshots under ignored .local/screenshots.
 - Temporary visits and explicit travel closures use the stated recommended defaults;
   no reply to the optional questions was received. Permanent migration is separate.
+
+- Published milestone `ce30c90` to the public repository on main; this entry records
+  publication after the successful push.
