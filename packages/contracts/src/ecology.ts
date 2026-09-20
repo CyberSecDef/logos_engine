@@ -1,0 +1,6 @@
+import {z} from 'zod';
+const count=z.number().int().min(1).max(1_000_000),rate=z.number().min(0).max(100);
+export const EcologySettingsSchema=z.object({farmerPopulationMax:count,cityPopulationStart:count,cityPopulationFull:count,rainRecovery:rate,droughtLoss:rate,excessRainLoss:rate,heatLoss:rate,coldLoss:rate,floodLoss:rate,farmerGain:rate,cityLoss:rate,cityVegetationLoss:z.number().min(0).max(1)}).strict();
+export const SoilEcologySchema=z.object({model:z.literal('soil-ecology-v1'),version:z.number().int().min(1),enabled:z.boolean(),fieldId:z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/),settings:EcologySettingsSchema}).strict();
+export const SoilDaySchema=z.object({tick:z.number().int().nonnegative(),before:z.number().min(0).max(100),after:z.number().min(0).max(100),weatherPoints:z.number().min(-500).max(100),stewardshipPoints:rate,urbanPoints:rate,vegetationLoss:z.number().min(0).max(1),fertilityPermille:z.number().int().min(0).max(1000)}).strict();
+export const ecologyOperations=[z.object({kind:z.literal('soil-ecology-configure'),tileId:z.number().int().nonnegative(),expectedVersion:z.number().int().nonnegative(),enabled:z.boolean(),fieldId:SoilEcologySchema.shape.fieldId,settings:EcologySettingsSchema}).strict()] as const;

@@ -527,3 +527,11 @@ reviewed settings/food/population operations, exact daily ledgers, overlays and
 recovery. See [the complete contract](docs/settlements.md) and DEVELOPMENT.md for
 acceptance/publication evidence. Trade/movement is next (5c); environmental health,
 technology and conflict remain separate planned milestones.
+
+### Phase 5b follow-up — soil ecology
+
+Connect the existing fertility index to farm harvests through a reviewed versioned
+world model. Rain/temperature affect soil; farmer-sized populations improve it,
+while urban populations reduce soil and vegetation. All population thresholds and
+rates are bounded world settings. See [soil ecology](docs/soil-ecology.md) for defaults,
+activation, writer conflicts, ordering, compatibility and verification.

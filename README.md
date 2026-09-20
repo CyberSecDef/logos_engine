@@ -88,6 +88,8 @@ Phase 5 is underway; see the [milestones and agreed decisions](docs/phase-5-plan
 
 Creator-placed [settlements](docs/settlements.md) now track food reserves, weather-limited
 harvest, shortage losses and gradual growth, with reviewed prompts and overlays.
+[Soil ecology](docs/soil-ecology.md) connects fertility to harvest, weather, farmer
+stewardship and urban soil/vegetation loss through reviewed world activation.
 
 **Still planned:** richer erosion, trade,
 conflict, and technology. The communication flag is persisted but

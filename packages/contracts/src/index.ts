@@ -1,3 +1,4 @@
+import {SoilEcologySchema,SoilDaySchema,ecologyOperations} from './ecology.js';
 import {SettlementSchema,settlementOperations} from './settlements.js';
 import {EntitiesSchema,entityOperations} from './entities.js';
 import {ArtworkPackSchema,artworkOperations} from './artwork.js';
@@ -18,7 +19,7 @@ export const TileSchema = z.object({
   waterL: uint, sedimentKg: uint, rainMm: uint.max(1000),
   temperatureC: z.number().finite(), vegetation: z.number().min(0).max(1),
   temperatureAnomalyC: z.number().finite().optional(),
-  population: uint, settlement:SettlementSchema.optional(), communication: z.boolean(),
+  soilDay:SoilDaySchema.optional(), population: uint, settlement:SettlementSchema.optional(), communication: z.boolean(),
   properties:z.record(Id,z.number().finite().min(-1e9).max(1e9)),
 }).strict();
 export const RainRuleSchema = z.object({
@@ -31,6 +32,7 @@ export const TemperatureRuleSchema = z.object({
 }).strict();
 export const RuleSchema = z.discriminatedUnion('kind', [RainRuleSchema, TemperatureRuleSchema]);
 export const OperationSchema = z.discriminatedUnion('kind', [
+  ...ecologyOperations,
   ...settlementOperations,
   ...extensionOperations,
   ...artworkOperations,
@@ -57,7 +59,7 @@ export const WorldSchema = z.object({
   tick:uint, revision:uint, cells:z.array(CellSchema).min(12).max(6762),
   tiles:z.array(TileSchema).min(12).max(6762), rules:z.array(RuleSchema),
   definitions:DefinitionsSchema,resourceLedger:ResourceLedgerSchema,plugins:z.array(PluginInstanceSchema).max(8),
-  artwork:ArtworkPackSchema.optional(),entities:EntitiesSchema.optional(),
+  soilEcology:SoilEcologySchema.optional(),artwork:ArtworkPackSchema.optional(),entities:EntitiesSchema.optional(),
   history:z.array(ProposalSchema), events:z.array(EventSchema).max(200),
   accounting:z.object({rainL:uint, evaporationL:uint, oceanDrainL:uint}).strict(),
 }).strict();

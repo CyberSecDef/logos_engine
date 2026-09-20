@@ -176,3 +176,10 @@ Executable schemas: `packages/contracts/src/extensions.ts`; evaluator and
 validation: `packages/engine/src/extensions.ts`. The model response schema derives
 extension operations from the same Zod definitions. Tests cover model authority,
 version changes, migration, rules, overlays, and browser persistence.
+
+## Connect fertility to farms
+
+The historical soil example remains a custom-rule demonstration. To connect its
+existing values to harvests and population effects, review [soil ecology activation](soil-ecology.md).
+Activation explicitly pauses conflicting old weather writers to avoid counting
+rain/heat twice. The normalized index range supports both points and fractions.

@@ -20,8 +20,8 @@ One inhabitant consumes one ration per day. Each day after weather/hydrology:
    Ideal temperature is 10–30 °C; output falls linearly to zero at 0/45 °C.
    Moisture reaches full effectiveness at 5 mm of rain plus standing water
    (standing-water contribution capped at 20 mm). Flood depths over 100 mm or
-   elevation at/below zero prevent farming. Natural vegetation/custom fertility
-   are not automatically farm productivity; that would require an explicit rule.
+   elevation at/below zero prevent farming. The optional [soil ecology model](soil-ecology.md) also scales harvest by normalized
+   fertility. With ecology inactive, the original full-fertility calculation remains.
 3. Harvest, account for food beyond the one-billion-ration storage bound as
    overflow, then consume up to the day's demand. Record unmet demand explicitly.
 4. Consecutive shortage days accumulate; the default seven-day interval removes
@@ -134,8 +134,8 @@ require a build supporting this feature. New model versions must retain old mode
 semantics for replay. There is no population ticking while the application is closed.
 
 No trade, migration, sanitation, pollution or disease is active yet. Food aid is
-explicit creator intervention. Generic entities named farms/towns and custom soil
-fertility do not automatically participate. These are future explicit integrations.
+explicit creator intervention. Generic entities named farms/towns do not automatically participate. Custom soil
+fertility participates when explicitly bound through [soil ecology](soil-ecology.md).
 
 Validation: `npm run check` and `npm run test:settlements`. Tests exercise stock
 balances, rounding, extreme weather, zero rates, extinction, capacity, stale edits,

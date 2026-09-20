@@ -68,3 +68,10 @@ new properties are not automatically writable from every existing interface.
 
 See [environment and health](environment-and-health.md) for the requested smoke,
 contaminated runoff, famine/sanitation and travel-linked illness scenarios.
+
+### 5b soil follow-up
+
+Added explicit [soil ecology](soil-ecology.md): fertility-limited harvest, weather
+recovery/depletion, farmer stewardship and urban fertility/vegetation pressure.
+Thresholds and rates are world data; historical worlds retain original behavior
+until reviewed activation. Trade/movement remains next.

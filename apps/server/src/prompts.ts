@@ -82,6 +82,7 @@ export class PromptService {
      if(!packs.some(pack=>JSON.stringify(pack)===JSON.stringify(op.pack)))throw Error('Import and review artwork before selecting it through a prompt');
     }
    }
+   if(op.kind==='soil-ecology-configure'&&job.request.scope!=='world')throw Error('Soil ecology configuration requires Entire world scope');
    if((op.kind==='entity-type-define'||op.kind==='entity-type-remove')&&job.request.scope!=='world')throw Error('Entity type definitions require Entire world scope');
    if(op.kind==='entity-update'&&op.toTileId!==undefined&&!ids.includes(op.toTileId))throw Error('Entity destination is outside the selected scope');
    if((op.kind==='plugin-define'||op.kind==='plugin-toggle'||op.kind==='plugin-remove')&&job.request.scope!=='world')throw Error('Plugin changes require Entire world scope');
@@ -146,7 +147,7 @@ export function forecast(world:World,proposal:Proposal) {
   if(op.kind==='artwork-activate'||op.kind==='artwork-reset')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='entity-update'&&op.toTileId!==undefined)ids.add(op.toTileId);
   if(op.kind==='entity-type-define'||op.kind==='entity-type-remove')for(const tile of world.tiles)ids.add(tile.id);
-  if(op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
+  if(op.kind==='soil-ecology-configure'||op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='appearance-define')for(const id of ruleTargets(world,op.rule))ids.add(id);
   if(op.kind==='appearance-define'||op.kind==='appearance-remove'){const old=world.definitions.appearance?.find(r=>r.id===(op.kind==='appearance-define'?op.rule.id:op.ruleId));if(old)for(const id of ruleTargets(world,old))ids.add(id);}
   if(op.kind==='rule-define')for(const id of ruleAffectedTargets(world,op.rule))ids.add(id);

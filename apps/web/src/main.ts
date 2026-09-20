@@ -1,3 +1,4 @@
+import {ecologySetup} from '../../../packages/engine/src/ecology-setup.js';
 import {DEFAULT_SETTLEMENT_SETTINGS} from '../../../packages/contracts/src/settlement-defaults.js';
 import type {WaterPreview} from '../../../packages/contracts/src/transport.js';
 import type { Checkpoint } from '../../../packages/contracts/src/checkpoints.js';
@@ -53,15 +54,18 @@ function selectTile(id:number) {
  for(const rule of world.definitions.rules.filter(r=>ruleAffectedTargets(world,r).includes(id))){const note=document.createElement('p');note.className='rule-note';note.textContent=`${rule.label} · v${rule.version}${rule.enabled?'':' · paused'}: ${describeRule(rule)}`;container.append(note);}
  for(const e of world.entities?.instances.filter(e=>e.tileId===id)??[]){const type=world.entities!.types.find(t=>t.id===e.typeId)!;const row=document.createElement('p');row.className='entity-note rule-note';row.textContent=`${e.label} (${e.id}) · ${type.label} v${type.version} · ${type.properties.map(f=>`${f.label}: ${e.properties[f.id]??f.defaultValue} ${f.unit}`).join(', ')}`;container.append(row);}
  const settlement=t.settlement;
+ $('soil-enable').hidden=!!world.soilEcology?.enabled;
+ $('soil-status').textContent=world.soilEcology?.enabled?`Soil ecology active · ${world.soilEcology.fieldId}. Soil quality multiplies farming output.`:'Soil ecology is inactive. Review activation for fertility, weather and population effects across this world.';
  $('settlement-create-controls').hidden=!!settlement;$('settlement-food-controls').hidden=!settlement;
  $<HTMLButtonElement>('settlement-create').disabled=!!promptJobId||t.elevationM<=0||t.population!==0;
+ if(world.soilEcology?.enabled){const soil=document.createElement('p');soil.className='soil-ledger muted';const d=t.soilDay;soil.textContent=d?`Soil day ${d.tick}: ${d.before.toFixed(2)}% → ${d.after.toFixed(2)}%; weather ${d.weatherPoints>=0?'+':''}${d.weatherPoints.toFixed(3)}, farmer stewardship +${d.stewardshipPoints.toFixed(3)}, urban pressure −${d.urbanPoints.toFixed(3)} fertility points. Urban vegetation loss ${(d.vegetationLoss*100).toFixed(3)} percentage points. Soil values are bounded and rounded.`:'Soil ecology is active. Daily soil accounting begins with the next simulated day.';$('tile-details').append(soil);}
  if(settlement){
   const block=document.createElement('div');block.className='settlement-inspector';
   const heading=document.createElement('p');heading.className='rule-note';heading.textContent=`${settlement.label} · settlement rules v${settlement.rulesVersion}`;block.append(heading);
   const r=settlement.settings;
   for(const [label,value] of [['Inhabitants',`${fmt(t.population)} / ${fmt(r.capacity)}`],['Food reserve',`${fmt(settlement.foodRations)} rations`],['Reserve at current demand',t.population?`${(settlement.foodRations/t.population).toFixed(1)} days`:'No inhabitants'],['Farm / worker capacity',`${fmt(r.farmRationsPerDay)} / ${r.workerRationsPerDay} rations/day`],['Shortage progress',`${settlement.shortageDays} / ${r.shortageIntervalDays} days`],['Surplus progress',`${settlement.surplusDays} / ${r.growthIntervalDays} days`]]){const row=document.createElement('div');row.className='stat';const k=document.createElement('span'),v=document.createElement('strong');k.textContent=label;v.textContent=value;row.append(k,v);block.append(row);}
   const policy=document.createElement('p');policy.className='muted';policy.textContent=`Growth ${(r.growthPermille/10)}% per surplus interval with ${r.reserveDays} days of reserves; shortage loss ${(r.lossPermille/10)}% per shortage interval. Rounding and capacity limits apply.`;block.append(policy);
-  const d=settlement.lastDay;if(d){const balance=document.createElement('p');balance.className='settlement-ledger muted';balance.textContent=`Day ${d.tick}: ${fmt(d.beforeFood)} + ${fmt(d.produced)} harvested − ${fmt(d.overflow)} overflow − ${fmt(d.consumed)} consumed = ${fmt(d.afterFood)} rations; ${fmt(d.unmet)} demand unmet. Population ${fmt(d.beforePopulation)} + ${fmt(d.births)} born − ${fmt(d.losses)} lost = ${fmt(d.afterPopulation)}. Production: ${d.temperaturePermille/10}% temperature, ${d.moisturePermille/10}% moisture${!d.land?', submerged':d.flooded?', flooded':''}.`;block.append(balance);}
+  const d=settlement.lastDay;if(d){const balance=document.createElement('p');balance.className='settlement-ledger muted';balance.textContent=`Day ${d.tick}: ${fmt(d.beforeFood)} + ${fmt(d.produced)} harvested − ${fmt(d.overflow)} overflow − ${fmt(d.consumed)} consumed = ${fmt(d.afterFood)} rations; ${fmt(d.unmet)} demand unmet. Population ${fmt(d.beforePopulation)} + ${fmt(d.births)} born − ${fmt(d.losses)} lost = ${fmt(d.afterPopulation)}. Production: ${d.temperaturePermille/10}% temperature, ${d.moisturePermille/10}% moisture${d.fertilityPermille===undefined?'':`, ${d.fertilityPermille/10}% soil fertility`}${!d.land?', submerged':d.flooded?', flooded':''}.`;block.append(balance);}
   container.append(block);
  }
  const activeStyle=matchingAppearance(world,t);
@@ -71,6 +75,7 @@ function selectTile(id:number) {
  const events=world.events.filter(e=>e.tileId===id).slice(-2);for(const e of events){const p=document.createElement('p');p.className='muted';p.textContent=`Day ${e.tick} · ${e.message}`;container.append(p);}
  text('communication-change',t.communication?'Isolate communication':'Restore communication');
 }
+$('soil-enable').onclick=()=>{setPlaying(false);void action(async()=>{await reviewProposal({id:`change-${requestId()}`,worldId:world.id,expectedRevision:world.revision,summary:'Enable soil ecology across this world. Preserve soil values; disable whole conflicting custom rules/plugins to avoid double-counting. Review all listed changes before Apply.',operations:ecologySetup(world,selected)});});};
 $('settlement-create').onclick=()=>void propose({kind:'settlement-create',tileId:selected,label:$<HTMLInputElement>('settlement-label').value,population:Number($<HTMLInputElement>('settlement-population').value),foodRations:Number($<HTMLInputElement>('settlement-initial-food').value),settings:{...DEFAULT_SETTLEMENT_SETTINGS,capacity:Number($<HTMLInputElement>('settlement-capacity').value),farmRationsPerDay:Number($<HTMLInputElement>('settlement-farms').value)}},'Place a settlement with daily food and population simulation.');
 $('settlement-food').onclick=()=>void propose({kind:'settlement-food',tileId:selected,deltaRations:Number($<HTMLInputElement>('settlement-food-delta').value)},'Adjust settlement food reserves as a creator intervention.');
 $('water-explain').onclick=()=>{setPlaying(false);void action(async()=>{
@@ -241,8 +246,13 @@ function describeSettlementSettings(settings:Partial<typeof DEFAULT_SETTLEMENT_S
  const labels:Record<string,string>={capacity:'population capacity',farmRationsPerDay:'farm capacity (rations/day)',workerRationsPerDay:'worker output (rations/person/day)',shortageIntervalDays:'shortage interval (days)',growthIntervalDays:'surplus growth interval (days)',reserveDays:'reserves required for growth (days)',lossPermille:'population loss (%)',growthPermille:'population growth (%)'};
  return Object.entries(settings).map(([key,value])=>`${labels[key]??key}: ${key==='lossPermille'||key==='growthPermille'?value/10:fmt(value)}`).join('; ');
 }
+function describeEcologySettings(settings:NonNullable<World['soilEcology']>['settings']):string {
+ const labels:Record<string,string>={farmerPopulationMax:'peak farming population',cityPopulationStart:'urban pressure begins',cityPopulationFull:'full urban pressure',rainRecovery:'rain recovery',droughtLoss:'drought loss',excessRainLoss:'heavy rain loss',heatLoss:'heat loss',coldLoss:'cold loss',floodLoss:'flood loss',farmerGain:'maximum farmer benefit',cityLoss:'maximum urban soil loss',cityVegetationLoss:'maximum urban vegetation loss'};
+ return Object.entries(settings).map(([key,value])=>`${labels[key]}: ${value}`).join('; ');
+}
 function describeOperation(o:Operation):string {
  switch(o.kind){
+  case 'soil-ecology-configure':return `${o.enabled?'Enable/update':'Disable'} soil ecology for the entire world, version ${o.expectedVersion} → ${o.expectedVersion+1}. Fertility property: ${o.fieldId}; normalized fertility multiplies farm harvests. Settings: ${describeEcologySettings(o.settings)}. Rates are fertility percentage points/day; vegetation loss is fraction/day. Existing soil values are preserved.`;
   case 'settlement-create':return `Create ${o.label} on zone ${o.tileId}: ${fmt(o.population)} inhabitants and ${fmt(o.foodRations)} food rations. Settings: ${describeSettlementSettings(o.settings??DEFAULT_SETTLEMENT_SETTINGS)}. Activates daily food/population simulation.`;
   case 'settlement-configure':return `Settlement on zone ${o.tileId}: update rules v${o.expectedRulesVersion} → v${o.expectedRulesVersion+1}: ${describeSettlementSettings(o.settings)}${o.label?`; name ${o.label}`:''}. Existing shortage/surplus progress is retained.`;
   case 'settlement-food':return `Zone ${o.tileId}: creator ${o.deltaRations>=0?'adds':'removes'} ${fmt(Math.abs(o.deltaRations))} food rations; this is not trade.`;
@@ -309,7 +319,7 @@ async function reviewProposal(proposal:Proposal) {
 }
 function promptState(id:string|null) {
  promptJobId=id;document.body.classList.toggle('prompt-running',!!id);$('chat-progress').hidden=!id;
- for(const name of ['chat-discuss','chat-propose','chat-export','chat-close','worlds-toggle','play','step','water-explain','settlement-create','settlement-food','rain-change','elevation-change','temperature-change','temperature-reset','communication-change'])$<HTMLButtonElement>(name).disabled=!!id;
+ for(const name of ['chat-discuss','chat-propose','chat-export','chat-close','worlds-toggle','play','step','water-explain','soil-enable','settlement-create','settlement-food','rain-change','elevation-change','temperature-change','temperature-reset','communication-change'])$<HTMLButtonElement>(name).disabled=!!id;
  $<HTMLButtonElement>('temperature-reset').disabled=!!id||!world?.rules.some(r=>r.tileId===selected&&r.kind==='temperature');
  $<HTMLTextAreaElement>('chat-message').disabled=!!id;
  $<HTMLInputElement>('chat-import').disabled=!!id||busy;

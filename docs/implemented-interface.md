@@ -233,3 +233,10 @@ Optional versioned tile state and `settlement-create`, `settlement-configure`,
 proposal/preview/Apply routes. Preview includes bounded settlement comparison rows.
 Custom reads include food and shortage/surplus counters. See [settlements](settlements.md)
 for exact operation bodies, limits, tick ordering, defaults and compatibility.
+
+## Soil ecology
+
+`soil-ecology-configure` is a world-scope, version-checked operation in the existing
+proposal flow. Optional `world.soilEcology`, `tile.soilDay` and the settlement daily
+`fertilityPermille` field preserve old states when inactive. See [soil ecology](soil-ecology.md)
+for exact settings, dependencies, writer conflicts, tick ordering and activation.

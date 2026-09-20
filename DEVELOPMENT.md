@@ -6,21 +6,11 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5 has started. The [milestone plan](docs/phase-5-plan.md) defines 5a–5i:
-water transport/explanations, food/population, trade/movement, air pollution,
-water contamination/sanitation, disease, technology, conflict and final tuning.
-
-**5a is complete and deployed:** actual water transport and next-day explanations.
-It preserves existing physics and save hashes while exposing reusable edge flows
-and per-zone budgets. All 118 tests and water/prompt/selective browser checks pass.
-**5b is complete, deployed and published.**
-Creator-placed settlements now track inhabitants, food, weather-limited harvest,
-shortage losses and sustained-surplus growth. Reviewed prompts and direct controls,
-inspection, overlays and recovery are integrated. All 125 tests and the settlement
-browser check pass, along with five browser regressions and native Claude acceptance.
-Existing settlement-free replay hashes remain unchanged. Next: 5c trade and movement.
-The player confirmed explicit placement and actual inhabitants/daily food reserves.
-Per-settlement balance settings are an implementation default pending feedback.
+Phase 5a and 5b are complete. The soil ecology follow-up is implemented, verified
+and deployed: reviewed activation connects fertility to harvests, weather changes
+soil, farmer populations improve it and urban pressure reduces soil/vegetation.
+All 132 tests, four browser checks and a native Claude activation check pass.
+Publishing this milestone; next planned phase is 5c trade and movement.
 
 ## Completed
 
@@ -1259,3 +1249,50 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published `1ae5d36` to public `CyberSecDef/logos_engine` on `main`.
 - Settlement/food/population milestone complete, with documented defaults, reviewed
   creator operations and exact live-state preservation. Next milestone: 5c.
+
+### 2026-09-20 — Soil ecology follow-up started
+
+- User requested fertility-limited farming, weather-driven fertility and ranged
+  population impacts on soil and vegetation. Existing custom fertility is currently
+  independent of harvest; connecting it through explicit world-level ecology.
+- Default farmer benefit peaks at 1,000 people, fades by 5,000; urban losses ramp
+  from 5,000 to 50,000. All rates and thresholds are reviewed world data settings.
+- Preserve original world/save history until activation. Reuse existing fertility
+  values and normalized field range; disable conflicting writers explicitly rather
+  than counting their rainfall/heat rules twice. No autonomous model calls.
+- Engine/contracts and direct activation review are implemented; tests, provider
+  verification, docs and deployment remain in progress.
+
+### 2026-09-20 — Soil ecology acceptance
+
+- Added optional soil-ecology-v1 with index binding, adjustable population bands
+  and rates, weather/stewardship/urban soil changes, urban vegetation loss and
+  multiplicative fertility-limited harvest. Daily ledgers explain the components.
+- Direct world activation preserves soil, proposes any missing definition and
+  explicitly pauses whole conflicting writers. Native prompts use world scope;
+  local fertility edits remain ordinary field-set operations.
+- Initial full check passes all 132 tests with zero skips/failures. A journal fixture
+  needed canonical proposal parsing; corrected it to match the real API boundary.
+- Soil browser passes activation/cancel/Apply, writer pausing, city-to-farmer
+  transition, exact harvest, overlay/reload/replay and mobile layout. Adjusted one
+  browser assertion to the interface's established “paused” terminology.
+- Settlement, custom-extension and water-transport browser regressions pass.
+  Native Claude generated a valid two-operation soil activation proposal; preview,
+  copy Apply and daily ledger passed without writing the saved test fixture.
+- Inspected mobile soil ledger screenshot; documented all defaults and limits in
+  docs/soil-ecology.md. Final regression check and deployment/publication remain.
+
+### 2026-09-20 — Soil ecology final validation and deployment
+
+- Final full check: 132 passing tests, zero failures/skips; types/build pass.
+  Added explicit plugin-writer conflict and bound-field removal checks.
+- Soil, settlement, extension and transport browser checks pass. Native Claude
+  world-scope proposal validated. Mobile ledger visuals inspected.
+- Deployed to 0.0.0.0:5180 with Claude Code still selected. Verified the exact
+  saved envelope and world hash after restart: day 1011/revision 1027,
+  `d6cf34843d51fcced54d55b881e2810efb9ae74c8fdb9d38cb0c3d1b2f1c9cfc`.
+- Existing two settlements and all player data remain unchanged. Ecology is
+  available through Settlement and food → Review soil ecology activation; the
+  existing world remains inactive until reviewed Apply. No automatic migration.
+- Documentation covers settings, thresholds, normalized fertility, writer pausing,
+  rounding, ordering and compatibility. Publishing the completed follow-up.

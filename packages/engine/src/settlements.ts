@@ -1,3 +1,4 @@
+import {fertilityPermille} from './ecology.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 import {DEFAULT_SETTLEMENT_SETTINGS,SETTLEMENT_LIMITS} from '../../contracts/src/settlements.js';
 export function validateSettlements(world:World):void {
@@ -37,7 +38,8 @@ export function advanceSettlements(world:World):void {
   const temperaturePermille=Math.max(0,Math.min(1000,Math.floor(temp<10?temp*100:temp<=30?1000:(45-temp)*1000/15)));
   const moisturePermille=Math.max(0,Math.min(1000,Math.floor((tile.rainMm+Math.min(20,waterMm))*200)));
   const potential=Math.min(r.farmRationsPerDay,pop*r.workerRationsPerDay);
-  const produced=land&&!flooded?Math.floor(potential*temperaturePermille*moisturePermille/1_000_000):0;
+  const fertility=fertilityPermille(world,tile.id);
+  const produced=land&&!flooded?Math.floor((potential*temperaturePermille*moisturePermille/1_000_000)*(world.soilEcology?.enabled?fertility/1000:1)):0;
   const overflow=Math.max(0,before+produced-SETTLEMENT_LIMITS.food),available=before+produced-overflow,consumed=Math.min(pop,available),unmet=pop-consumed;
   s.foodRations=available-consumed;let births=0,losses=0;
   if(pop===0){s.shortageDays=0;s.surplusDays=0;}
@@ -50,7 +52,7 @@ export function advanceSettlements(world:World):void {
    }else s.surplusDays=0;
   }
   tile.population=pop+births-losses;
-  s.lastDay={tick:world.tick,beforeFood:before,produced,overflow,consumed,unmet,afterFood:s.foodRations,beforePopulation:pop,births,losses,afterPopulation:tile.population,potential,temperaturePermille,moisturePermille,land,flooded};
+  s.lastDay={...(world.soilEcology?.enabled?{fertilityPermille:fertility}:{}),tick:world.tick,beforeFood:before,produced,overflow,consumed,unmet,afterFood:s.foodRations,beforePopulation:pop,births,losses,afterPopulation:tile.population,potential,temperaturePermille,moisturePermille,land,flooded};
   if(births||losses){world.events.push({tick:world.tick,kind:'population',tileId:tile.id,amount:births||losses,message:births?`${s.label}: ${births} inhabitants added after sustained food reserves.`:`${s.label}: ${losses} inhabitants lost after sustained food shortage.`});if(world.events.length>200)world.events.shift();}
  }
 }

@@ -1,3 +1,4 @@
+import {validateEcology,applyEcology,advanceEcology} from './ecology.js';
 import {validateSettlements,applySettlement,advanceSettlements} from './settlements.js';
 import {validateEntities,validateEntityMigrations,applyEntity,invalidateEntityReads} from './entities.js';
 import { ProposalSchema, WorldSchema, type World, type Proposal, type WorldEvent } from '../../contracts/src/index.js';
@@ -26,7 +27,7 @@ export function validateWorld(input:unknown):World {
     commands.add(p.id);
   }
   if(w.artwork&&new Set(w.artwork.images.map(i=>i.slot)).size!==w.artwork.images.length)throw Error('Duplicate artwork slot');
-  validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
+  validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
   return w;
 }
 function event(w:World,e:WorldEvent) { w.events.push(e); if(w.events.length>200) w.events.shift(); }
@@ -46,7 +47,7 @@ export function applyProposal(world:World,input:unknown):World {
       next.artwork=op.pack;
     }
     if(op.kind==='artwork-reset')delete next.artwork;
-    applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
+    applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
     if(op.kind==='elevation') tile.elevationM+=op.deltaM;
     if(op.kind==='communication') tile.communication=op.enabled;
     if(op.kind==='rainfall') {
@@ -76,6 +77,7 @@ function advanceDay(world:World,report?:WaterTransportReport):World {
   const next=structuredClone(world); next.tick++; next.revision++;
   advanceTemperature(world,next);
   advanceHydrology(world,next,event,report);
+  advanceEcology(next);
   advanceSettlements(next);
   advanceExtensions(next,advancePlugins(next));
   return validateWorld(next);
