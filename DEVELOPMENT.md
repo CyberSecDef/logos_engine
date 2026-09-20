@@ -6,8 +6,8 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5e water contamination/sanitation is implemented and deployed; publication
-pending. Confirmed water-quality farming damage is active only after reviewed
+Phase 5e water contamination/sanitation is implemented, deployed and published
+as `19e084b`. Confirmed water-quality farming damage is active only after reviewed
 world activation; illness remains deferred. 183 tests, three browser scenarios
 and a native Claude source request pass. Current saved world remains unchanged.
 Next: Phase 5f generic disease and travel-linked spread.
@@ -1613,3 +1613,6 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Documented scope, equations, defaults and limitations in docs/water-quality.md;
   updated README, PLAN, interface, water transport, settlements and Phase 5 roadmap.
 - Existing Vite large-bundle advisory remains Phase 6 optimization (658 kB).
+
+- Published Phase 5e milestone `19e084b` to the public repository on main; this
+  follow-up records the successful push.
