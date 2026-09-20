@@ -2256,3 +2256,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
   Evidence: `/tmp/logos-phase6a-deploy.json`. No live test edits or ticks.
 - Phase 6a complete; 6b desktop navigation/usable small screens is next.
+
+### 2026-09-20 — Phase 6a publication
+
+- Published milestone `e50e292` to public `CyberSecDef/logos_engine` main.
+- Desktop-first preference recorded. Next: 6b navigation and usable small screens;
+  6c performance, 6d local operation/recovery and 6e final acceptance remain planned.
