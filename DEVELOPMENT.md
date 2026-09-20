@@ -6,13 +6,12 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5 is complete within the agreed simulation scope. The [final acceptance
-matrix](docs/phase-5-acceptance.md) records 269 passing tests, typecheck/build,
-combined browser acceptance, multi-size long runs, saved restart recovery and
-compatibility evidence. Phase 5i measured the current defaults without changing
-rules or saved schemas. Deployment on `0.0.0.0:5180` preserved the live world and
-complete save envelope exactly. Subsequent work is scale/polish or newly agreed
-mechanics; scope and performance limits are documented in the acceptance matrix.
+Phase 6 has started; see the [milestone plan](docs/phase-6-plan.md). Confirmed:
+desktop first, mobile remains usable. 6a review accessibility is implemented and verified:
+native modal dialogs, keyboard access, focus restoration, error feedback and
+submission/cancellation behavior. LAN deployment preserved the complete live save.
+Next: 6b desktop navigation and usable small screens. Phase 5 is complete and its acceptance evidence
+remains in [the final matrix](docs/phase-5-acceptance.md).
 
 ## Completed
 
@@ -43,7 +42,7 @@ mechanics; scope and performance limits are documented in the acceptance matrix.
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
 | 5. Broader simulation | Complete: 5a–5i implemented and verified | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
-| 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
+| 6. Polish and scale | In progress: 6a complete; 6b next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
 
@@ -2231,3 +2230,29 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Updated the phase overview table to mark Phase 5 complete (5a–5i verified).
 - Standardized all Phase 5 milestone table labels to complete, consistent with
   the final acceptance record. Documentation only; no application or save changes.
+
+### 2026-09-20 — Phase 6a review accessibility
+
+- Documented 6a–6e milestones and confirmed desktop-first priority with usable mobile.
+- Found proposal focus loop skips expandable details; world-review focus handling
+  is incomplete. Converting both reviews to native modal semantics.
+- Adding initiating-control focus restoration, heading-first review, visible modal
+  errors, and dismissal protection during submission. No engine/schema changes.
+- All 269 tests, typecheck and production build pass after final changes.
+- New Chromium review-accessibility browser test passes: full dynamic tab order,
+  heading focus, background isolation, inline failed Apply, Escape protection during
+  submission, successful Apply/restore, focus return and cancellation save hash.
+- Testing exposed native focus leaving for browser chrome and asynchronous chat
+  refresh replacing the opener. Added dynamic boundary traversal and stable review
+  button identities with visible fallbacks; no two-button-only keyboard loop.
+- Existing plugin, checkpoint/replay, historical branch and combined simulation
+  browser workflows pass. Desktop/mobile screenshots inspected at 1440/390px.
+- Documented limits: Chromium automation is not a full assistive-technology audit;
+  broader navigation/mobile usability and bundle work remain 6b/6c.
+- Deployed and verified native dialogs through LAN on `0.0.0.0:5180`.
+  Preserved first-world day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete save envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Evidence: `/tmp/logos-phase6a-deploy.json`. No live test edits or ticks.
+- Phase 6a complete; 6b desktop navigation/usable small screens is next.

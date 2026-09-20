@@ -683,3 +683,11 @@ default balance controls, saved restart recovery, combined browser acceptance an
 measured latency/size limits. No balance defaults or world schemas changed.
 Further scale/polish and new mechanics remain subsequent work; maximum-size
 measurements do not imply fully populated/custom-rule worst-case performance.
+
+
+## Phase 6 execution plan — 2026-09-20
+
+[Phase 6 milestones](docs/phase-6-plan.md) cover review accessibility, desktop-first
+navigation with usable mobile layouts, measured rendering/delivery performance,
+local operation/recovery and final integration. Start with keyboard-accessible
+review dialogs; preserve the engine, saved worlds and explicit creator approval.

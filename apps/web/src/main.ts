@@ -1,3 +1,4 @@
+import {openReview,closeReview} from './review-dialog.js';
 import {DEFAULT_CONFLICT_SETTINGS} from '../../../packages/contracts/src/conflict.js';
 import {armyJourneyPath} from '../../../packages/engine/src/armies.js';
 import {garrisonAvailability} from '../../../packages/engine/src/garrisons.js';
@@ -26,6 +27,7 @@ function requestId():string {
 }
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 let token='',world:World,selected=-1,busy=false,playing=false,pending:Proposal|null=null,timer:ReturnType<typeof setTimeout>|undefined;
+let actionOrigin:Element|null=null;
 let promptJobId:string|null=null,chatPoll:ReturnType<typeof setTimeout>|undefined;
 const globe=new WorldGlobe($<HTMLCanvasElement>('globe'),selectTile,status=>text('art-status',status),()=>({Authorization:`Bearer ${token}`}));
 try{globe.texturesEnabled=localStorage.getItem('logos-terrain-style')!=='colors';}catch{}
@@ -33,7 +35,7 @@ $<HTMLSelectElement>('texture-mode').value=globe.texturesEnabled?'artwork':'colo
 $('texture-mode').onchange=()=>{globe.texturesEnabled=$<HTMLSelectElement>('texture-mode').value==='artwork';try{localStorage.setItem('logos-terrain-style',globe.texturesEnabled?'artwork':'colors');}catch{}globe.update();};
 const fmt=(n:number)=>Math.round(n).toLocaleString();
 const text=(id:string,value:string)=>{$(id).textContent=value;};
-function error(e:unknown) {text('toast',e instanceof Error?e.message:String(e));$('toast').hidden=false;setTimeout(()=>{$('toast').hidden=true;},6500);}
+function error(e:unknown) {const modal=document.querySelector<HTMLElement>('dialog[open] .review-error');if(modal){modal.textContent=e instanceof Error?e.message:String(e);modal.hidden=false;return;}text('toast',e instanceof Error?e.message:String(e));$('toast').hidden=false;setTimeout(()=>{$('toast').hidden=true;},6500);}
 async function api<T>(path:string,body?:unknown):Promise<T> {
  const res=await fetch('/api/'+path,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:body===undefined?undefined:JSON.stringify(body)});
  const data=await res.json();if(!res.ok)throw Error(data.error??'Request failed');return data;
@@ -44,11 +46,11 @@ function setPlaying(value:boolean) {
  if(value)timer=setTimeout(tick,Number($<HTMLSelectElement>('speed').value));
 }
 async function action(fn:()=>Promise<void>) {
- if(busy)return;busy=true;document.body.classList.add('busy');$<HTMLInputElement>('chat-import').disabled=true;$<HTMLInputElement>('import-world').disabled=true;$<HTMLInputElement>('import-artwork').disabled=true;
+ if(busy)return;actionOrigin=document.activeElement;busy=true;document.body.classList.add('busy');$<HTMLInputElement>('chat-import').disabled=true;$<HTMLInputElement>('import-world').disabled=true;$<HTMLInputElement>('import-artwork').disabled=true;
  try {await fn();}catch(e){setPlaying(false);error(e);try{setWorld(await api<World>('world'));}catch{}}
  finally{busy=false;document.body.classList.remove('busy');$<HTMLInputElement>('chat-import').disabled=!!promptJobId;$<HTMLInputElement>('import-world').disabled=!!promptJobId;$<HTMLInputElement>('import-artwork').disabled=!!promptJobId;}
 }
-function setWorld(value:World) {const changed=world?.id!==value.id;world=value;if(changed){pending=null;$('proposal').hidden=true;selected=-1;$('conversation').hidden=true;document.body.classList.remove('chat-open');$('chat-history').replaceChildren();promptState(promptJobId);}updateCustomLayers();globe.setWorld(world);selectTile(selected);text('world-name',world.name);text('day',`DAY ${world.tick}`);text('save-status',`Saved locally · ${fmt(world.tiles.length)} places`);}
+function setWorld(value:World) {const changed=world?.id!==value.id;world=value;if(changed){pending=null;closeReview($<HTMLDialogElement>('proposal'),$('worlds-toggle'));selected=-1;$('conversation').hidden=true;document.body.classList.remove('chat-open');$('chat-history').replaceChildren();promptState(promptJobId);}updateCustomLayers();globe.setWorld(world);selectTile(selected);text('world-name',world.name);text('day',`DAY ${world.tick}`);text('save-status',`Saved locally · ${fmt(world.tiles.length)} places`);}
 function selectTile(id:number) {
  $('water-preview').hidden=true;$('water-preview').replaceChildren();
  if(promptJobId&&id!==selected)return;
@@ -261,31 +263,29 @@ $('elevation-change').onclick=()=>void propose({kind:'elevation',tileId:selected
 $('temperature-change').onclick=()=>{const celsius=Number($<HTMLInputElement>('temperature').value),mode=$<HTMLSelectElement>('temperature-mode').value as 'pulse'|'sustained';void propose({kind:'temperature',tileId:selected,celsius,mode},`${mode==='pulse'?'One-time temperature event: set':'Maintain'} zone ${selected} at ${celsius} °C. Heat or cold affects neighbors as time advances.`);};
 $('temperature-reset').onclick=()=>void propose({kind:'temperature-reset',tileId:selected},`Stop maintaining zone ${selected} temperature. Remaining heat or cold will spread and fade.`);
 $('communication-change').onclick=()=>void propose({kind:'communication',tileId:selected,enabled:!world.tiles[selected].communication},`${world.tiles[selected].communication?'Disable':'Restore'} communication for zone ${selected}. This gates neighbor knowledge exchange when enabled; previously learned knowledge is retained.`);
-$('cancel-proposal').onclick=()=>{pending=null;$('proposal').hidden=true;$('rain-change').focus();};
-$('apply-proposal').onclick=()=>void action(async()=>{if(!pending)return;setWorld(await api<World>('proposals/apply',pending));pending=null;$('proposal').hidden=true;$('rain-change').focus();if(!$('conversation').hidden)await loadChat();});
-$('proposal').addEventListener('keydown',e=>{if(e.key==='Escape')$('cancel-proposal').click();if(e.key==='Tab'){const first=$('cancel-proposal'),last=$('apply-proposal');if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
+$('cancel-proposal').onclick=()=>{if(busy)return;pending=null;closeReview($<HTMLDialogElement>('proposal'),$(!$('conversation').hidden?'chat-message':'rain-change'));};
+$('apply-proposal').onclick=()=>void action(async()=>{if(!pending)return;setWorld(await api<World>('proposals/apply',pending));pending=null;closeReview($<HTMLDialogElement>('proposal'),$(!$('conversation').hidden?'chat-message':'rain-change'));if(!$('conversation').hidden){await loadChat();if(document.activeElement===document.body)$('chat-message').focus();}});
+$('proposal').addEventListener('cancel',e=>{e.preventDefault();if(!busy)$('cancel-proposal').click();});
 const layers:{id:Overlay;label:string;legend:string}[]=[{id:'territory',label:'Territory',legend:'Faction colors · grey: unclaimed. Enabled border policies govern travel, trade and knowledge.'},{id:'terrain',label:'Terrain',legend:'Ocean / grassland / forest / alpine'},{id:'water',label:'Water',legend:'Dry land / retained water / flooding above 100 mm'},{id:'rain',label:'Rainfall',legend:'Dark → light · 0–100+ mm per day'},{id:'temperature',label:'Temperature',legend:'Blue: cold · red: warm · darker: extreme temperatures'},{id:'population',label:'Population',legend:'Log scale · dark: empty · light: up to one million inhabitants'},{id:'food',label:'Food reserves',legend:'Settlements only · red: empty · green: 30+ days at current demand; grey: no inhabitants'},{id:'illness',label:'Illness',legend:'Share of residents ill · green: none → red: all; grey: health inactive. Contact spread requires separate activation.'},{id:'water-quality',label:'Water quality',legend:'Game indicator · teal: clean → orange: configured concentration limit; tan: dry; grey: inactive. Active water quality scales farm output.'},{id:'deposits',label:'Surface deposits',legend:'Log scale · dark: no deposits → light orange: 1 million+ pollution units; grey: inactive.'},{id:'air',label:'Air pollution',legend:'Game units/km² · log scale · teal: clean → purple: 1,000+; grey: inactive. No damage effects.'},{id:'wind',label:'Wind',legend:'Direction TOWARD: red north, yellow-green east, cyan south, violet west. Dark: calm; grey: inactive.'},{id:'communication',label:'Connections',legend:'Green: connected · amber: isolated'}];
 for(const l of layers){const b=document.createElement('button');b.textContent=l.label;b.classList.toggle('active',l.id==='terrain');b.onclick=()=>{globe.overlay=l.id;$<HTMLSelectElement>('custom-layer').value='';globe.update();text('legend',l.legend);for(const x of Array.from($('layer-buttons').children))x.classList.toggle('active',x===b);};$('layer-buttons').append(b);}
 type WorldSummary={name:string;tick:number;tiles:number;fields:number;plugins:number;rules:number;interventions:number;entities?:number;entityTypes?:number;settlements?:number;population?:number;travelers?:number};
 let worldReview:{path:string;body:unknown}|null=null;
 function finishWorldReview() {
- worldReview=null;$('world-review').hidden=true;$('world-review-artwork').replaceChildren();
- for(const child of Array.from(document.body.children))if(child instanceof HTMLElement)child.inert=false;
- document.body.classList.remove('world-review-open');$('worlds-toggle').focus();
+ worldReview=null;closeReview($<HTMLDialogElement>('world-review'),$('worlds-toggle'));$('world-review-artwork').replaceChildren();
+ document.body.classList.remove('world-review-open');
 }
 function reviewWorld(title:string,summary:WorldSummary,note:string,label:string,path:string,body:unknown) {
  $('world-review-artwork').replaceChildren();setPlaying(false);worldReview={path,body};text('world-review-title',title);
  text('world-review-summary',`${summary.name} · day ${summary.tick} · ${summary.tiles} zones · ${summary.settlements??0} settlements (${fmt(summary.population??0)} inhabitants, ${fmt(summary.travelers??0)} traveling) · ${summary.fields} custom properties · ${summary.rules} custom rules · ${summary.plugins} plugins · ${summary.entities??0} entities (${summary.entityTypes??0} types) · ${summary.interventions} recorded changes.`);
- text('world-review-note',note);text('apply-world-review',label);$('world-review').hidden=false;
- for(const child of Array.from(document.body.children))if(child instanceof HTMLElement&&child.id!=='world-review'&&child.id!=='toast')child.inert=true;
- document.body.classList.add('world-review-open');$('cancel-world-review').focus();
+ text('world-review-note',note);text('apply-world-review',label);
+ document.body.classList.add('world-review-open');openReview($<HTMLDialogElement>('world-review'),actionOrigin,$('world-review-title'));
 }
-$('cancel-world-review').onclick=finishWorldReview;
-$('world-review').addEventListener('keydown',e=>{if(e.key==='Escape')finishWorldReview();});
+$('cancel-world-review').onclick=()=>{if(!busy)finishWorldReview();};
+$('world-review').addEventListener('cancel',e=>{e.preventDefault();if(!busy)finishWorldReview();});
 $('apply-world-review').onclick=()=>void action(async()=>{
  if(!worldReview)return;const next=await api<World>(worldReview.path,worldReview.body);
- pending=null;$('proposal').hidden=true;setWorld(next);$('conversation').hidden=true;document.body.classList.remove('chat-open');promptState(null);
- finishWorldReview();$('worlds').hidden=true;
+ pending=null;closeReview($<HTMLDialogElement>('proposal'),$('worlds-toggle'));setWorld(next);$('conversation').hidden=true;document.body.classList.remove('chat-open');promptState(null);
+ $('worlds').hidden=true;finishWorldReview();
 });
 let historyCursor:string|null=null;
 async function reviewSelective(recordId:string,edit:{mode:'omit'}|{mode:'replace';summary:string;operations:Operation[]}){
@@ -475,6 +475,7 @@ function updateCustomLayers() {
 }
 $('custom-layer').onchange=()=>{const value=$<HTMLSelectElement>('custom-layer').value;if(!value)return;globe.overlay=value as Overlay;globe.update();updateCustomLayers();for(const button of Array.from($('layer-buttons').children))button.classList.remove('active');};
 async function reviewProposal(proposal:Proposal) {
+ const origin=actionOrigin??document.activeElement;
  const result=await api<{conflictPreview:{enabled:boolean;settings:typeof DEFAULT_CONFLICT_SETTINGS;days:NonNullable<NonNullable<World['conflict']>['lastDay']>[];beforePopulation:number;forecastPopulation:number;baselinePopulation:number}|null;factionPreview:{before:{id:string;label:string;zones:number;residents:number}[];applied:{id:string;label:string;zones:number;residents:number}[];forecast:{id:string;label:string;zones:number;residents:number}[];relations:NonNullable<World['factions']>['relations'];borders:NonNullable<World['factions']>['borders']|null;garrisons:{tileId:number;target:number;reserveDays:number;lastDay:NonNullable<World['tiles'][number]['garrison']>['lastDay']|null}[]}|null;healthPreview:{day:NonNullable<World['disease']>['lastDay']|null;before:{susceptible:number;ill:number;immune:number};applied:{susceptible:number;ill:number;immune:number};forecast:{susceptible:number;ill:number;immune:number};baseline:{susceptible:number;ill:number;immune:number}}|null;waterQualityPreview:{enabled:boolean;before:{dissolved:number;surface:number};applied:{dissolved:number;surface:number};forecast:{dissolved:number;surface:number};baseline:{dissolved:number;surface:number};day:{tick:number;emitted:number;waste:number;treated:number;oceanExport:number;decayed:number}|null}|null;airPreview:{enabled:boolean;before:{load:number};applied:{load:number};forecast:{load:number};baseline:{load:number};day:{tick:number;emitted:number;removed:number;rejectedEmission:number}|null}|null;migrationPreview:{days:NonNullable<NonNullable<World['migration']>['lastDay']>[]} |null;neighborVisitPreview:{tick:number;total:number;visitors:number;rations:number;entries:NonNullable<NonNullable<World['neighborVisits']>['lastDay']>['entries']}|null;journeyPreview:{before:{population:number;travelers:number;foodInTransit:number};applied:{population:number;travelers:number;foodInTransit:number};forecast:{population:number;travelers:number;foodInTransit:number};baseline:{population:number;travelers:number;foodInTransit:number};active:NonNullable<World['journeys']>['active'];reports:NonNullable<NonNullable<World['journeys']>['lastDay']>['entries']};routePreview:{tick:number;total:number;entries:NonNullable<NonNullable<World['resourceRoutes']>['lastDay']>['entries']}|null;foodTradePreview:{tick:number;beforeFood:number;afterFood:number;transferred:number;routeCount:number;transfers:{from:number;to:number;rations:number}[]}|null;settlementChanges:{total:number;rows:{tileId:number;before:string;after:string;forecast:string;baseline:string}[]};entityChanges:{total:number;rows:{id:string;before:{summary:string}|null;after:{summary:string}|null;forecast:{summary:string}|null;baseline:{summary:string}|null}[]};appearanceChanges:{total:number;tiles:{tileId:number;before:{label:string;color:string;asset:string;layers:{asset:string;opacity:number}[]};after:{label:string;color:string;asset:string;layers:{asset:string;opacity:number}[]}}[]};pluginMigrations:{id:string;label:string;totalTiles:number;tiles:{tileId:number;before:Record<string,number>;after:Record<string,number>}[]}[];tick:number;baselineError:string|null;baselineTick:number;totalTiles:number;resources:{fieldId:string;label:string;unit:string;baselineUnit:string|null;totalMilli:number;beforeMilli:number|null;baselineMilli:number|null}[];tiles:{waterQuality:{concentration:number|null;qualityPercent:number|null;usableWaterL:number}|null;baselineWaterQuality:{concentration:number|null;qualityPercent:number|null;usableWaterL:number}|null;properties:{id:string;label:string;unit:string;baselineUnit:string|null;after:number;baseline:number|null}[];id:number;after:World['tiles'][number];baseline:World['tiles'][number];waterMm:number;baselineWaterMm:number}[]}>('proposals/preview',proposal);
  pending=proposal;text('proposal-summary',proposal.summary);
  const container=$('preview-results');container.replaceChildren();
@@ -511,7 +512,7 @@ async function reviewProposal(proposal:Proposal) {
   if(tile.after.air){const row=document.createElement('p');row.className='air-tile-preview';row.textContent=`Air pollution: ${fmt(tile.after.air.load)} units (${fmt(tile.baseline.air?.load??0)} without this change); wind toward ${tile.after.air.windBearingDeg}°, ${tile.after.air.windPermille/10}% daily.`;container.append(row);}
   for(const field of tile.properties){const row=document.createElement('p');row.textContent=`${field.label}: ${field.after} ${field.unit} (${field.baseline===null?'not previously defined':`${field.baseline} ${field.baselineUnit??field.unit} without this change`})`;container.append(row);}
  }
- $('proposal').hidden=false;$('apply-proposal').focus();
+ openReview($<HTMLDialogElement>('proposal'),origin,$('proposal-title'));
 }
 function promptState(id:string|null) {
  promptJobId=id;document.body.classList.toggle('prompt-running',!!id);$('chat-progress').hidden=!id;
@@ -545,7 +546,7 @@ async function loadChat() {
    if(job.reply?.assumptions.length){const p=document.createElement('p');p.className='muted';p.textContent='Assumptions: '+job.reply.assumptions.join(' ');article.append(p);}
    if(job.proposal) {
     const applied=world.history.some(h=>h.id===job.proposal!.id);
-    if(!applied&&job.proposal.expectedRevision===world.revision){const button=document.createElement('button');button.textContent='Review five-day preview';button.onclick=()=>void action(()=>reviewProposal(job.proposal!));article.append(button);}
+    if(!applied&&job.proposal.expectedRevision===world.revision){const button=document.createElement('button');button.id=`review-${job.request.id}`;button.textContent='Review five-day preview';button.onclick=()=>void action(()=>reviewProposal(job.proposal!));article.append(button);}
     else {const p=document.createElement('p');p.className='muted';p.textContent=applied?'Applied to this world.':'World has changed. Send a new prompt for a current proposal.';article.append(p);}
    }
    if(job.status==='awaiting-import'){const b=document.createElement('button');b.textContent='Use this export for import';b.onclick=()=>{$<HTMLInputElement>('external-request').value=job.request.id;};article.append(b);}

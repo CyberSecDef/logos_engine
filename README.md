@@ -88,6 +88,9 @@ Phase 5 is complete within the [agreed simulation scope](docs/phase-5-plan.md).
 See the [final acceptance matrix](docs/phase-5-acceptance.md) for reproducible
 long-run, balance, scale, restart and browser checks.
 
+[Phase 6](docs/phase-6-plan.md) is underway: desktop-first accessibility and polish,
+usable mobile layouts, measured performance improvements and local operation.
+
 Creator-placed [settlements](docs/settlements.md) now track food reserves, weather-limited
 harvest, shortage losses and gradual growth, with reviewed prompts and overlays.
 [Soil ecology](docs/soil-ecology.md) connects fertility to harvest, weather, farmer
