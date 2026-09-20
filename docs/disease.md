@@ -1,9 +1,9 @@
-# Health and recovery — Phase 5f1
+# Health, recovery and contact spread — Phase 5f
 
 The first health milestone tracks susceptible, ill and temporarily immune people.
 It supports creator introduction/treatment, recovery, immunity loss, polluted-water
-exposure and lost farm labor. **Contact transmission is not implemented yet**;
-local infection and exposure through visits/arrivals are the next milestone (5f2).
+exposure and lost farm labor. Phase 5f2 adds separately activated local and travel
+contact transmission.
 These are fictional game balance rules, not a model of a real disease.
 
 ## Activation and interface
@@ -70,14 +70,16 @@ after meals, so its new travelers have already progressed for this day.
 Ill residents and ill incoming work visitors cannot farm. All still consume food
 and can travel. Outgoing ill visitors are subtracted from home unavailable labor;
 only incoming work visitors contribute to destination farm labor. Susceptible and
-immune people work normally. The farm ledger records unavailable ill workers.
+immune people work normally. The farm ledger records unavailable ill workers, including cases introduced during
+the current contact phase.
 Visit allocation does not specifically recruit replacement workers for illness.
 
 Departures debit health from home; arrivals and docking credit it exactly once.
 Blocked travelers continue recovery and immunity loss. Health moves with automatic
 relocation as well as creator journeys. Temporary visits retain home residency and
 sample from one shared remaining origin pool, preventing duplication across trips.
-There is currently no infection caused by sharing a destination with an ill visitor.
+With contact spread enabled, sharing a destination with ill people can introduce
+cases, including among visitors.
 
 Every permanent departure, population decrease and starvation loss partitions
 susceptible/ill/immune proportionally using exact integer products and largest
@@ -105,3 +107,70 @@ exposure, pause, workforce, visits, migration, arrivals, blocked journeys, starv
 births, scope, replay, checkpoints and portable saves. `npm run test:disease` checks
 review/cancel/apply, treatment, travel recovery, labor, overlays, save/reload,
 desktop/mobile layout and no autonomous model calls in an isolated world.
+
+## Daily contact spread — Phase 5f2
+
+Contact spread requires **separate reviewed activation** after health tracking.
+Use **Review enabling contact spread** or ask the advisor with Entire world scope.
+Old health saves/replays keep exactly their previous behavior without this option.
+The new `disease-contact-configure` operation takes `tileId`, `expectedVersion`
+(the current disease version), `enabled` and integer `ratePermille` between 0 and
+1,000. It increments the shared disease version and clears the previous daily
+report. The inspector starts with rate 200. This is a fictional gameplay setting.
+`disease-configure` preserves this optional `contact` object, marked
+`model: daily-contact-v1`. Both health and contact flags must be enabled to spread.
+Pausing contact alone leaves water exposure, recovery and lost farm labor active.
+
+After recovery/water exposure, journey advancement/arrivals and visit assignment,
+**before farming and meals**, construct one frozen presence snapshot:
+
+- Home groups contain residents who did not visit elsewhere that day.
+- Each visit group spends its contact phase at its recorded destination. Food,
+  work and exploration visits all mix. Each visitor is counted once and retains
+  their home residency and home meals.
+- Remaining transit parties mix internally, including blocked parties. Parties
+  do not mix with one another or the zones they pass through or wait beside.
+  Completed arrivals are already destination residents and mix there instead.
+
+For every resident/visitor group at a location, let S be its susceptible count,
+I the **total ill people present**, and P the **total people present**. New cases:
+
+```
+floor(S * ratePermille * I / (1000 * P))
+```
+
+Use exact integer arithmetic. Empty locations give zero. There is no minimum case
+or fractional carry; small exposures can round to zero. Apply the same formula
+within each transit party. All case counts use the frozen snapshot, so new contact
+cases never create another round of transmission that day. Newly ill visitors
+return their cases to their home health counts, and their visit health records
+also reflect those cases for farm labor accounting. No population is created,
+lost or permanently moved by a contact calculation.
+
+People whose immunity waned earlier today are susceptible. People who recovered
+are protected; earlier water-caused cases can be infectious in this contact phase.
+New contact cases cannot farm today and begin recovery on subsequent days. Existing
+starvation rules still run afterward. Automatic migration departs after meals and
+carries the resulting health, without a second contact phase on departure day.
+
+Travel closures block actual visits and journey movement; they do not suppress
+local mixing, mixing inside waiting parties, or physical water contamination.
+The communication flag does not affect contact spread. Resource/food transfers
+without people have no contact effect. There is no long-distance spontaneous
+infection, air-pollution health effect or direct disease death.
+
+`disease.lastDay.contactCases` totals new contact cases. Nonzero `contactEntries`
+record resident/visitor home zone and exposure zone, or transit journey ID, along
+with group population, susceptible count, ill/present totals and resulting cases.
+These identify where exposure happened, not which individual transmitted it.
+Entries describe that day's contact phase, before subsequent meals/migration;
+current populations may differ. The inspector shows up to 20 relevant entries;
+full reports are retained in world state and available to the advisor. Five-day
+proposal previews include final-day contact and water-case totals alongside the
+population health baseline comparison.
+
+`npm run test:disease-contact` exercises reviewed activation/cancel, observed cases,
+attribution, forecasts, replay/reload, responsive layout and zero autonomous model
+calls. Engine tests cover closed travel, visitor return, no same-day cascade,
+arrival/blocked transit, immunity, pause, rounding, version/scope enforcement,
+100-day determinism, population conservation and portable/checkpoint persistence.

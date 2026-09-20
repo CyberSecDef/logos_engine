@@ -6,8 +6,9 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5f1 health accounting/recovery is implemented, deployed and published.
-Next: 5f2 local and travel-contact transmission; no contagion exists yet.
+Phase 5f2 local and travel-contact transmission is implemented and deployed;
+publication is underway. Phase 5f health/disease is complete. Next: Phase 5g
+knowledge and technology, with tangible research costs and bounded unlocks.
 Confirmed: workforce loss, recovery and temporary immunity, no direct disease
 deaths, and polluted water may introduce initial cases. See [health model](docs/disease.md).
 
@@ -37,7 +38,7 @@ deaths, and polluted water may introduce initial cases. See [health model](docs/
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
-| 5. Broader simulation | In progress: 5a–5e and 5f1 implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
+| 5. Broader simulation | In progress: 5a–5f implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
@@ -1654,3 +1655,41 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published milestone `10a0316` to public `CyberSecDef/logos_engine` main.
 - Next work remains 5f2 contact transmission; health accounting and environmental
   introduction are complete, with explicit activation required in existing worlds.
+
+### 2026-09-20 — Phase 5f2 local and travel contact transmission
+
+- Added separately reviewed `daily-contact-v1` with `disease-contact-configure`,
+  shared health version checks, world-only prompt scope and bounded rate0–1000.
+  Existing health worlds/replays retain their behavior until explicit activation.
+- After arrivals/visit assignment and before farming, partition everyone into
+  home groups, destination visits or remaining transit parties. Use frozen presence
+  and exact integer case counts; no same-day cascading or population creation.
+  Returning visitors credit cases to their home; blocked parties mix internally;
+  passing through a zone does not expose its residents. Closures block real trips.
+- New cases lose farm labor today, recover on later days, and survive all existing
+  migration/starvation accounting. No direct disease deaths or air damage added.
+- Added home/exposure-zone and transit case attribution, daily totals, inspector
+  controls, preview summaries and native provider capabilities v21. Health pause
+  pauses contacts; contact-only pause preserves water/recovery effects.
+- Updated health/interface/environment docs and Phase 5 plan with precise snapshot,
+  immunity/water timing, rounding, report scope and compatibility semantics.
+- Final `npm run check`: **198 tests passed**, typecheck/build passed. New tests
+  cover opt-in compatibility, version/scope rejection, closed travel, visitor
+  return, frozen no-cascade snapshots, immunity, arrival/blocked transit, small
+  fractions, large populations, same-day starvation, 100-day deterministic
+  conservation and replay/checkpoints/portable saves.
+- Contact, health and neighbor-visit browser workflows passed, including cancel,
+  Apply, attribution, forecasts, reload/replay and desktop/mobile with zero
+  autonomous model calls. Inspected contact screenshots in `.local/screenshots/`.
+- Real authenticated native Claude produced the requested world contact setting
+  at rate200; exact operation/schema/scope and read-only forecast passed in a
+  temporary world. No user data changed during provider acceptance.
+- Deployed and verified `http://192.168.0.10:5180` (`0.0.0.0:5180`), preserving
+  first-world day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and save envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Health/contact remain inactive pending reviewed activation. Evidence:
+  `/tmp/logos-contact-deploy.json`. Existing ~663 kB bundle warning remains Phase 6.
+- Phase 5f complete. Next: 5g knowledge/technology, then 5h conflict and 5i integrated
+  long-run tuning; broader Phase 5 is not complete yet.

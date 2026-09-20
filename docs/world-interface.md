@@ -238,4 +238,7 @@ operations. No air-to-water deposition is implemented.
 [Health and recovery](disease.md) adds separately activated `health-state-v1`,
 `disease-configure`, `disease-introduce` and `disease-treat`. It reads water quality
 for resident exposure, tracks health through all population changes and removes
-ill people from available farm labor. Contact transmission remains the next step.
+ill people from available farm labor. `disease-contact-configure` separately
+activates daily contact spread with a bounded rate, frozen presence snapshots
+and location/journey attribution. It shares the health version and requires world
+prompt scope. Existing health saves do not gain contact spread automatically.

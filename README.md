@@ -106,7 +106,8 @@ dry deposits, tracks settlement waste/treatment and reduces farming when standin
 water is contaminated. Activate it through its reviewed inspector control.
 [Health and recovery](docs/disease.md) separately enables illness, temporary immunity,
 water-caused cases and lost farm labor, with health carried by travelers.
-Contact-based transmission is the next milestone.
+Separately activated contact spread connects local mixing, routine visits and
+arrivals, with new cases attributed to their exposure location.
 
 **Still planned:** richer erosion, broader trade and movement,
 conflict, and technology. The communication flag is persisted but

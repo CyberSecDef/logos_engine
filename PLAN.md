@@ -592,4 +592,6 @@ read-only diagnostics and five-day forecast comparisons. See docs/water-quality.
 [Health and recovery](docs/disease.md) implements optional susceptible/ill/immune
 accounting, creator intervention, water-caused cases, reduced farm labor and
 health-preserving travel/demographic edits. No direct disease deaths. Phase 5f2
-contact transmission is next; current travel carries health without contagion.
+adds separately activated contact transmission through local mixing, visits and
+arrivals, plus mixing inside transit parties. See the health model for exact
+snapshots, attribution, rounding and compatibility. Phase 5g technology is next.

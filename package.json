@@ -44,6 +44,7 @@
     "test:neighbor-visits": "npm run build && node tests/neighbor-visits-browser.mjs",
     "test:air-migration": "npm run build && node tests/air-migration-browser.mjs",
     "test:water-quality": "npm run build && node tests/water-quality-browser.mjs",
+    "test:disease-contact": "npm run build && node tests/disease-contact-browser.mjs",
     "test:disease": "npm run build && node tests/disease-browser.mjs"
   },
   "dependencies": {

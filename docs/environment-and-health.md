@@ -134,5 +134,6 @@ migration also exist. With explicit water-quality activation, settlements emit
 waste and food shortages reduce sanitation condition; pollution can reduce harvest.
 [Health accounting](disease.md) now supports recovery, temporary immunity,
 workforce loss and water-caused cases after separate activation. Health travels
-with people; contact transmission remains planned for Phase 5f2.
+with people; Phase 5f2 now adds separately activated local/visit/arrival contact
+transmission and internal transit-party mixing using one daily snapshot.
 The confirmed first disease model has no direct disease deaths.

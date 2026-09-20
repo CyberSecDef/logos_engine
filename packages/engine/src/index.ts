@@ -1,4 +1,4 @@
-import {validateDisease,applyDisease,advanceDisease,attachVisitHealth} from './disease.js';
+import {validateDisease,applyDisease,advanceDisease,attachVisitHealth,advanceContacts} from './disease.js';
 import {validateWaterQuality,applyWaterQuality,advanceWaterQuality,advanceSanitation,waterQualityMetrics} from './water-quality.js';
 import {validateAir,applyAir,advanceAir} from './air.js';
 import {validateMigration,applyMigration,advanceMigration} from './migration.js';
@@ -95,6 +95,7 @@ function advanceDay(world:World,report?:WaterTransportReport):World {
   advanceFoodTrade(next);
   advanceNeighborVisits(next);
   attachVisitHealth(next);
+  advanceContacts(next);
   advanceSettlements(next);
   advanceSanitation(next);
   advanceMigration(next);
