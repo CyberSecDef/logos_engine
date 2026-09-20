@@ -13,6 +13,11 @@ export function applyFaction(w:World,op:Operation):void {
   if(t.elevationM<=0)throw Error('New territory claims require land above sea level');
   t.factionId=op.factionId;return;
  }
+ if(op.kind==='faction-borders-configure'){
+  if(!w.factions)throw Error('Define factions before configuring borders');
+  if(op.expectedVersion!==w.factions.version)throw Error('Stale faction registry version');
+  w.factions.borders={model:'hostile-borders-v1',enabled:op.enabled,travel:op.travel,trade:op.trade,knowledge:op.knowledge};w.factions.version++;return;
+ }
  if(op.kind!=='faction-define'&&op.kind!=='faction-remove'&&op.kind!=='faction-relation')return;
  if(op.expectedVersion!==(w.factions?.version??0))throw Error('Stale faction registry version');
  if(op.kind==='faction-define'){
@@ -35,3 +40,12 @@ export function applyFaction(w:World,op:Operation):void {
  w.factions!.version=op.expectedVersion+1;
 }
 export function factionSummary(w:World){return w.factions?.definitions.map(f=>({...f,zones:w.tiles.filter(t=>t.factionId===f.id).length,residents:w.tiles.filter(t=>t.factionId===f.id).reduce((n,t)=>n+t.population,0)}))??[];}
+
+// Territorial edge policy, not personal allegiance. Physical transport and generic
+// custom transfers do not call this gate. Missing policy preserves legacy replay.
+export function factionBorderOpen(w:World,from:number,to:number,channel:'travel'|'trade'|'knowledge'):boolean {
+ const policy=w.factions?.borders;if(!policy?.enabled||!policy[channel])return true;
+ const a=w.tiles[from].factionId,b=w.tiles[to].factionId;if(!a||!b||a===b)return true;
+ return !w.factions!.relations.some(r=>r.relationship==='hostile'&&(r.a===a&&r.b===b||r.a===b&&r.b===a));
+}
+export function factionBorderSummary(w:World,tileId:number){return w.cells[tileId].neighbors.map(to=>({to,travel:factionBorderOpen(w,tileId,to,'travel'),trade:factionBorderOpen(w,tileId,to,'trade'),knowledge:factionBorderOpen(w,tileId,to,'knowledge')}));}

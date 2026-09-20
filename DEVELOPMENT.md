@@ -10,8 +10,10 @@ Phase 5h factions and conflict is underway. [The plan](docs/factions.md) separat
 identities/territory (5h1), borders/mobilization (5h2), conflict (5h3) and integrated
 acceptance (5h4). Confirmed creator-established factions/territory and automatic
 conflict under explicit rules. 5h1 registry, territory/relationships and review UI
-are implemented, deployed and published. Next: border policy and
-mobilization. Relationship records do not yet affect borders or initiate combat.
+are deployed and published. 5h2a independent hostile border rules are implemented
+and deployed; 233 tests, typecheck/build, browser and native Claude acceptance
+passed. Publishing the milestone. Next: 5h2b mobilization with real inhabitants
+and provisions; automatic conflict (5h3), integration (5h4) and tuning (5i) remain.
 
 ## Completed
 
@@ -1899,3 +1901,56 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `2005452` to public `CyberSecDef/logos_engine` main.
 - Next: Phase 5h2 borders/mobilization, then automatic conflict under explicit rules.
+
+### 2026-09-20 — Phase 5h2a border policies in progress
+
+- Next delivery: explicit world border policy, shared edge checks for journeys,
+  routine visits, migration, food sharing, named resource routes and knowledge.
+  Phase 5h2b will implement mobilization separately; conflict remains 5h3.
+- Reviewing channel semantics with the creator. Border rules must be optional,
+  preserve old replay behavior, leave physical transport unchanged, and explain
+  stranded journeys without duplicating or deleting people or provisions.
+- Planned checks: independent channel switches, symmetric ownership/relations,
+  pathfinding and closure during transit, pure previews, scope/version rejection,
+  conservation, saved replay, browser review/apply and unchanged live-world deploy.
+
+
+### 2026-09-20 — Phase 5h2a implementation and unit acceptance
+
+- Creator confirmed independent hostile travel/trade/knowledge blocks; neutral,
+  allied, same-owner and unclaimed edges stay open subject to local permissions.
+- Added optional versioned `hostile-borders-v1`, reviewed world-scope configuration,
+  inspector settings/edge diagnostics, forecast policy and provider capabilities26.
+- Shared gates cover pathfinding, departures/hops, visits, migration, food sharing,
+  named stock routes and knowledge assistance. Stock-cargo journeys require trade;
+  personal provisions are exempt. Physical and generic custom flows ignore borders.
+- In-flight closures preserve leg progress and inventory, report `border-closed`,
+  and retain meals/starvation accounting. Local provisioning/docking and alternate
+  routes remain available. Territory-based access has no personal citizenship.
+- `npm run check`: **233 tests passed**, typecheck/build passed. Eleven new tests
+  cover switches, local permissions, path alternatives, closure/reopening,
+  conservation/recovery, food/visits/migration/routes/research, world scope,
+  pure forecasts, versions, replay/checkpoint/export and unaffected physics.
+- Browser and authenticated native Claude acceptance running. Production deployment
+  and publication remain pending. Existing ~736 kB bundle warning remains Phase6.
+
+
+### 2026-09-20 — Phase 5h2a acceptance and deployment
+
+- Faction-border and existing faction browser workflows passed, including channel
+  switches, review/cancel/apply, stranded party meals, reopening, replay/reload and
+  desktop/mobile layouts. Inspected both new screenshots. The browser assertion
+  was corrected to match human-readable “border closed” status; no runtime fix
+  was necessary. Existing journey and knowledge browser suites also passed.
+- Authenticated native Claude produced the requested travel/trade blockade while
+  leaving knowledge open; schema/scope/forecast passed and temporary save remained
+  unchanged. Browser workflows made zero autonomous model calls.
+- Deployed on `0.0.0.0:5180`, verified new controls through LAN. Preserved first-world
+  day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  No factions, border activation or test ticks added to the live world. Evidence:
+  `/tmp/logos-borders-deploy.json`.
+- Updated README, PLAN, Phase5 plan, world interface and detailed faction/channel
+  documentation. Phase5h2a complete; mobilization (5h2b) is the next development task.

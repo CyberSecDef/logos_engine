@@ -1,3 +1,4 @@
+import {factionBorderOpen} from './factions.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 import {farmConditions} from './farm-conditions.js';
 export function validateNeighborVisits(w:World):void {
@@ -22,9 +23,9 @@ export function advanceNeighborVisits(w:World):void {
  const entries:NonNullable<NonNullable<World['neighborVisits']>['lastDay']>['entries']=[];
  for(const t of w.tiles){if(!open[t.id]||!t.population||!r.dailyPermille)continue;
   let left=Math.min(t.population,Math.max(1,Math.floor(t.population*r.dailyPermille/1000)));
-  const sorted=[...w.cells[t.id].neighbors].filter(id=>open[id]).sort((a,b)=>a-b),offset=sorted.length?(w.tick+t.id)%sorted.length:0;
+  const sorted=[...w.cells[t.id].neighbors].filter(id=>open[id]&&factionBorderOpen(w,t.id,id,'travel')).sort((a,b)=>a-b),offset=sorted.length?(w.tick+t.id)%sorted.length:0;
   const neighbors=[...sorted.slice(offset),...sorted.slice(0,offset)];
-  for(const to of neighbors){if(!left||!demand[t.id]||!supply[to]||!r.carryRationsPerVisitor)continue;
+  for(const to of neighbors){if(!factionBorderOpen(w,t.id,to,'trade')||!left||!demand[t.id]||!supply[to]||!r.carryRationsPerVisitor)continue;
    const rations=Math.min(left*r.carryRationsPerVisitor,demand[t.id],supply[to]),visitors=Math.ceil(rations/r.carryRationsPerVisitor);
    left-=visitors;demand[t.id]-=rations;supply[to]-=rations;balance[t.id]+=rations;balance[to]-=rations;entries.push({from:t.id,to,purpose:'food',visitors,rations});
   }

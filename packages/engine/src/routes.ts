@@ -1,3 +1,4 @@
+import {factionBorderOpen} from './factions.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 import type {TransferRequest} from './resources.js';
 export function validateRoutes(w:World):void {
@@ -30,7 +31,7 @@ export function applyRoute(w:World,op:Operation):void {
 export function routeRequests(w:World):TransferRequest[] {
  const data=w.resourceRoutes;if(!data)return [];data.lastDay={tick:w.tick,entries:[]};const requests:TransferRequest[]=[];
  for(const r of data.routes){const from=w.tiles[r.tileId],to=w.tiles[r.toTileId],field=w.definitions.fields.find(f=>f.id===r.fieldId)!;
-  const status=!r.enabled?'paused':w.tick%r.everyDays!==0?'not-due':from.travelAllowed===false||to.travelAllowed===false?'closed':from.elevationM<=0||to.elevationM<=0?'submerged':'limited';
+  const status=!r.enabled?'paused':w.tick%r.everyDays!==0?'not-due':from.travelAllowed===false||to.travelAllowed===false?'closed':!factionBorderOpen(w,r.tileId,r.toTileId,'travel')||!factionBorderOpen(w,r.tileId,r.toTileId,'trade')?'border-closed':from.elevationM<=0||to.elevationM<=0?'submerged':'limited';
   data.lastDay.entries.push({routeId:r.id,from:r.tileId,to:r.toTileId,fieldId:r.fieldId,label:r.label,unit:field.unit,amountMilli:0,status});
   if(status==='limited')requests.push({ruleId:r.id,routeId:r.id,effectIndex:0,from:r.tileId,destinations:[r.toTileId],fieldId:r.fieldId,amountMilli:Math.round(r.amount*1000),reserveMilli:Math.round(r.reserve*1000),targetMilli:Math.round(r.target*1000)});
  }

@@ -1,3 +1,4 @@
+import {factionBorderOpen} from './factions.js';
 import {takeHealth} from './disease.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 import type {Journey,JourneyStatus} from '../../contracts/src/journeys.js';
@@ -28,6 +29,8 @@ export function applyJourney(w:World,op:Operation):void {
  if(op.kind==='journey-depart'){
   if(w.journeys?.active.some(j=>j.id===op.journeyId)||w.history.some(p=>p.operations.some(o=>o.kind==='journey-depart'&&o.journeyId===op.journeyId)))throw Error('Journey ID has already been used');
   checkJourneyPath(w,op.path,op.tileId);if(op.path.some(id=>w.tiles[id].elevationM<=0||w.tiles[id].travelAllowed===false))throw Error('Departure path must be open land');
+  if(op.path.some((id,i)=>i>0&&!factionBorderOpen(w,op.path[i-1],id,'travel')))throw Error('Departure path crosses a closed faction border');
+  if(op.cargo.some(c=>c.amount>0)&&op.path.some((id,i)=>i>0&&!factionBorderOpen(w,op.path[i-1],id,'trade')))throw Error('Cargo departure path crosses a closed faction trade border');
   const source=w.tiles[op.tileId],s=source.settlement;if(!s||!w.tiles[op.path.at(-1)!].settlement)throw Error('Journeys require existing source and destination settlements');
   if(op.population>source.population||op.foodRations>s.foodRations)throw Error('Insufficient departure population or food');
   const j:Journey={id:op.journeyId,label:op.label,path:op.path,daysPerHop:op.daysPerHop,index:0,remainingDays:op.daysPerHop,population:op.population,foodRations:op.foodRations,cargo:op.cargo,departedTick:w.tick,shortageDays:0,shortageIntervalDays:s.settings.shortageIntervalDays,lossPermille:s.settings.lossPermille};
@@ -48,7 +51,7 @@ export function advanceJourneys(w:World):void {
  for(const j of [...data.active].sort((a,b)=>a.id<b.id?-1:1)){
   const beforePopulation=j.population,beforeFood=j.foodRations;let status:JourneyStatus='moving',consumed=0,unmet=0,losses=0,arrived=false;
   const from=w.tiles[j.path[j.index]],to=w.tiles[j.path[j.index+1]];
-  if(!j.population)status='no-travelers';else if(from.travelAllowed===false||to.travelAllowed===false)status='closed';else if(from.elevationM<=0||to.elevationM<=0)status='submerged';else{
+  if(!j.population)status='no-travelers';else if(from.travelAllowed===false||to.travelAllowed===false)status='closed';else if(!factionBorderOpen(w,from.id,to.id,'travel')||j.cargo.some(c=>c.amount>0)&&!factionBorderOpen(w,from.id,to.id,'trade'))status='border-closed';else if(from.elevationM<=0||to.elevationM<=0)status='submerged';else{
    j.remainingDays=Math.max(0,j.remainingDays-1);
    if(j.remainingDays===0){if(j.index===j.path.length-2){const blocked=arrivalBlock(w,j,to.id);if(blocked)status=blocked;else{unload(w,j,to.id);status='arrived';arrived=true;}}
     else{j.index++;j.remainingDays=j.daysPerHop;}}

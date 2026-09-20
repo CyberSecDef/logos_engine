@@ -1,3 +1,4 @@
+import {factionBorderOpen} from './factions.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 import {SETTLEMENT_LIMITS} from '../../contracts/src/settlement-defaults.js';
 export function validateFoodTrade(w:World):void {
@@ -30,6 +31,7 @@ export function advanceFoodTrade(w:World):void {
  // no cascading of deliveries or reuse of a freed slot during this phase.
  for(const tile of w.tiles){const from=tile.id;if(!supply[from])continue;
   for(const to of [...w.cells[from].neighbors].sort((a,b)=>a-b)){
+   if(!factionBorderOpen(w,from,to,'trade'))continue;
    const amount=Math.min(supply[from],demand[to],r.edgePerDay);if(amount<=0)continue;
    supply[from]-=amount;demand[to]-=amount;balances[from]-=amount;balances[to]+=amount;
    transfers.push({from,to,rations:amount});

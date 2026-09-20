@@ -1,3 +1,4 @@
+import {factionBorderOpen} from './factions.js';
 import {takeHealth} from './disease.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 export function validateMigration(w:World):void {
@@ -19,7 +20,7 @@ export function advanceMigration(w:World):void {
  const cooldown=new Map(m.lastDepartures.map(d=>[d.tileId,d.tick]));const receiving=new Set<number>(),departing=new Set<number>();
  for(const t of w.tiles){if((w.journeys?.active.length??0)>=64)break;const a=snap[t.id];if(!a.eligible||!a.population||receiving.has(t.id)||incoming[t.id]>0||w.tick-(cooldown.get(t.id)??-r.cooldownDays)<r.cooldownDays)continue;
   const pressure=a.shortage>=r.shortageDays||a.food<a.population,crowded=a.population*1000>=a.capacity*r.crowdingPermille;
-  const candidates=w.cells[t.id].neighbors.filter(id=>{const b=snap[id];return b.eligible&&!departing.has(id)&&b.capacity>b.population+incoming[id]&&b.food>=(b.population+incoming[id]+1)*r.destinationReserveDays;}).sort((x,y)=>{const a=snap[x],b=snap[y];return b.food/Math.max(1,b.population+incoming[y])-a.food/Math.max(1,a.population+incoming[x])||x-y;});
+  const candidates=w.cells[t.id].neighbors.filter(id=>{const b=snap[id];return b.eligible&&factionBorderOpen(w,t.id,id,'travel')&&!departing.has(id)&&b.capacity>b.population+incoming[id]&&b.food>=(b.population+incoming[id]+1)*r.destinationReserveDays;}).sort((x,y)=>{const a=snap[x],b=snap[y];return b.food/Math.max(1,b.population+incoming[y])-a.food/Math.max(1,a.population+incoming[x])||x-y;});
   for(const to of candidates){const b=snap[to],budget=Math.min(a.population,Math.max(1,Math.floor(a.population*r.departurePermille/1000))),housing=b.capacity-b.population-incoming[to],foodSpace=Math.floor(b.food/r.destinationReserveDays)-b.population-incoming[to];const population=Math.min(budget,housing,foodSpace);if(population<=0)continue;
    const destinationPopulation=b.population+incoming[to]+population;
    const betterFood=b.food/destinationPopulation>=a.food/a.population+r.reserveImprovementDays;

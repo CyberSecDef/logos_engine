@@ -263,5 +263,9 @@ plugins. They cannot write built-in research/effects. See [technology effects](t
 [Factions and territory](factions.md) adds optional `territory-v1`, versioned
 `faction-define`/`faction-remove`/`faction-relation` world operations and local
 `faction-claim` (existing ID or explicit null). Claims preserve zone contents;
-relationships currently have no combat/border effect. Referential integrity and
-existing prompt scope/review rules apply.
+relationships affect only explicitly enabled border rules. World-scope
+`faction-borders-configure` supplies the current registry version and explicit
+`enabled`, `travel`, `trade`, `knowledge` booleans. Optional `factions.borders`
+uses `hostile-borders-v1`; blocked journeys/routes report `border-closed`.
+Referential integrity and existing prompt scope/review rules apply. Combat is
+not implemented yet. See the faction document for channel and stranded-party rules.

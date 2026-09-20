@@ -624,3 +624,13 @@ Construction/material recipes remain future scope; worker-time is the current co
 edits, land claims/releases, symmetric relationships and a territory overlay.
 The player confirmed creator-established factions and rule-driven automatic
 conflict. Borders/mobilization/conflict follow; 5h1 labels have no combat effects.
+
+
+### Phase 5h2a implementation update
+
+[Hostile border policies](docs/factions.md#implemented-5h2a-hostile-border-policies)
+now connect explicit world settings to travel, trade and knowledge exchange.
+Neutral/allied/unclaimed edges remain open under local permissions. Journey
+closures preserve parties and leg progress while food consumption continues.
+Physical transport and custom generic flows remain independent. Mobilization
+(5h2b), automatic conflict (5h3), combined acceptance (5h4) and tuning (5i) remain.

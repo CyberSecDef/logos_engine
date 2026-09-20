@@ -1,3 +1,4 @@
+import {factionBorderOpen} from './factions.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 export function validateTechnology(w:World):void {
  const tech=w.technology;
@@ -55,7 +56,7 @@ export function advanceResearch(w:World):void {
    else if(!t.population||!t.settlement)reason='empty';
    else if(t.elevationM<=0||t.waterL/w.cells[t.id].areaM2>100)reason='terrain';
    else if(t.settlement.foodRations<t.population*(a.reserveDays+1))reason='food';
-   else{const v=away.get(t.id),ill=w.disease?.enabled?(t.health!.ill-(v?.ill??0)):0,available=Math.max(0,t.population-(v?.population??0)-ill);const source=exchange&&t.communication?[...w.cells[t.id].neighbors].sort((a,b)=>a-b).find(id=>known[id].has(d.id)):undefined;
+   else{const v=away.get(t.id),ill=w.disease?.enabled?(t.health!.ill-(v?.ill??0)):0,available=Math.max(0,t.population-(v?.population??0)-ill);const source=exchange&&t.communication?[...w.cells[t.id].neighbors].sort((a,b)=>a-b).find(id=>known[id].has(d.id)&&factionBorderOpen(w,t.id,id,'knowledge')):undefined;
     const bonus=source!==undefined?exchange!.bonusPermille:0,remaining=d.workRequired-p.progress;
     workers=Math.min(a.workers,available,Math.ceil(remaining*1000/(1000+bonus)));
     progressAdded=Math.min(remaining,workers+Math.floor(workers*bonus/1000));
