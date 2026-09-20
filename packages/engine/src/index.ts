@@ -1,3 +1,4 @@
+import {validateRoutes,applyRoute} from './routes.js';
 import {validateFoodTrade,applyFoodTrade,advanceFoodTrade} from './food-trade.js';
 import {validateEcology,applyEcology,advanceEcology} from './ecology.js';
 import {validateSettlements,applySettlement,advanceSettlements} from './settlements.js';
@@ -28,7 +29,7 @@ export function validateWorld(input:unknown):World {
     commands.add(p.id);
   }
   if(w.artwork&&new Set(w.artwork.images.map(i=>i.slot)).size!==w.artwork.images.length)throw Error('Duplicate artwork slot');
-  validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
+  validateRoutes(w);validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
   return w;
 }
 function event(w:World,e:WorldEvent) { w.events.push(e); if(w.events.length>200) w.events.shift(); }
@@ -48,7 +49,7 @@ export function applyProposal(world:World,input:unknown):World {
       next.artwork=op.pack;
     }
     if(op.kind==='artwork-reset')delete next.artwork;
-    applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
+    applyRoute(next,op);applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
     if(op.kind==='elevation') tile.elevationM+=op.deltaM;
     if(op.kind==='communication') tile.communication=op.enabled;
     if(op.kind==='rainfall') {

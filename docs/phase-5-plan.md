@@ -6,7 +6,7 @@ deterministic tests, persistence/replay checks, readable previews and a usable U
 The model is called only for creator prompts. No offline progression, autonomous
 model decisions, arbitrary engine edits during play or automatic provider repair.
 
-Status: **5a and 5b complete and deployed**. 5c1 adjacent food sharing is complete and deployed; later 5c work and 5d–5i remain planned.
+Status: **5a and 5b complete and deployed**. 5c1 adjacent food sharing is complete and deployed; 5c2 resource routes are complete and deployed; 5c3 and 5d–5i remain planned.
 
 ## Sequence and exit criteria
 
@@ -81,7 +81,7 @@ until reviewed activation. Trade/movement remains next.
 1. **5c1 — adjacent food sharing:** automatic neighbor sharing after reviewed world
    activation (confirmed), protected reserves, demand targets, capacities, local
    permissions and conserved daily routes. See [food sharing](food-sharing.md).
-2. **5c2 — resource routes and travel permissions:** define resource-route policies
+2. **5c2 — resource routes and travel permissions:** implemented [named stock routes](resource-routes.md) with resource-route policies
    and tangible general movement permissions without conflating communication,
    existing custom stock effects and food sharing.
 3. **5c3 — timed journeys and migration:** explicit departures/arrivals, capacity,

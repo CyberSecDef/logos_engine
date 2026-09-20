@@ -183,3 +183,7 @@ The historical soil example remains a custom-rule demonstration. To connect its
 existing values to harvests and population effects, review [soil ecology activation](soil-ecology.md).
 Activation explicitly pauses conflicting old weather writers to avoid counting
 rain/heat twice. The normalized index range supports both points and fractions.
+
+Stock unit conversions also require explicit updates/removal of every dependent
+[named resource route](resource-routes.md), including paused ones. Route amount,
+reserve and destination target remain in the field's units; no automatic rescaling.

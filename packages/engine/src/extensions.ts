@@ -192,6 +192,7 @@ export function validateConversions(world:World,operations:Operation[]):void {
   if(op.kind!=='field-define'||!op.transform)continue;
   const id=op.definition.id;
   if(operations.filter(o=>o.kind==='field-define'&&o.definition.id===id).length!==1)throw Error('Convert a property at most once per proposal');
+  for(const route of world.resourceRoutes?.routes??[])if(route.fieldId===id&&!operations.some(o=>o.kind==='resource-route-define'&&o.route.id===route.id||o.kind==='resource-route-remove'&&o.routeId===route.id))throw Error(`Conversion requires an explicit update or removal of resource route ${route.id}`);
   for(const rule of world.definitions.rules) {
    if(!rule.effects.some(e=>!e.entityTypeId&&e.fieldId===id)&&!reads(rule).some(r=>r.source==='custom'&&r.fieldId===id))continue;
    if(!operations.some(o=>o.kind==='rule-define'&&o.rule.id===rule.id||o.kind==='rule-remove'&&o.ruleId===rule.id))throw Error(`Conversion requires an explicit update or removal of rule ${rule.id}`);

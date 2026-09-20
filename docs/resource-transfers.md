@@ -114,3 +114,10 @@ the new format; run only one writer per world directory.
 between eligible neighbors. Its open/closed permission and reserve/edge settings
 apply only to food. Existing custom-stock transfers keep their own validated rules;
 closing food sharing does not silently disable mana or other stock movement.
+
+## Named resource routes
+
+[Named routes](resource-routes.md) now share this stock resolver. Legacy rules retain
+priority and their previous permission semantics. Route deliveries and old sharing
+cannot reuse each other's incoming stock in the same phase. Named routes add
+explicit endpoints, reserves, target levels, schedules and travel-permission gates.

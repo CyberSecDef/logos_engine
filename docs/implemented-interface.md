@@ -248,3 +248,11 @@ for exact settings, dependencies, writer conflicts, tick ordering and activation
 Optional `world.foodTrade` stores settings and bounded exact route accounting.
 Preview returns a bounded first-day `foodTradePreview`; normal settlement comparison
 still shows day +5. See [food sharing](food-sharing.md) for bodies and semantics.
+
+## Named resource routes (5c2)
+
+`resource-route-define` and `resource-route-remove` authorize both endpoints;
+`travel-permission` is local. Optional `world.resourceRoutes` and `tile.travelAllowed`
+retain versioned route definitions and daily reports. The existing stock resolver
+reserves inventory/capacity across generic rules and routes without forwarding.
+See [resource routes](resource-routes.md) for exact operations and limits.

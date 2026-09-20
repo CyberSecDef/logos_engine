@@ -543,3 +543,11 @@ import/export/edge limits, exact conserved routes, local permissions separate fr
 communication, next-day route previews and inspection. See [food sharing](docs/food-sharing.md).
 Resource routes, general travel permissions, timed journeys and migration remain
 separate 5c substeps. DEVELOPMENT.md records verification and publication.
+
+### Phase 5c2 execution — named resource routes
+
+Added directed adjacent stock routes with versioned capacity/reserve/target/cadence,
+local travel gates and per-route reports. Uses the original transfer reservation
+phase so legacy rules and routes cannot double-spend or forward same-phase receipts.
+Food, communication and legacy generic sharing remain separate channels. Timed
+journeys and migration stay in 5c3. See docs/resource-routes.md and DEVELOPMENT.md.

@@ -6,12 +6,12 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5c1 adjacent food sharing is complete, deployed and published as `2c141ee`.
-Confirmed automatic sharing on reviewed world activation conserves food, protects
-reserves, obeys daily limits and independent zone permissions, and explains routes.
-All 139 tests, four browser checks and native Claude acceptance pass. Settlement
-balance settings are confirmed adjustable per settlement through reviewed prompts.
-Next: 5c2 resource routes and travel permissions, then 5c3 timed journeys/migration.
+Phase 5c2 named resource routes and travel permissions are complete and deployed;
+publishing this milestone. Routes share conserved stock/capacity reservations with
+legacy transfers and expose versioned reserves, targets, cadence and daily reports.
+All 146 tests, four browser checks and native Claude acceptance pass. Land-only is
+the stated first-model default; optional sea-support preference is unanswered.
+Next: Phase 5c3 timed journeys and migration.
 
 ## Completed
 
@@ -1362,3 +1362,42 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published `2c141ee` to public `CyberSecDef/logos_engine` on `main`.
 - Adjacent food sharing is complete. Phase 5c2 resource routes/travel permissions
   and Phase 5c3 journeys/migration remain planned and are not claimed implemented.
+
+### 2026-09-20 — Phase 5c2 started
+
+- Implementing directed adjacent stock routes with limits/reserves/targets/schedules.
+- Shared resolver prevents overspending and same-day forwarding across old rules
+  and new routes; existing rules retain priority and previous behavior.
+- Separate travel permission gates new resource routes. Food-sharing permission,
+  communication and existing generic custom transfers retain their own semantics.
+- Optional question asks land-only first versus adjacent sea support. Common route
+  accounting implemented while awaiting feedback; first model planned land-only.
+- World data, version/dependency validation, unit-conversion checks and engine
+  integration underway; provider/UI, tests, documentation and publication remain.
+
+### 2026-09-20 — Phase 5c2 initial acceptance
+
+- All 146 tests pass, zero failures/skips. Legacy resource behavior is preserved;
+  new tests cover limits, stock/rule/route competition, no same-phase forwarding,
+  cadence, terrain, permissions, fractions, versions, conversions, scope and replay.
+- Implemented direct route creation, travel closure/reopening, readable inspection,
+  first-day route preview and LLM operations for editing/pausing/removing routes.
+- Route browser passed create/cancel/Apply, exact deliveries, closed/open travel,
+  prompted pause, mobile, reload/replay and no autonomous calls.
+- Land-only remains the stated implementation default pending optional feedback.
+- Documentation added in docs/resource-routes.md; native provider and regression
+  browser checks plus deployment/publication are in progress.
+
+### 2026-09-20 — Phase 5c2 deployment and final acceptance
+
+- Final full check: 146 passing tests, zero failures/skips; types/build pass.
+- Route, resource-sharing, food-sharing and extension browsers pass. Inspected
+  mobile route status/ledger. Real Claude route proposal passed scope/schema,
+  forecast, copy Apply and exactly 20 motes conserved; saved fixture unchanged.
+- Deployed on 0.0.0.0:5180 with Claude Code selected. Exact saved envelope and world
+  survived restart: first-world day 1170/revision 1189,
+  `e28b0dda8702d12de755a9f93126d958b0e528a052d31347a741b59d4a586a13`.
+- No routes or other interventions were added to the player's world. New controls
+  are available under Resource routes and travel. All changes require reviewed Apply.
+- Phase 5c2 complete; timed journeys/migration remain 5c3. Publishing documentation,
+  contract, implementation and tests. Land-only remains the implementation default.

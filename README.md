@@ -92,6 +92,8 @@ harvest, shortage losses and gradual growth, with reviewed prompts and overlays.
 stewardship and urban soil/vegetation loss through reviewed world activation.
 [Neighbor food sharing](docs/food-sharing.md) moves surplus between settlements
 with protected reserves, daily limits and independent local permissions.
+[Named resource routes](docs/resource-routes.md) carry custom stocks between adjacent
+land zones with reserves, destination targets, schedules and travel permissions.
 
 **Still planned:** richer erosion, broader trade and movement,
 conflict, and technology. The communication flag is persisted but

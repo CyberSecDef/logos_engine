@@ -1,7 +1,8 @@
+import {routeRequests} from './routes.js';
 import type { World } from '../../contracts/src/index.js';
 import type { FieldDefinition } from '../../contracts/src/extensions.js';
 
-export type TransferRequest={ruleId:string;effectIndex:number;from:number;destinations:number[];fieldId:string;amountMilli:number};
+export type TransferRequest={ruleId:string;effectIndex:number;from:number;destinations:number[];fieldId:string;amountMilli:number;routeId?:string;reserveMilli?:number;targetMilli?:number};
 export function stockUnits(world:World,tileId:number,field:FieldDefinition):number {
  const properties=world.tiles[tileId].properties;
  return Math.round((Object.hasOwn(properties,field.id)?properties[field.id]:field.defaultValue)*1000);
@@ -22,6 +23,7 @@ export function transferOnce(world:World,from:number,to:number,fieldId:string,am
  world.tiles[to].properties[fieldId]=(destination+units)/1000;
 }
 export function settleTransfers(world:World,requests:TransferRequest[],before:Map<string,number[]>):void {
+ requests.push(...routeRequests(world));
  const stocks=world.definitions.fields.filter(f=>f.quantity==='stock');
  const balances=new Map(stocks.map(f=>[f.id,world.tiles.map(t=>stockUnits(world,t.id,f))]));
  const outgoing=new Map(stocks.map(f=>[f.id,[...balances.get(f.id)!]]));
@@ -34,16 +36,19 @@ export function settleTransfers(world:World,requests:TransferRequest[],before:Ma
  });
  // Fixed rule/effect/source/destination priority resolves competition. Reservations
  // read post-production stocks/capacities; incoming stock cannot travel twice.
- requests.sort((a,b)=>(a.ruleId<b.ruleId?-1:a.ruleId>b.ruleId?1:0)||a.effectIndex-b.effectIndex||a.from-b.from);
+ requests.sort((a,b)=>Number(!!a.routeId)-Number(!!b.routeId)||(a.ruleId<b.ruleId?-1:a.ruleId>b.ruleId?1:0)||a.effectIndex-b.effectIndex||a.from-b.from);
  for(const request of requests) {
   const available=outgoing.get(request.fieldId)!,headroom=space.get(request.fieldId)!,balance=balances.get(request.fieldId)!;
-  const budget=Math.min(request.amountMilli,available[request.from]),count=request.destinations.length;
+  const budget=Math.min(request.amountMilli,Math.max(0,available[request.from]-(request.reserveMilli??0))),count=request.destinations.length;
   const share=Math.floor(budget/count),remainder=budget%count;
   for(const [i,to] of request.destinations.entries()) {
-   const amount=Math.min(share+(i<remainder?1:0),headroom[to]);
+   const field=stocks.find(f=>f.id===request.fieldId)!;
+   const targetRoom=request.targetMilli===undefined?headroom[to]:Math.max(0,request.targetMilli-(Math.round(field.max*1000)-headroom[to]));
+   const amount=Math.min(share+(i<remainder?1:0),headroom[to],targetRoom);
    available[request.from]-=amount;headroom[to]-=amount;
    balance[request.from]-=amount;balance[to]+=amount;
    entries.find(e=>e.fieldId===request.fieldId)!.transferredMilli+=amount;
+   if(request.routeId&&amount>0){const entry=world.resourceRoutes!.lastDay!.entries.find(e=>e.routeId===request.routeId)!;entry.amountMilli+=amount;entry.status='moved';}
   }
  }
  for(const field of stocks) {
