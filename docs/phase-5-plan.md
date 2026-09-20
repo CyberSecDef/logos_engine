@@ -10,7 +10,7 @@ Status: **5a–5e implemented and deployed**, including automatic visits and
 relocation follow-ups. Phase 5e passes engine, browser and native Claude source
 acceptance. Historical provider refusal for the earlier combined air/migration
 request is documented in DEVELOPMENT.md. Phase 5f1 health accounting and 5f2 contact transmission are implemented.
-Next: 5g knowledge and technology.
+Current: [5g knowledge and technology](technology.md), beginning with local research.
 
 ## Sequence and exit criteria
 
@@ -151,3 +151,14 @@ See [water quality](water-quality.md) for activation, conservation, scope and li
 Confirmed: no direct disease deaths; starvation rules still apply. Polluted water
 may introduce initial cases, in addition to creator introduction. Existing worlds
 require reviewed health activation; no model calls occur during simulation.
+
+### Phase 5g substeps and decisions
+
+- **5g1 implemented:** automatic local research, healthy resident worker-time
+  costs, reserve checks, cultivation improvements and local archives. Confirmed
+  settlements choose projects automatically; cultivation is the first example.
+- **5g2 next:** communication-gated knowledge exchange with one-hop snapshots.
+- **5g3 pending:** broader bounded unlocks, resource costs/custom reads as needed,
+  and combined-world acceptance. See [technology contracts](technology.md).
+
+The entire 5g milestone is not complete yet.

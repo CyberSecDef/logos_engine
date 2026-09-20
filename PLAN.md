@@ -595,3 +595,10 @@ health-preserving travel/demographic edits. No direct disease deaths. Phase 5f2
 adds separately activated contact transmission through local mixing, visits and
 arrivals, plus mixing inside transit parties. See the health model for exact
 snapshots, attribution, rounding and compatibility. Phase 5g technology is next.
+
+### Phase 5g1 implementation update
+
+[Automatic local research](docs/technology.md) now supports world-defined
+cultivation improvements, healthy resident labor costs and food reserve gates.
+The player confirmed automatic project selection. Knowledge sharing and broader
+unlocks follow in 5g2/5g3; research runs without automatic model calls.

@@ -6,11 +6,13 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5f2 local and travel-contact transmission is implemented, deployed and
-published. Phase 5f health/disease is complete. Next: Phase 5g
-knowledge and technology, with tangible research costs and bounded unlocks.
-Confirmed: workforce loss, recovery and temporary immunity, no direct disease
-deaths, and polluted water may introduce initial cases. See [health model](docs/disease.md).
+Phase 5g knowledge and technology is underway. The plan is split into local
+research (5g1), communication-based knowledge exchange (5g2), and broader unlocks
+plus integration (5g3). See [technology plan](docs/technology.md).
+Confirmed: settlements choose projects automatically; improved cultivation first.
+5g1 automatic local research is implemented and deployed; publication is underway.
+204 tests, three browser workflows and native Claude acceptance passed. Next:
+5g2 communication-gated knowledge exchange.
 
 ## Completed
 
@@ -1698,3 +1700,49 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `70f5e14` to public `CyberSecDef/logos_engine` main.
 - Phase 5f is complete; next development milestone is 5g knowledge and technology.
+
+### 2026-09-20 — Phase 5g started
+
+- Documented three substeps: local research, knowledge exchange, broader unlocks.
+- Reviewed settlement labor/food ledgers, visits, health and sanitation hooks.
+  Research must reserve healthy resident workers once; completed effects must
+  derive effective capacities rather than mutate base settings every tick.
+- Asked the player about project assignment and cultivation versus treatment.
+
+### 2026-09-20 — Phase 5g1 automatic local research and cultivation
+
+- Confirmed automatic project selection and improved cultivation with the player.
+  Implemented optional `local-research-v1`, world-scoped immutable definitions,
+  automatic assignment, manual overrides, local pause/resume and tile archives.
+- Default research budget10% of residents, protected7 food days plus today's meals.
+  One healthy resident staying home contributes one worker-day and cannot also
+  farm. Food/terrain/health/visits bound work; progress caps at the exact requirement.
+  Settlements retain a current project, then choose cheapest total work, tie ID.
+- Cultivation costs200 worker-days for+20% farm capacity and worker productivity.
+  Effects begin next day, stack additively at most+100%, retain existing weather/
+  soil/water limits and absolute farm cap, and never rewrite/compound base settings.
+- Inspector activation/example definition, progress/stall/completion reports,
+  five-day baseline comparison and advisor capabilities v22 are available. No
+  autonomous model calls. Existing worlds require reviewed activation/definitions.
+- Documented contracts, fixed primitives, local archives after depopulation,
+  scope/version rules and pause semantics in [technology](docs/technology.md).
+  Knowledge exchange, prerequisites, definition migrations and broader unlocks
+  are not claimed by this milestone; 5g2/5g3 remain.
+- `npm run check`: **204 tests passed**, typecheck/build passed. Covers automatic
+  ordering, labor, food, flood, illness/visits, pause/manual override, immutable IDs,
+  invalid state, bonus timing/cap, unchanged base settings, scope, forecast purity,
+  100-day deterministic replay, checkpoints and portable saves.
+- Research browser passed activation/cancel, definition, automatic work, pause/
+  resume, completion/next-day output, reload/replay and responsive layouts with
+  zero model calls. Contact and neighbor-visit regressions also passed. Screenshots
+  inspected in `.local/screenshots/technology-{desktop,mobile}.png`.
+- Native authenticated Claude returned exactly the requested cultivation definition
+  with200 worker-days in a temporary world; schema/scope/forecast passed and save
+  stayed unchanged. User world never received acceptance changes.
+- LAN deployment verified at `0.0.0.0:5180`, preserving first-world day1206,
+  revision1235 and complete save envelope. World hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`;
+  envelope `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Evidence `/tmp/logos-technology-deploy.json`; research inactive until review.
+- Existing web bundle size warning remains a Phase 6 task. Next: 5g2 knowledge
+  exchange over permitted communication channels; full Phase 5g remains open.

@@ -242,3 +242,9 @@ ill people from available farm labor. `disease-contact-configure` separately
 activates daily contact spread with a bounded rate, frozen presence snapshots
 and location/journey attribution. It shares the health version and requires world
 prompt scope. Existing health saves do not gain contact spread automatically.
+
+[Local research](technology.md) adds optional `local-research-v1`, immutable world
+technologies and tile archives. `technology-configure`/`technology-define` require
+world prompt scope and current technology versions; `research-assign`,
+`research-pause` and `research-auto` act locally. Automatic worker allocation is
+deterministic, disjoint from farm labor, and completes effects on the next day.

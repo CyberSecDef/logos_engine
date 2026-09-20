@@ -109,8 +109,12 @@ water-caused cases and lost farm labor, with health carried by travelers.
 Separately activated contact spread connects local mixing, routine visits and
 arrivals, with new cases attributed to their exposure location.
 
+[Automatic research](docs/technology.md) lets settlements spend healthy resident
+worker-days on local technologies. Improved cultivation boosts farming after
+completion; knowledge exchange remains the next milestone.
+
 **Still planned:** richer erosion, broader trade and movement,
-conflict, and technology. The communication flag is persisted but
+conflict, and broader technology effects. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 
 ## Verify and use the CLI
