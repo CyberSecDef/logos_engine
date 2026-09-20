@@ -16,7 +16,7 @@ portable world import/export, and persistent world selection. Published as
 instruction budgets, saved per-tile state, reviewed installation/update, and
 failure recovery. Verified, deployed, and published as `b10dbed`. General entity
 migrations and a complete replay journal remain pending. Phase 4d terrain
-artwork is verified and live; milestone publication is in progress.
+artwork is verified, live, and published as `6099bd3`.
 
 ## Completed
 
@@ -425,7 +425,7 @@ runoff with sediment conservation, and checksummed storage/path validation.
   proposals, immutable artifacts, execution and failure recovery — implemented;
   complete, verified, live, and published. JavaScript/native plugins are not enabled.
 - 4d: shared painterly terrain pack, actual atlas rendering, 1,000-day staggered
-  reveal and applied-action reveal — verified and live; publication in progress. Layering and world-local packs remain future work.
+  reveal and applied-action reveal — complete, verified, live, and published. Layering and world-local packs remain future work.
 - 4e: world checkpoints, branches, restore, and portable state import/export —
   complete, live, and published. Plugin/texture bundles
   and selective event replay remain future work.
@@ -653,3 +653,14 @@ runoff with sediment conservation, and checksummed storage/path validation.
   rendering limits, and remaining world-local/layered-pack scope.
 - Publishing six original generated PNGs with versioned immutable URLs, plus
   the 1,000-day and action-triggered reveal implementation.
+
+### 2026-09-19 — Terrain artwork publication
+
+- Pushed `6099bd3` to public `CyberSecDef/logos_engine` on `main`.
+- Live LAN verification passed with no shader/page errors and immutable asset
+  caching. Aethra remains at day 407; 590 of 1,442 places are illustrated based
+  on age plus existing applied actions. No simulation data was changed.
+- Six painterly PNGs and their exact built-in imagegen prompts are committed
+  under `packages/tile-packs/public/painterly-v1/`.
+- General entity migrations, a complete replay journal, world-local artwork
+  bundles, and layered appearance composition remain future work.
