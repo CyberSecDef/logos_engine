@@ -10,7 +10,7 @@ Phase 5a and 5b are complete. The soil ecology follow-up is implemented, verifie
 and deployed: reviewed activation connects fertility to harvests, weather changes
 soil, farmer populations improve it and urban pressure reduces soil/vegetation.
 All 132 tests, four browser checks and a native Claude activation check pass.
-Publishing this milestone; next planned phase is 5c trade and movement.
+Published as `226584b`; next planned phase is 5c trade and movement.
 
 ## Completed
 
@@ -1296,3 +1296,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   existing world remains inactive until reviewed Apply. No automatic migration.
 - Documentation covers settings, thresholds, normalized fertility, writer pausing,
   rounding, ordering and compatibility. Publishing the completed follow-up.
+
+### 2026-09-20 — Soil ecology publication
+
+- Published `226584b` to public `CyberSecDef/logos_engine` on `main`.
+- Verified deployment and exact player save preservation. Soil activation remains
+  an explicit reviewed world change; Phase 5c trade/movement remains next.
