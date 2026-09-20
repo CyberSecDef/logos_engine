@@ -11,7 +11,8 @@ old behavior until a recorded `neighbor-visits-configure` operation activates it
 The inspector's **Everyday neighbor travel** control reviews activation or pause.
 Configuration through the advisor requires Entire world scope and review/Apply.
 Existing explicit travel closures are respected at both endpoints; absent means
-open. Communication is independent. Permanent migration still uses journeys.
+open. Communication is independent. Permanent migration uses journeys, including the separately configured
+[automatic relocation policy](automatic-migration.md).
 
 ## Rules and effects
 

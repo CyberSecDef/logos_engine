@@ -96,6 +96,11 @@ with protected reserves, daily limits and independent local permissions.
 land zones with reserves, destination targets, schedules and travel permissions.
 [Migration journeys](docs/journeys.md) carry inhabitants, food and optional cargo
 over timed land paths, with waiting, shortage accounting and reviewed recovery.
+[Automatic relocation](docs/automatic-migration.md) lets residents leave for better
+food or housing without individual player approval.
+[Air pollution](docs/air-pollution.md) adds seeded winds, pulses, recurring emissions,
+cleanup and conserved transport, with inspector budgets and air/wind overlays.
+It currently has no damage effects.
 
 **Still planned:** richer erosion, broader trade and movement,
 conflict, and technology. The communication flag is persisted but

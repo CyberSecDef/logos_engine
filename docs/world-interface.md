@@ -219,3 +219,12 @@ Acceptance scenarios include persistent rain causing downstream wash-off,
 elevation redirecting flow, communication isolation affecting knowledge transfer
 without blocking water, discussion with zero mutation, an honest unsupported
 response, and a new mechanic supplied entirely by a sandboxed world plugin.
+
+## Phase 5 environmental and movement contracts
+
+Versioned optional built-in world models now include
+[automatic neighbor relocation](automatic-migration.md) and
+[airflow/pollution](air-pollution.md). Their dedicated operations, bounds, phase
+ordering, conservation rules and read primitives are specified in those documents
+and exported in the provider response schema. Both evolve without model calls.
+Pollution damage remains unimplemented; air transport does not emit water pollution.

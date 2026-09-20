@@ -6,8 +6,10 @@ deterministic tests, persistence/replay checks, readable previews and a usable U
 The model is called only for creator prompts. No offline progression, autonomous
 model decisions, arbitrary engine edits during play or automatic provider repair.
 
-Status: **5a, 5b and 5c complete and deployed** for their documented first scope.
-5c4 automatic neighbor visits is also complete and deployed. Next: 5d airflow and air pollution. Milestones 5e–5i remain planned.
+Status: **5a–5d implemented and deployed**, including automatic visits and
+relocation follow-ups. Native Claude acceptance for the latest operations is
+unverified due to an external provider refusal; direct controls, schema/engine
+tests and browser acceptance pass. Next: 5e water contamination/sanitation.
 
 ## Sequence and exit criteria
 
@@ -16,7 +18,7 @@ Status: **5a, 5b and 5c complete and deployed** for their documented first scope
 | 5a. Actual water transport and explanations | Extract the current hydrology phase without changing its arithmetic or ordering. Expose exact one-hop water/sediment transfers and per-zone source/sink budgets through a read-only next-day preview. | Old 100-day hashes remain identical; every zone balances; no same-day retransmission of incoming runoff; preview changes neither save nor journal and makes zero model calls. |
 | 5b. Food and population — complete | Explicitly introduce settlement state, food inventory, bounded production/consumption and tangible weather/flood/heat effects. Define inhabitants, food units, capacity and shortage/surplus counters. Creator placement and actual inhabitants/daily food reserves are confirmed. See [implemented model](settlements.md). | Food sources/sinks balance; inhabitants stay bounded/nonnegative; shortage and recovery are observable; existing worlds do not silently acquire active demographic rules. |
 | 5c. Trade and movement — complete | Begin with adjacent food/resource transfers, capacities and supply/demand. Add explicit travel permissions independent of communication, then timed long-distance routes and migration. | No double spending, lost inventory or duplicated people; stable competition resolution; travel respects duration; world totals include travelers in transit. |
-| 5d. Airflow and air pollution | Deterministic spherical wind field, emissions, bounded directed transport, mixing and explicit removal. Add creator pulses and sustained sources, wind/air-quality inspection and overlays. | Wind reversal changes the affected neighbors; calm behavior is defined; emissions/transfers/removal balance; stopping emissions does not erase existing load. |
+| 5d. Airflow and air pollution — implemented | Deterministic spherical wind field, emissions, bounded directed transport, mixing and explicit removal. Add creator pulses and sustained sources, wind/air-quality inspection and overlays. | Wind reversal changes the affected neighbors; calm behavior is defined; emissions/transfers/removal balance; stopping emissions does not erase existing load. |
 | 5e. Water contamination and sanitation | Reuse 5a water volumes for load transfer. Define dissolved load, dry deposits, dilution, wash-off and ocean export. Add explicit sanitation/infrastructure links after 5b; famine affects these through documented rules. | Evaporation does not delete contaminant mass; dry zones avoid division by zero; runoff carries load downstream; sources/sinks and ocean export balance. |
 | 5f. Generic disease | After 5b/5c: healthy/ill/recovered people, local contact, recovery and declared losses. Carry health state with travelers. Environmental exposure is separate from infectious spread. | Empty zones cannot gain sick inhabitants spontaneously; distant arrivals spread illness only on arrival; people and health compartments reconcile. |
 | 5g. Knowledge and technology | Tangible research costs, progress and unlocked bounded production/infrastructure effects. Communication permits defined knowledge exchange; completion activates effects at a documented tick boundary. | Knowledge does not teleport across closed channels; costs debit once; unlocks survive saves/replay; no model call is needed for progress. |
@@ -95,8 +97,8 @@ balance settings are adjustable through reviewed prompts.
 ### Phase 5c3 decisions
 
 Confirmed: creator-directed departures between existing settlements, with blocked
-arrivals waiting for repair/capacity or redirection. Automatic famine migration is
-deferred. Land neighbors first was also confirmed for resource routes. See
+arrivals waiting for repair/capacity or redirection. Automatic migration was
+initially deferred and is now added under the separately requested 5c5 policy. Land neighbors first was also confirmed for resource routes. See
 [journeys](journeys.md) for provisions, shortage losses, recovery and conservation.
 
 ### Phase 5c acceptance
@@ -104,8 +106,8 @@ deferred. Land neighbors first was also confirmed for resource routes. See
 5c1 automatic food sharing, 5c2 named adjacent stock routes/travel gates, and 5c3
 timed creator-directed land journeys are implemented and deployed. Whole-world
 population and stock totals include transit; movement/capacity/shortage outcomes
-are explained and recoverable. Automatic famine migration, sea travel and currency
-markets remain future extensions rather than part of this completed first scope.
+are explained and recoverable. Automatic relocation is the requested 5c5 follow-up;
+sea travel and currency markets remain future extensions.
 
 ### Phase 5c4 — routine neighbor visits (complete)
 
@@ -114,3 +116,15 @@ work and exploration without individual player approval. Implement temporary
 same-day trips, separate from migration, with default-open travel permissions,
 conserved food, reallocated labor and visible deterministic contact records.
 See [neighbor visits](neighbor-visits.md) for defaults, phase ordering and limits.
+
+### Phase 5c5 — automatic relocation (implemented)
+
+Player now requests autonomous permanent moves as well as temporary visits.
+Food pressure, crowding and better nearby conditions motivate departures; explicit
+travel closures apply. See [automatic migration](automatic-migration.md).
+
+### Phase 5d confirmed scope
+
+Track and spread air pollution first; defer ALL vegetation, farming and health
+damage. The load/wind/source/control/overlay milestone is documented in
+[air pollution](air-pollution.md). Physical transport ignores human travel borders.

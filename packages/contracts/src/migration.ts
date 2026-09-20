@@ -1,0 +1,7 @@
+import {z} from 'zod';import {DEFAULT_MIGRATION_SETTINGS} from './migration-defaults.js';
+const count=z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),tile=z.number().int().min(0).max(6761),days=z.number().int().min(1).max(3650);
+export const MigrationSettingsSchema=z.object({departurePermille:z.number().int().min(0).max(1000),cooldownDays:days,shortageDays:days,crowdingPermille:z.number().int().min(1).max(1000),reserveImprovementDays:days,destinationReserveDays:days,daysPerHop:z.number().int().min(1).max(30),provisionDays:z.number().int().min(0).max(3650)}).strict();
+export const MigrationDaySchema=z.object({tick:count,entries:z.array(z.object({from:tile,to:tile,journeyId:z.string().max(64),population:count.positive(),foodRations:count,reason:z.enum(['food-pressure','crowding','better-reserves'])}).strict()).max(64)}).strict();
+export const MigrationSchema=z.object({model:z.literal('neighbor-migration-v1'),version:count.positive(),enabled:z.boolean(),settings:MigrationSettingsSchema,nextSequence:count.positive(),lastDepartures:z.array(z.object({tileId:tile,tick:count}).strict()).max(6762),lastDay:MigrationDaySchema.optional()}).strict();
+export const migrationOperations=[z.object({kind:z.literal('migration-configure'),tileId:tile,expectedVersion:count,enabled:z.boolean(),settings:MigrationSettingsSchema}).strict()] as const;
+export const defaultMigration=()=>({model:'neighbor-migration-v1' as const,version:1,enabled:true,settings:{...DEFAULT_MIGRATION_SETTINGS},nextSequence:1,lastDepartures:[]});

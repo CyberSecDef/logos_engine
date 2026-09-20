@@ -2,8 +2,9 @@
 
 The player confirmed creator-directed departures between existing settlements,
 with blocked arrivals waiting in transit. `land-journeys-v1` implements this over
-saved adjacent land paths. Automatic famine-driven migration, sea travel, disease
-spread and autonomous departure policies remain future work.
+saved adjacent land paths. [Automatic neighboring relocation](automatic-migration.md)
+now launches these journeys under a separate world policy. Sea travel and disease
+spread remain future work.
 
 ## Use it
 

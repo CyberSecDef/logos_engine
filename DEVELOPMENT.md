@@ -6,11 +6,13 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5c4 automatic neighbor visits is complete, deployed and published as `ce30c90`.
-Daily food collectors, farm workers and explorers return home without individual
-approvals or model calls. 161 tests, neighbor/migration browser checks and native
-Claude acceptance pass. Activated in the current world after a named checkpoint,
-without advancing day 1180. Next: 5d airflow and air pollution.
+Phase 5c5 automatic relocation and Phase 5d air transport are implemented and
+deployed; publication pending. Automatic relocation is activated in the current
+world after a checkpoint; air transport awaits creator activation in its controls.
+174 tests and three browser scenarios pass. Native Claude acceptance is unverified:
+the provider refused the benign fantasy-world request with a biology safety tag,
+while login and a minimal isolated discussion work. Provider remains unchanged.
+Next: Phase 5e water contamination and sanitation; all air damage remains deferred.
 
 ## Completed
 
@@ -38,7 +40,7 @@ without advancing day 1180. Next: 5d airflow and air pollution.
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
-| 5. Broader simulation | In progress: 5a–5b complete | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
+| 5. Broader simulation | In progress: 5a–5d implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
@@ -1507,3 +1509,56 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `ce30c90` to the public repository on main; this entry records
   publication after the successful push.
+
+### 2026-09-20 — Automatic relocation and air transport implemented
+
+- Confirmed both late neighbor-travel answers: allow automatic permanent moves;
+  respect existing travel closures. Food/crowding/better-reserve motives confirmed.
+- Added versioned automatic migration, cooldowns, conservative inbound reservations,
+  timed journeys and five-day departure reports. Residents and food debit once;
+  home shortage counters persist and no per-trip approval/model call occurs.
+- Air pollution tracks/spreads only (confirmed): seeded saved spherical winds,
+  integer loads/emissions, one-hop transport/mixing, explicit removal/capacity budgets,
+  local pulses/cleanup/sources/wind operations, and read-only next-day diagnostics.
+- Added air/wind overlays, inspector controls and custom/plugin read primitives;
+  updated provider capabilities to v18 with both model contracts.
+- First full verification passed 171 tests and production build. Improving the
+  cumulative migration preview; browser and native-provider acceptance next.
+
+### 2026-09-20 — Browser acceptance passed; native provider limit identified
+
+- Combined air/migration browser scenario passes cumulative departure forecasts,
+  timed automatic arrivals, air activation/cancel/release/source/stop/calm controls,
+  exact read-only next-day budget, overlays, desktop/mobile and replay with zero
+  autonomous model calls. Desktop screenshot inspected.
+- Added localized pollution comparisons to proposal previews and always show transit
+  totals when an automatic migration policy is present.
+- Native Claude combined acceptance did not return a proposal. Login status is
+  active; a minimal isolated discussion succeeds. Private diagnostics identify an
+  external provider refusal tagged biology for the fantasy-world context, not an
+  expired login or an engine/schema error. No default-provider switch or filter
+  workaround was made. Real-provider acceptance remains unverified for this change.
+- Added competing-destination/manual-ID collision, full journey queue and 100-day
+  air conservation/replay regressions. Final verification running before release.
+
+### 2026-09-20 — Relocation and airflow released locally
+
+- Final `npm run check`: 174 passed, zero failures/skips; typecheck/build pass.
+  Three final browser scenarios pass: air/migration, neighbor visits and journeys.
+  Covers 100-day pollution budgets/replay, wind reversal/calm/capacity, no damage,
+  scopes, persistence, population/food accounting and migration competition/limits.
+- Preserved the exact world and save-envelope hashes across restart. Server remains
+  at 0.0.0.0:5180. Created “Before automatic permanent relocation” checkpoint and
+  applied the requested migration activation through the validated API at day 1180,
+  revision 1207 → 1208. Actual result exactly matched the expected proposal state;
+  no day advanced, no tile values changed, no pollution introduced.
+- Air controls expose reviewed activation, local load/source/wind edits, cleanup,
+  next-day flow explanation and overlays. Creator damage preference is documented:
+  air changes neither vegetation, farms, health, weather nor water contamination.
+- External limitation: real Claude combined-operation check was refused by the
+  provider's biology classifier. No credential reset, provider switch or safeguard
+  workaround performed. Schema/scope/forecast tests and direct UI checks pass.
+- Evidence: /tmp/logos-air-migration-final.log, /tmp/logos-air-migration-browser-final.log,
+  /tmp/logos-air-neighbor-regression.log, /tmp/logos-air-journey-regression.log and
+  /tmp/logos-air-migration-deploy.json. Failed provider logs are ignored/local only.
+- Existing Vite large-bundle warning remains a Phase 6 optimization (648 kB).

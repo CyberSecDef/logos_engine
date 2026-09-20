@@ -1,6 +1,6 @@
 import {readValue} from '../../engine/src/extensions.js';
 import type { Tile, World } from '../../contracts/src/index.js';
-export type Overlay='terrain'|'water'|'rain'|'temperature'|'population'|'food'|'communication'|`custom:${string}`;
+export type Overlay='terrain'|'water'|'rain'|'temperature'|'population'|'food'|'communication'|'air'|'wind'|`custom:${string}`;
 export type Appearance={label:string;color:string;assetId?:string;variant:number;textureOpacity:number;layers:{asset:string;opacity:number}[]};
 import manifest from '../../tile-packs/public/painterly-v1/manifest.json' with {type:'json'};
 export type TerrainEntry={id:string;label:string;color:string;image:string;conditions:{field:'elevationM'|'vegetation'|'population'|'temperatureC'|'rainMm';comparison:'lt'|'lte'|'gt'|'gte';value:number}[]};
@@ -32,6 +32,8 @@ export function appearance(w:World,t:Tile,overlay:Overlay='terrain',reveal?:numb
  }
  if(overlay==='population')color=`hsl(45, 50%, ${18+Math.min(1,Math.log10(1+t.population)/6)*55}%)`;
  if(overlay==='food')color=!t.settlement||!t.population?'#53616a':`hsl(${Math.min(30,t.settlement.foodRations/t.population)*4}, 55%, 45%)`;
+ if(overlay==='air')color=t.air?`hsl(${170+Math.min(1,Math.log10(1+t.air.load/(w.cells[t.id].areaM2/1e6))/3)*110}, 45%, 42%)`:'#53616a';
+ if(overlay==='wind')color=t.air?`hsl(${t.air.windBearingDeg}, 55%, ${18+t.air.windPermille/900*42}%)`:'#53616a';
  if(overlay==='communication') color=t.communication?'#469783':'#d8956b';
  const textureOpacity=overlay==='terrain'?(reveal??textureReveals(w)[t.id]):0;
  return {label:custom?.style.label??entry.label,color,assetId:textureOpacity>0?(custom?(custom.style.asset==='none'?undefined:custom.style.asset==='terrain'?entry.id:custom.style.asset):entry.id):undefined,variant:hash(`${terrainPack.id}:${t.id}`),textureOpacity,layers:textureOpacity>0?(custom?.style.layers??[]):[]};

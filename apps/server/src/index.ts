@@ -1,3 +1,5 @@
+import {previewAir} from '../../../packages/engine/src/air.js';
+import {defaultMigration} from '../../../packages/contracts/src/migration.js';
 import {defaultNeighborVisits} from '../../../packages/contracts/src/neighbor-visits.js';
 import {previewWater} from '../../../packages/engine/src/index.js';
 import {unpackBundle,MAX_BUNDLE_BYTES,artworkHashes} from './portable.js';
@@ -32,7 +34,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
   catch(error) {
     if((error as NodeJS.ErrnoException).code!=='ENOENT'||activeId!=='first-world') throw error;
     world=createWorld({id:'first-world',name:'Aethra',seed:'aethra-01',frequency:12});
-    world.neighborVisits=defaultNeighborVisits();
+    world.neighborVisits=defaultNeighborVisits();world.migration=defaultMigration();
     await store.save(world);
   }
   let queue=Promise.resolve();
@@ -97,6 +99,11 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(pathname==='/api/prompts/import')return json(res,200,await prompts.import(world,input));
       if(pathname==='/api/prompts/cancel'){const p=z.object({id:z.string()}).strict().parse(input);prompts.cancel(world,p.id);return json(res,200,{cancelled:true});}
       if(prompts.busy)throw Error('World is paused while the model responds; wait or cancel the request');
+      if(pathname==='/api/air/preview'){
+        const p=z.object({worldId:Id,expectedRevision:z.number().int().nonnegative(),tileId:z.number().int().nonnegative()}).strict().parse(input);
+        if(p.worldId!==world.id)throw Error('Air preview belongs to another world');revision(p.expectedRevision);
+        return json(res,200,previewAir(world,p.tileId));
+      }
       if(pathname==='/api/transport/preview'){
         const p=z.object({worldId:Id,expectedRevision:z.number().int().nonnegative(),tileId:z.number().int().nonnegative()}).strict().parse(input);
         if(p.worldId!==world.id)throw Error('Water preview belongs to another world');revision(p.expectedRevision);
@@ -174,7 +181,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
         await store.createNew(next,undefined,parsed);await activate(next);return json(res,200,world);
       }
       if(pathname==='/api/worlds/create') {
-        const next=createWorld(CreateWorldSchema.parse(input));next.neighborVisits=defaultNeighborVisits();await store.createNew(next);await activate(next);return json(res,200,world);
+        const next=createWorld(CreateWorldSchema.parse(input));next.neighborVisits=defaultNeighborVisits();next.migration=defaultMigration();await store.createNew(next);await activate(next);return json(res,200,world);
       }
       if(pathname==='/api/worlds/open') {
         const p=z.object({id:Id}).strict().parse(input);await activate(await store.load(p.id));return json(res,200,world);

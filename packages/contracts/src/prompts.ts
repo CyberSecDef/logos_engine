@@ -1,3 +1,5 @@
+import {airOperations} from './air.js';
+import {migrationOperations} from './migration.js';
 import {visitOperations} from './neighbor-visits.js';
 import {journeyOperations} from './journeys.js';
 import {routeOperations} from './routes.js';
@@ -37,6 +39,8 @@ export const modelReplyJsonSchema={
   kind:{type:'string',enum:['discussion','proposal','clarification','unsupported']},message:{type:'string'},
   assumptions:{type:'array',items:{type:'string'}},
   operations:{type:'array',items:{anyOf:[
+   ...airOperations.map(modelSchema),
+   ...migrationOperations.map(modelSchema),
    ...visitOperations.map(modelSchema),
    ...journeyOperations.map(modelSchema),
    ...routeOperations.map(modelSchema),

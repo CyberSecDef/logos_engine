@@ -1,8 +1,10 @@
 # Planned environmental pollution and disease
 
-Status: pollution/disease remain future work, requested September 19, 2026.
+Status: air transport is implemented (September 20, 2026); water contamination
+and disease remain planned. Player confirmed air tracking/spread only, with all
+damage deferred. See [air pollution](air-pollution.md).
 Phase 5a now exposes [actual water transfers](water-transport.md) for their future
-transport calculations; contaminant and illness state are not implemented yet. This extends the broader-simulation roadmap; it does not change
+transport calculations; water contaminant and illness state are not implemented yet. This extends the broader-simulation roadmap; it does not change
 the running game's capabilities. All mechanics are abstract fantasy gameplay,
 with world-defined balance values rather than real-world pollutant or pathogen models.
 
@@ -127,6 +129,6 @@ The scenarios and separate-channel requirements above remain the acceptance goal
 ### Phase 5b prerequisite update
 
 Creator-placed inhabitants and food reserves now exist; see [settlements](settlements.md).
-Shortage and growth are implemented, but sanitation, travel, contamination and
-health links above remain planned. A shortage currently affects only the local
+Shortage and growth are implemented, but sanitation, water contamination and
+health links above remain planned. Visits and timed migration now exist. A shortage currently affects only the local
 food/population model; it does not emit pollution or spread illness.

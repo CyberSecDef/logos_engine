@@ -41,7 +41,8 @@
     "test:food-trade": "npm run build && node tests/food-trade-browser.mjs",
     "test:routes": "npm run build && node tests/routes-browser.mjs",
     "test:journeys": "npm run build && node tests/journeys-browser.mjs",
-    "test:neighbor-visits": "npm run build && node tests/neighbor-visits-browser.mjs"
+    "test:neighbor-visits": "npm run build && node tests/neighbor-visits-browser.mjs",
+    "test:air-migration": "npm run build && node tests/air-migration-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",

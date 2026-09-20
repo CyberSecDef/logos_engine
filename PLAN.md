@@ -565,3 +565,15 @@ Implemented daily temporary neighbor trips for food, work and exploration with
 conserved food and farm labor. Versioned activation preserves old replay; trips
 respect explicit travel closures and need no individual review/model call.
 See docs/neighbor-visits.md and DEVELOPMENT.md for rules and acceptance evidence.
+
+### Phase 5c5 and 5d execution — autonomous relocation and air transport
+
+Confirmed automatic permanent relocation based on food/crowding/better nearby
+conditions; travel closures apply. Implemented with existing timed journeys,
+inbound capacity checks, cooldowns and conserved population/food.
+
+Confirmed air pollution tracks/spreads only; ALL damage links are deferred. Added
+seeded saved spherical wind, whole-unit emission/transport/mixing/removal budgets,
+scoped creator controls, custom reads, diagnostics and air/wind overlays. Air ignores
+human borders and has no water/vegetation/farming/health consequences yet.
+See docs/automatic-migration.md, docs/air-pollution.md and DEVELOPMENT.md.

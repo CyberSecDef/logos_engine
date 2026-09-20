@@ -8,7 +8,7 @@ export const FieldDefinitionSchema=z.object({
  description:z.string().max(300),quantity:z.enum(['index','stock']).optional(),min:scalar,max:scalar,defaultValue:scalar,
 }).strict();
 export const ReadSchema=z.object({
- source:z.enum(['temperatureC','rainMm','waterMm','vegetation','elevationM','population','foodRations','shortageDays','surplusDays','custom','entity-count','entity-sum']),
+ source:z.enum(['airLoad','airDensity','windBearingDeg','windPermille','temperatureC','rainMm','waterMm','vegetation','elevationM','population','foodRations','shortageDays','surplusDays','custom','entity-count','entity-sum']),
  fieldId:id.optional(),entityTypeId:id.optional(),sample:z.enum(['self','neighbors-average','neighbors-min','neighbors-max']),
 }).strict();
 export const FormulaSchema=z.object({
