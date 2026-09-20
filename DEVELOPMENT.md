@@ -6,7 +6,7 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5c3 timed journeys/migration is complete and deployed; publishing this milestone.
+Phase 5c3 timed journeys/migration is complete, deployed and published as `f962383`.
 Creator-directed land departures, carried food/cargo, shortage losses, blocked
 arrivals and reviewed recovery are implemented. Both player preferences are confirmed.
 All 154 tests, five browser checks and native Claude acceptance pass. Phase 5c is
@@ -1467,3 +1467,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Phase 5c3 and the documented first trade/movement scope are complete. Next: 5d
   airflow and air pollution. Automatic famine migration, sea travel and currency
   markets are intentionally not claimed implemented.
+
+### 2026-09-20 — Phase 5c3 publication
+
+- Published `f962383` to public `CyberSecDef/logos_engine` on `main`.
+- Timed journeys complete the first Phase 5c trade/movement scope; save-preserving
+  deployment verified. Next milestone is Phase 5d airflow and air pollution.
