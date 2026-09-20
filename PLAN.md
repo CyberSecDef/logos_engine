@@ -643,3 +643,12 @@ reserve local population slots, staff healthy home workers before research/farms
 and retain ordinary meals/health. Food/terrain can pause service; demobilization
 releases slots. No second population ledger or military stockpile exists. Moving
 armies, automatic conflict and associated supplies/losses remain Phase5h3.
+
+
+### Phase 5h3a implementation update
+
+[Supplied troop movements](docs/factions.md#implemented-5h3a-supplied-troop-movements)
+move healthy resident garrison members through own/allied land, preserving faction
+identity and actual population/health/food, and reinforce own settlements. Automatic
+battles/capture follow in5h3b. Confirmed battle consequence: bounded combatant losses,
+with civilians and buildings preserved; later work may add displacement/damage.

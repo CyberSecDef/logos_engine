@@ -278,3 +278,12 @@ contact and before research/farming. Residents retain normal meals and health;
 reserved slots stay home. Food/terrain can pause service. Demobilize (`target:0`)
 before changing owner or removing the settlement. See [resident garrisons](factions.md#implemented-5h2b-local-resident-garrisons)
 for exact eligibility, daily order, reports, migration and supply limitations.
+
+
+`army-depart` uses the existing journey ledger with optional saved
+`military:{factionId,homeTileId,reserveDays}`. It debits healthy garrison members,
+service target and actual food; requires planned-trip provisions and remaining
+home reserves. Own/allied transit and own-faction arrival are enforced; survivors
+reinforce destination garrison. Existing provision/redirect/dock operations retain
+military checks. See [supplied troop movements](factions.md#implemented-5h3a-supplied-troop-movements).
+Automatic battle/capture operations are not implemented yet.

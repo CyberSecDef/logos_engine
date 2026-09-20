@@ -5,10 +5,10 @@ Phase 5h is split into four deliveries:
 1. **5h1 — identities and territory:** named/color-coded factions, stable IDs,
    tile ownership, explicit symmetric relationships, a territory overlay and
    reviewed world/local edits. Ownership does not create or move inhabitants.
-2. **5h2 — borders and mobilization:** 5h2a border policy and 5h2b local resident garrisons are implemented; moving armies follow with conflict. connect explicit faction policy to defined
+2. **5h2 — borders and mobilization:** 5h2a border policy and 5h2b local resident garrisons are implemented; supplied troop movements are implemented in5h3a; battles follow in5h3b. connect explicit faction policy to defined
    travel/trade/knowledge channels, reserve existing inhabitants and provisions,
    and explain why movement or preparation stops. Avoid a second population ledger.
-3. **5h3 — conflict resolution:** automatic initiation under explicit world rules,
+3. **5h3 — conflict resolution:** 5h3a supplied troop movements are implemented; 5h3b adds automatic initiation under explicit world rules,
    bounded deterministic contests, explicit supplies/losses/territory changes and
    recovery. No autonomous LLM calls or invented abstract political scores.
 4. **5h4 — integration:** closures, stranded travelers, food/health/research,
@@ -16,13 +16,15 @@ Phase 5h is split into four deliveries:
    full world including conflict.
 
 Confirmed: the creator establishes named factions and their initial territory.
+The first battles will use bounded combatant losses; civilians and infrastructure
+survive capture. Displacement and building damage are later scope.
 Conflict initiation will be automatic under explicit world rules when the conflict
 mechanics are implemented in the following milestones.
 
 Identity and territory are implemented, together with separately enabled border
 rules. A hostile label alone does not close a border or cause casualties or war.
-Local resident garrisons prepare a labor/supply foundation; moving armies and
-conflict consequences remain future milestones. Existing worlds
+Local resident garrisons and supplied troop movements prepare the labor/supply
+foundation; battle consequences and automatic initiation remain in5h3b. Existing worlds
 remain factionless until reviewed setup. Save schema extensions must remain
 optional so existing replay remains unchanged.
 
@@ -170,7 +172,7 @@ generic transfers, local versus assisted research, scope/version checks, pure
 forecasts, checkpoint/export/replay and unchanged physical simulation.
 `npm run test:faction-borders` covers review/cancel/apply, settings, stranded
 travelers, pause/reopen, saved reload/replay, responsive layouts and no autonomous
-model calls. Phase **5h3 moving armies/automatic conflict**, **5h4 combined acceptance**, and
+model calls. Phase **5h3b automatic conflict**, **5h4 combined acceptance**, and
 **5i whole-world tuning** remain to be implemented.
 
 
@@ -253,5 +255,99 @@ manual departure limits, safe ownership/removal, attrition, versions, malformed
 reports, scope, pure forecasts, deterministic replay, checkpoints and portable saves.
 `npm run test:garrisons` covers review/cancel/apply, staffing costs, food pause,
 demobilization, save/reload/replay, responsive layouts and zero autonomous model calls.
-Moving armies and automatic conflict are next (5h3); they must explicitly account
-for departures, supplies, injury/losses, capture and recovery before any battle runs.
+Supplied troop movement is described below (5h3a). Automatic conflict is next
+(5h3b); explicit losses, capture and recovery must be implemented before battles run.
+
+
+## Implemented: 5h3a supplied troop movements
+
+Healthy garrison members can now move to reinforce another settlement belonging
+to their faction. Open **Move garrison troops**, choose a destination, troop count,
+carried rations and days per leg, then review and Apply. The pathfinder searches
+own/allied open land; it does not cross neutral, unclaimed or hostile territory.
+Ordinary local travel closures and enabled faction border restrictions still apply.
+
+This delivery implements creator-directed reinforcement. It does not initiate
+attacks, capture territory, or automatically dispatch armies. The confirmed next
+step is automatic conflict under explicit world rules, with bounded combatant
+losses and civilian/infrastructure preservation. No LLM runs during ticks.
+
+### Interface and departure accounting
+
+`army-depart` has `tileId`, unique `journeyId`, `label`, simple adjacent `path`
+(2–65 zones), `daysPerHop` (1–30), positive `population` (up to1,000,000) and
+`foodRations` (up to1,000,000,000). It shares the journey ID namespace and the limit
+of64 active journeys. All path zones must fit the prompt scope; use neighbors for
+an adjacent destination or Entire world for a longer route. Example:
+
+> Move 40 healthy garrison members from this zone to our other settlement, taking
+> two days per leg and 400 food rations. Explain the departure and arrival effects.
+
+The origin must have an eligible supplied garrison. Troop count cannot exceed the
+reserved slots or healthy resident count. Ill residents are never recruited, even
+when disease progression is paused. Susceptible/immune recruits use proportional
+integer partition with largest remainders (susceptible first on ties), preserving
+all existing health totals. The initial path must be own/allied open land and end
+at an **own-faction** settlement; destination capacity is checked on arrival.
+
+Apply atomically debits inhabitants, carried food and garrison target by the troop
+count. It increments the source garrison version and clears its old daily report.
+This avoids immediately replacing departing troops with another full levy. Source
+settlement demographic counters reset as with civilian departure. No extra people,
+food or health compartments are generated. Armies carry no custom stock cargo in
+this first departure format.
+
+Require at least `troops * legs * daysPerHop` food on departure and leave at least
+`remainingResidents * (source.reserveDays + 1)` food at home. This deliberately
+budgets every planned travel day, including the arrival day, even though arrival
+meals are handled at the destination. These are departure checks, not a guarantee
+against later delays. Food capacity can limit the largest possible deployment.
+
+### Persistent identity and daily behavior
+
+An army is a normal saved journey with optional
+`military:{factionId,homeTileId,reserveDays}`. Allegiance is frozen in transit,
+independent of later changes to its origin's owner. Civilians keep their existing
+territorial movement model and gain no personal faction identity.
+
+Armies use existing transit meals, starvation settings frozen at departure,
+health progression, contact handling, arrival capacity and deterministic priority.
+They are included once in world population, health, food and portable/replay totals.
+Each hop rechecks friendly access at both current and next zones, plus normal
+land/travel/border restrictions. If access changes, `military-access` reports a
+wait, retaining leg progress. Waiting still consumes food and can cause existing
+starvation losses; no combat losses occur in this milestone.
+
+Arrival or local `journey-dock` requires an own-faction settlement with full
+population/food/cargo capacity. It transfers surviving people, food and health once
+and reinforces that settlement's garrison target by survivors, capped by the
+resulting resident population. Existing reserve-day settings stay intact; a new
+garrison inherits the departure reserve-day setting. Local garrison version is
+incremented. Arrivals participate in the destination's ordinary service and meals
+that day, with no transit meal double charge. Zero-survivor recovery creates no
+new service slots.
+
+### Recovery and limits
+
+Use the existing reviewed `journey-provision`, `journey-redirect` and
+`journey-dock` operations. Provisioning requires a local own/allied settlement and
+debits its food; later resupply retains ordinary journey semantics without imposing
+the initial departure's home reserve check. Redirects must use own/allied territory
+and end at an own-faction settlement, reset leg time, and do not create provisions.
+Redirects can be blocked by terrain/travel flags until repaired. If the current
+zone loses friendly status, restore ownership/alliance before local resupply or
+movement; no automatic retreat through hostile territory exists yet. Ending a
+journey restores service slots rather than discarding the troops.
+
+Faction removal rejects while any active army retains its identity, including
+zero-survivor parties awaiting recovery. Journey reports record the military faction
+for arrivals/losses after the active party is gone; historical report IDs remain
+valid even if that faction is subsequently removed. Battles, offensive entry,
+automatic deployments, capture, retreats and combat accounting remain5h3b.
+
+`npm run check` covers exact departure/arrival accounting, healthy recruitment,
+provisions/home reserves, friendly access, ownership changes, recovery, capacity
+waits, starvation/health totals, shared IDs, removal safeguards, full path scope,
+pure previews, checkpoint/export and deterministic replay. `npm run test:armies`
+checks review/cancel/apply, debits, military identity, meals, arrival/reinforcement,
+saved transit reload/replay, responsive layouts and no autonomous model calls.

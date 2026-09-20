@@ -47,7 +47,7 @@ export function applyProposal(world:World,input:unknown):World {
   if(p.worldId!==world.id) throw Error('Proposal belongs to another world');
   if(world.history.some(h=>h.id===p.id)) throw Error('Proposal has already been applied');
   if(p.expectedRevision!==world.revision) throw Error('Stale proposal: refresh and review again');
-  const departureIds=p.operations.flatMap(op=>op.kind==='journey-depart'?[op.journeyId]:[]);if(new Set(departureIds).size!==departureIds.length)throw Error('Journey IDs cannot be reused within a proposal');
+  const departureIds=p.operations.flatMap(op=>(op.kind==='journey-depart'||op.kind==='army-depart')?[op.journeyId]:[]);if(new Set(departureIds).size!==departureIds.length)throw Error('Journey IDs cannot be reused within a proposal');
   validateEntityMigrations(world,p.operations);validateConversions(world,p.operations);validateStateMappings(world,p.operations);
   const next=structuredClone(world);
   for(const op of p.operations) {

@@ -26,6 +26,7 @@ export function applyFaction(w:World,op:Operation):void {
  }else{
   if(!w.factions?.definitions.some(f=>f.id===op.factionId))throw Error('Unknown faction');
   if(op.kind==='faction-remove'){
+   if(w.journeys?.active.some(j=>j.military?.factionId===op.factionId))throw Error('Recover all active armies before removing their faction');
    if(w.tiles.some(t=>t.factionId===op.factionId))throw Error('Release or reassign all territory before removing a faction');
    w.factions.definitions=w.factions.definitions.filter(f=>f.id!==op.factionId);
    w.factions.relations=w.factions.relations.filter(r=>r.a!==op.factionId&&r.b!==op.factionId);

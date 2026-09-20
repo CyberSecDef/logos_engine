@@ -87,7 +87,7 @@ export class PromptService {
      if(!packs.some(pack=>JSON.stringify(pack)===JSON.stringify(op.pack)))throw Error('Import and review artwork before selecting it through a prompt');
     }
    }
-   if(op.kind==='journey-depart'||op.kind==='journey-redirect'){
+   if(op.kind==='army-depart'||op.kind==='journey-depart'||op.kind==='journey-redirect'){
     if(op.path.some(id=>!ids.includes(id)))throw Error('Journey path exceeds selected scope');
     if(op.kind==='journey-redirect'){const old=world.journeys?.active.find(j=>j.id===op.journeyId);if(old&&old.path.slice(old.index).some(id=>!ids.includes(id)))throw Error('Existing journey path exceeds selected scope');}
    }
@@ -168,7 +168,7 @@ export function forecast(world:World,proposal:Proposal) {
   if(op.kind==='artwork-activate'||op.kind==='artwork-reset')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='entity-update'&&op.toTileId!==undefined)ids.add(op.toTileId);
   if(op.kind==='entity-type-define'||op.kind==='entity-type-remove')for(const tile of world.tiles)ids.add(tile.id);
-  if(op.kind==='garrison-configure'||op.kind.startsWith('faction-')||op.kind==='knowledge-configure'||op.kind.startsWith('technology-')||op.kind.startsWith('research-')||op.kind.startsWith('disease-')||op.kind.startsWith('water-')||op.kind==='sanitation-configure'||op.kind.startsWith('air-')||op.kind==='migration-configure'||op.kind==='neighbor-visits-configure'||op.kind.startsWith('journey-')||op.kind==='resource-route-define'||op.kind==='resource-route-remove'||op.kind==='travel-permission'||op.kind==='food-trade-permission'||op.kind==='food-trade-configure'||op.kind==='soil-ecology-configure'||op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
+  if(op.kind==='army-depart'||op.kind==='garrison-configure'||op.kind.startsWith('faction-')||op.kind==='knowledge-configure'||op.kind.startsWith('technology-')||op.kind.startsWith('research-')||op.kind.startsWith('disease-')||op.kind.startsWith('water-')||op.kind==='sanitation-configure'||op.kind.startsWith('air-')||op.kind==='migration-configure'||op.kind==='neighbor-visits-configure'||op.kind.startsWith('journey-')||op.kind==='resource-route-define'||op.kind==='resource-route-remove'||op.kind==='travel-permission'||op.kind==='food-trade-permission'||op.kind==='food-trade-configure'||op.kind==='soil-ecology-configure'||op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='appearance-define')for(const id of ruleTargets(world,op.rule))ids.add(id);
   if(op.kind==='appearance-define'||op.kind==='appearance-remove'){const old=world.definitions.appearance?.find(r=>r.id===(op.kind==='appearance-define'?op.rule.id:op.ruleId));if(old)for(const id of ruleTargets(world,old))ids.add(id);}
   if(op.kind==='rule-define')for(const id of ruleAffectedTargets(world,op.rule))ids.add(id);

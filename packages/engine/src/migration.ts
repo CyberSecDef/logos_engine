@@ -17,7 +17,7 @@ export function advanceMigration(w:World):void {
  const m=w.migration;if(!m?.enabled)return;const r=m.settings;m.lastDay={tick:w.tick,entries:[]};if(!r.departurePermille)return;
  const snap=w.tiles.map(t=>({population:t.population,food:t.settlement?.foodRations??0,capacity:t.settlement?.settings.capacity??0,eligible:!!t.settlement&&t.elevationM>0&&t.travelAllowed!==false,shortage:t.settlement?.shortageDays??0}));
  const incoming=w.tiles.map(()=>0),carried=w.tiles.map(()=>0);for(const j of w.journeys?.active??[]){incoming[j.path.at(-1)!]+=j.population;carried[j.path.at(-1)!]+=j.foodRations;}
- const used=new Set([...(w.journeys?.active.map(j=>j.id)??[]),...w.history.flatMap(p=>p.operations.flatMap(o=>o.kind==='journey-depart'?[o.journeyId]:[]))]);
+ const used=new Set([...(w.journeys?.active.map(j=>j.id)??[]),...w.history.flatMap(p=>p.operations.flatMap(o=>(o.kind==='journey-depart'||o.kind==='army-depart')?[o.journeyId]:[]))]);
  const cooldown=new Map(m.lastDepartures.map(d=>[d.tileId,d.tick]));const receiving=new Set<number>(),departing=new Set<number>();
  for(const t of w.tiles){if((w.journeys?.active.length??0)>=64)break;const a=snap[t.id];if(!a.eligible||!a.population||receiving.has(t.id)||incoming[t.id]>0||w.tick-(cooldown.get(t.id)??-r.cooldownDays)<r.cooldownDays)continue;
   const pressure=a.shortage>=r.shortageDays||a.food<a.population,crowded=a.population*1000>=a.capacity*r.crowdingPermille;

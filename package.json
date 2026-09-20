@@ -44,6 +44,7 @@
     "test:neighbor-visits": "npm run build && node tests/neighbor-visits-browser.mjs",
     "test:air-migration": "npm run build && node tests/air-migration-browser.mjs",
     "test:water-quality": "npm run build && node tests/water-quality-browser.mjs",
+    "test:armies": "npm run build && node tests/armies-browser.mjs",
     "test:garrisons": "npm run build && node tests/garrisons-browser.mjs",
     "test:faction-borders": "npm run build && node tests/faction-borders-browser.mjs",
     "test:factions": "npm run build && node tests/factions-browser.mjs",

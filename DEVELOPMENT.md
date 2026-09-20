@@ -14,8 +14,11 @@ are deployed and published. 5h2a independent hostile border rules are implemente
 and deployed; 233 tests, typecheck/build, browser and native Claude acceptance
 passed and published (`120f23a`). 5h2b resident garrisons are implemented; 242
 tests/typecheck/build, browser and native Claude acceptance passed. Deployment
-verified with exact saved-world preservation; published milestone `cc7b237`. Moving armies/automatic conflict (5h3), integration
-(5h4) and tuning (5i) remain.
+verified with exact saved-world preservation; published milestone `cc7b237`.
+5h3a supplied troop movements are implemented; 251 tests/typecheck/build passed.
+Browser/native acceptance and unchanged-world LAN deployment passed; publication
+is in progress. Automatic battles and
+capture (5h3b), integration (5h4) and tuning (5i) remain.
 
 ## Completed
 
@@ -2016,3 +2019,56 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `cc7b237` to public `CyberSecDef/logos_engine` main.
 - Next: moving armies and automatic conflict (5h3); local garrisons do not fight yet.
+
+### 2026-09-20 — Phase 5h3 started: supplied troop movements
+
+- Split 5h3 into 5h3a supplied troop movements and 5h3b automatic battles/capture.
+  Asked creator about combatant losses versus retreats before implementing combat.
+- Current work: depart healthy garrison members with actual provisions, retain
+  faction identity in transit, use friendly land access, reinforce own settlements,
+  and integrate existing meals/health/closures/replay. No battles in this delivery.
+- Next: bounded automatic conflict under explicit rules, then 5h4 combined acceptance.
+
+
+### 2026-09-20 — Phase 5h3a troop movement implemented
+
+- Creator confirmed first battles use bounded combatant losses while preserving
+  civilians and buildings; displacement/building damage remain later scope.
+  Recorded for5h3b; combat is not implemented in this transport delivery.
+- Added reviewed `army-depart` using the existing journey ledger. Healthy-only
+  recruitment debits source people, food and garrison target; reserves planned-trip
+  provisions and remaining residents’ home food threshold. Local garrison version
+  increments, preventing accidental immediate replacement of departing troops.
+- Army identity persists in saved `journey.military`; own/allied land access and
+  own-faction arrival/dock prevent silent allegiance changes. Closures wait with
+  normal meals/starvation; survivors reinforce destination service slots once.
+  Health, total population, food and saved histories use existing ledgers.
+- Added troop-movement controls/pathfinder, military inspector/report attribution,
+  forecast integration, provider capabilities28, full path scope and faction/ID
+  safeguards. Existing provision/redirect/dock operations enforce military access.
+- `npm run check`: **251 tests passed**, typecheck/build passed. Nine new tests
+  cover exact debits/arrivals, healthy partitions, provisioning, friendly access,
+  changed ownership, recovery, capacity/starvation, identities, prompt scope,
+  pure forecasts, checkpoint/export and deterministic replay.
+- Browser and authenticated native Claude acceptance running. Detailed interfaces,
+  supply limits and Phase5 substeps documented. Deployment/publication pending.
+
+
+### 2026-09-20 — Phase 5h3a acceptance and deployment
+
+- Troop browser acceptance passed review/cancel/apply, source debits, allegiance,
+  meals, arrival/reinforcement and saved transit reload/replay. Desktop/mobile
+  screenshots inspected. Existing garrison, civilian-journey and faction-border
+  browser workflows passed; no autonomous model calls.
+- Native authenticated Claude produced exact requested troops, provisions and path;
+  schema/scope and read-only arrival forecast passed. Temporary save unchanged.
+- Deployed `0.0.0.0:5180`; troop controls verified through LAN. Preserved first-world
+  day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and full save envelope
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  No troop departures, factions or test ticks introduced. Evidence:
+  `/tmp/logos-armies-deploy.json`.
+- 5h3a supplied friendly troop movement complete. Next:5h3b automatic battles and
+  capture with bounded combatant losses and civilian/building preservation, then
+  5h4 integration and5i tuning. Existing ~741 kB bundle warning remains Phase6.

@@ -31,4 +31,4 @@ button:disabled{cursor:wait;opacity:.45;pointer-events:none}textarea{font:inheri
 
 .settlement-inspector .stat{gap:8px}.settlement-inspector .stat strong{max-width:55%;text-align:right;overflow-wrap:anywhere}.settlement-preview{border:1px solid var(--line);padding:12px;margin:12px 0}#settlement-controls{margin:16px 0}.settlement-inspector p{overflow-wrap:anywhere}
 
-#faction-controls select{display:block;width:100%;margin-top:8px;padding:8px;background:#101d23;color:inherit;border:1px solid var(--line);border-radius:5px;font-size:11px}#faction-controls input[type=color]{height:40px;padding:4px}#faction-report p,.faction-preview{overflow-wrap:anywhere}
+#faction-controls select,#army-controls select{display:block;width:100%;margin-top:8px;padding:8px;background:#101d23;color:inherit;border:1px solid var(--line);border-radius:5px;font-size:11px}#faction-controls input[type=color]{height:40px;padding:4px}#faction-report p,.faction-preview{overflow-wrap:anywhere}
