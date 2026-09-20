@@ -1068,3 +1068,11 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Publishing the entity interface, cistern example and acceptance evidence.
 - Next: omit/replace an intervention and replay later inputs into a reviewed
   independent branch, with explicit dependency failures and bounded work.
+
+### 2026-09-19 — Generic entity publication
+
+- Published `d4420a4` to public `CyberSecDef/logos_engine` on `main`.
+- All 97 tests, entity/portable browser checks and native Claude Code entity
+  generation passed. LAN deployment preserved day 792/revision 805.
+- Phase 4 items 1–3 complete. Selective replay and final integration/compatibility
+  acceptance remain; Phase 4 is not yet closed.
