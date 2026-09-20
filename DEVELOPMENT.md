@@ -19,7 +19,10 @@ verified with exact saved-world preservation; published milestone `cc7b237`.
 Browser/native acceptance and unchanged-world LAN deployment passed; milestone
 `eb0dda6` is published. Automatic adjacent battles/capture (5h3b) are implemented;
 264 tests/typecheck/build, browser and native Claude acceptance passed.
-LAN deployment preserved the complete live save; milestone `224aa00` is published. Integrated acceptance (5h4) and whole-world tuning (5i) remain.
+LAN deployment preserved the complete live save; milestone `224aa00` is published. Phase 5h4 integrated acceptance is complete: expedition/migration reservation
+fix, combined environment/health/economy/conflict ledgers, recovery and persisted
+replay passed. All 267 tests, typecheck/build and three browser workflows passed;
+LAN deployment preserved the complete live save. Whole-world tuning (5i) is next.
 
 ## Completed
 
@@ -2147,3 +2150,29 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published milestone `224aa00` to public `CyberSecDef/logos_engine` main.
 - Next:5h4 integrated acceptance, then5i whole-world tuning. Live conflict remains
   inactive until the creator explicitly reviews and applies its activation.
+
+
+### 2026-09-20 — Phase 5h4 integrated acceptance
+
+- Added the combined acceptance matrix to `docs/factions.md` and updated the roadmap.
+- Reproduced expedition/migration regression: all 140 remaining inhabitants could
+  migrate, including 60 reserved guards. Preserve remaining reserved slots/workers
+  after departure; only 80 civilians may now migrate. No schema/provider changes.
+- Added 200-day combined systems replay and pollution/population/health budget
+  checks, pure forecast, saved history, checkpoint and portable-export checks.
+- Added terrain-stranded return, food exhaustion, recorded starvation, resupply and
+  recovery coverage. Civilian travel closure continues to permit military returns.
+- Validation passed: all 267 engine tests, typecheck and production build.
+  Conflict, garrison and air/migration browser workflows passed, including
+  reviewed changes, cancellation, recovery, replay, responsive layouts and zero
+  autonomous model calls. No schema or provider adapter change required.
+- LAN deployment verified at `0.0.0.0:5180`. Preserved first-world day1206 /
+  revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete save envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Conflict remains absent/inactive; no test ticks or factions added to the live world.
+  Deployment evidence: `/tmp/logos-conflict-integration-deploy.json`.
+- Phase 5h4 is complete; Phase 5i whole-world balance/performance tuning follows.
+  Forced displacement/building damage remain future scope. The existing large
+  frontend bundle warning remains deferred to Phase 6.

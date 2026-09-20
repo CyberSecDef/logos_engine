@@ -51,7 +51,11 @@ export function launchConflict(w:World):void {
   const to=[...w.cells[a.id].neighbors].sort((x,y)=>x-y).find(id=>{const b=snap[id];return b.eligible&&!busy.has(id)&&hostile(w,a.faction,b.faction)&&w.tick-(cooldown.get(id)??-r.cooldownDays)>=r.cooldownDays&&population*1000>=b.workers*r.requiredAdvantagePermille;});if(to===undefined)continue;
   let journeyId=`conflict-${c.nextSequence}`;while(ids.has(journeyId)&&c.nextSequence<Number.MAX_SAFE_INTEGER){c.nextSequence++;journeyId=`conflict-${c.nextSequence}`;}if(c.nextSequence>=Number.MAX_SAFE_INTEGER)break;c.nextSequence++;ids.add(journeyId);
   const health=w.disease?takeHealthyHealth(source.health!,source.population,population):undefined;
-  source.population-=population;s.foodRations-=foodRations;s.shortageDays=0;s.surplusDays=0;delete s.lastDay;g.target-=population;g.version++;delete g.lastDay;
+  source.population-=population;s.foodRations-=foodRations;s.shortageDays=0;s.surplusDays=0;delete s.lastDay;g.target-=population;g.version++;
+  // Keep the remaining home guard reserved for migration later this same day.
+  // The daily population records the original staffing snapshot; only the
+  // departing reserved slots/workers leave it. Recomputing would staff twice.
+  if(g.lastDay){g.lastDay.reserved-=population;g.lastDay.workers-=population;g.lastDay.reason=g.lastDay.workers?'serving':g.lastDay.reserved?'illness':'demobilized';}
   w.journeys??={model:'land-journeys-v1',active:[]};w.journeys.active.push({id:journeyId,label:`${a.faction} expedition`,path:[a.id,to],daysPerHop:r.daysPerHop,index:0,remainingDays:r.daysPerHop,population,foodRations,cargo:[],departedTick:w.tick,shortageDays:0,shortageIntervalDays:s.settings.shortageIntervalDays,lossPermille:s.settings.lossPermille,...(health?{health}:{}),military:{factionId:a.faction,homeTileId:a.id,reserveDays:g.reserveDays,mission:'assault'}});w.journeys.active.sort((a,b)=>a.id<b.id?-1:1);
   busy.add(a.id);busy.add(to);stamp(w,[a.id,to]);c.lastDay!.launches.push({journeyId,from:a.id,to,factionId:a.faction,population,foodRations});
  }

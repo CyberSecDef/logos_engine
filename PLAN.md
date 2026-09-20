@@ -663,3 +663,13 @@ Civilians/buildings/inventory survive direct capture; surviving attackers return
 home and defenders demobilize. Civilian closures do not stop invasion. Next:5h4
 integrated acceptance and5i whole-world tuning; naval/siege/damage/displacement
 systems remain future scope.
+
+
+### Phase 5h4 implementation update
+
+[Combined acceptance](docs/factions.md#phase-5h4-combined-acceptance) exercises
+conflict with environment, health, food, movement and research over 200 days,
+including persisted replay/checkpoints/export and stranded survivor recovery.
+Fixed same-day migration incorrectly releasing the remaining home garrison after
+an expedition departs. Phase 5i balance/performance tuning follows; displacement
+and building damage remain future scope.

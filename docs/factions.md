@@ -12,7 +12,7 @@ Phase 5h is split into four deliveries:
    bounded deterministic contests, explicit supplies/losses/territory changes and
    recovery. No autonomous LLM calls or invented abstract political scores.
 4. **5h4 — integration:** closures, stranded travelers, food/health/research,
-   displacement, recovery, replay and long-run acceptance. Phase 5i then tunes the
+   civilian preservation, recovery, replay and long-run acceptance. Phase 5i then tunes the
    full world including conflict.
 
 Confirmed: the creator establishes named factions and their initial territory.
@@ -172,8 +172,8 @@ generic transfers, local versus assisted research, scope/version checks, pure
 forecasts, checkpoint/export/replay and unchanged physical simulation.
 `npm run test:faction-borders` covers review/cancel/apply, settings, stranded
 travelers, pause/reopen, saved reload/replay, responsive layouts and no autonomous
-model calls. Phase **5h4 combined acceptance** and
-**5i whole-world tuning** remain to be implemented.
+model calls. Phase **5h4 combined acceptance** is documented below;
+**5i whole-world tuning** follows.
 
 
 ## Implemented: 5h2b local resident garrisons
@@ -472,6 +472,36 @@ Unit coverage includes activation/version/scope, supply/force/cooldown limits,
 disjoint fronts, capture and ties, civilian/infrastructure preservation, health
 and visitor protection, closed civilian borders, pause/peace, stranded returns,
 pure forecasts, replay/checkpoint/export and malformed accounting. Browser
-acceptance is `npm run test:conflict`. Broader integrated acceptance (5h4) and
-whole-world balance/performance tuning (5i) remain; naval warfare, sieges,
+acceptance is `npm run test:conflict`. Integrated acceptance (5h4) is documented below;
+whole-world balance/performance tuning (5i) remains; naval warfare, sieges,
 building damage and displacement are future scope.
+
+
+## Phase 5h4: combined acceptance
+
+`tests/conflict-integration.test.ts` adds full-tick integration scenarios to the
+existing conflict, army, border and garrison acceptance tests. Run them through
+`npm run check` (or build TypeScript and run the compiled test file).
+
+| Scenario | Required evidence |
+| --- | --- |
+| Expedition plus automatic relocation | From 200 residents and 120 guards, 60 troops depart; the 60 remaining guards stay reserved while at most 80 civilians migrate to a better supplied neighbor. All 400 inhabitants across the three settlements and journeys remain accounted for. |
+| 200-day combined world | Conflict, hostile borders, farming, fertility, weather, pollution, disease/contact, visits, migration, food sharing and research all enabled. Actual battles, losses, air transport, visits and completed research occur. Daily population equals initial population minus recorded combat losses with births/starvation disabled in this fixture; health population agrees. Air and water pollution budgets balance every day. |
+| Persisted reproducibility | Every day matches a separate deterministic run. A reviewed temperature-pulse forecast leaves the input unchanged. The 200-day saved history replays exactly; checkpoints and portable exports preserve the complete state hash. |
+| Stranded survivors and recovery | Submerging home blocks the return journey while provisions are consumed and recorded starvation removes real people. Resupply conserves food. Restoring land lets survivors return and reinforce exactly once, even with civilian travel closed. Disease compartments agree with population throughout. |
+
+The relocation scenario exposed a scheduling bug: automatic expedition departure
+cleared the home garrison report before the migration phase, releasing all remaining
+guards to migration. Departure now subtracts only the departing reserved slots and
+workers from that day's report. Remaining guards retain their reservation; staffing
+is not run a second time. The report's population remains its original staffing
+snapshot, consistent with other within-day reports. No saved schema or prompt
+operation changes are required.
+
+Existing tests cover hostile civilian closures/reopening, independently blocked
+trade and knowledge, food-limited service, illness/visitors excluded from combat,
+peace/pause cancellation, ownership/housing-blocked returns and recovery, and
+preservation of civilian infrastructure on capture. Forced displacement and building
+damage remain future mechanics. Phase 5i still owns broader balance and performance
+tuning; the small deterministic acceptance world does not establish large-world
+performance or long-term gameplay balance.

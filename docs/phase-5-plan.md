@@ -10,7 +10,7 @@ Status: **5a–5e implemented and deployed**, including automatic visits and
 relocation follow-ups. Phase 5e passes engine, browser and native Claude source
 acceptance. Historical provider refusal for the earlier combined air/migration
 request is documented in DEVELOPMENT.md. Phase 5f1 health accounting and 5f2 contact transmission are implemented.
-Phase 5g [knowledge and technology](technology.md) is implemented. Current: [5h factions and conflict](factions.md), with identity, territory and explicit hostile border channels implemented.
+Phase 5g [knowledge and technology](technology.md) is implemented. [5h factions and conflict](factions.md) is implemented through 5h4 integrated acceptance. Next: 5i whole-world balance/performance tuning.
 
 ## Sequence and exit criteria
 
@@ -174,11 +174,11 @@ independent hostile border policies across travel, trade and knowledge.
 **5h2b implemented:** local resident garrisons, healthy labor reservation and
 food eligibility using existing meal/health accounting. Supplied friendly troop movements are implemented in **5h3a**. **5h3b implemented:**
 bounded automatic conflict/capture, with combatant losses and civilian/building
-preservation (confirmed by the creator). **5h4:**
-combined acceptance. Relationship labels alone do not initiate combat in 5h1.
+preservation (confirmed by the creator). **5h4 implemented:**
+combined acceptance and the expedition/migration reservation fix. Relationship labels alone do not initiate combat in 5h1.
 
 
 Automatic conflict is opt-in, adjacent and deterministic. Supplied expeditions ignore
 civilian closures, resolve bounded healthy-combatant losses, preserve civilians and
 infrastructure on capture, and return survivors home. See [conflict rules](factions.md#implemented-5h3b-automatic-adjacent-conflict).
-Next:5h4 integrated conflict/environment acceptance, followed by5i whole-world tuning.
+Next:5i whole-world tuning. The [5h4 evidence matrix](factions.md#phase-5h4-combined-acceptance) covers combined ledgers, recovery and persisted replay.
