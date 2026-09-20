@@ -151,3 +151,8 @@ properties, reviewed migrations, and deterministic rule/plugin interactions.
 
 [Selective replay](docs/selective-replay.md) lets you omit or replace a recorded
 intervention, review the consequences, and create an independent alternate world.
+
+[Everyday neighbor travel](docs/neighbor-visits.md) adds automatic same-day food
+collection, farm work and exploration. New web-created worlds enable it by default;
+existing worlds can enable it under **Everyday neighbor travel**. Each trip runs
+without player approval or a model call, respects travel closures and returns home.

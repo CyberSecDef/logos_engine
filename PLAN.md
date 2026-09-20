@@ -558,3 +558,10 @@ Creator-directed migration and blocked-arrival waiting are confirmed. Implemente
 saved paths/timers, real inhabitants/food/cargo, shortage losses, capacity gates,
 reviewed provision/redirect/dock recovery, and transit-inclusive totals. No automatic
 famine migration or sea travel. See docs/journeys.md and DEVELOPMENT.md for acceptance.
+
+### Phase 5c4 execution — automatic neighbor visits
+
+Implemented daily temporary neighbor trips for food, work and exploration with
+conserved food and farm labor. Versioned activation preserves old replay; trips
+respect explicit travel closures and need no individual review/model call.
+See docs/neighbor-visits.md and DEVELOPMENT.md for rules and acceptance evidence.

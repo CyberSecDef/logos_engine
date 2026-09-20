@@ -166,3 +166,6 @@ Acceptance on 2026-09-20: all 154 tests pass, along with journey, route, food-sh
 settlement and resource browser checks. Native Claude proposed a departure whose
 timed arrival conserved 200 inhabitants. Mobile visuals were inspected. LAN
 restart preserved the exact active-world and saved-envelope hashes.
+
+Routine temporary day trips now have a separate [neighbor visits](neighbor-visits.md)
+model. They preserve residency; this document describes permanent migration.

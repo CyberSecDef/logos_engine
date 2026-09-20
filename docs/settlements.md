@@ -148,3 +148,7 @@ portable, entity and selective-replay browser checks pass. A real native Claude
 request produced a valid placement proposal, passed forecast/copy Apply/daily
 accounting and left the saved test fixture unchanged. Desktop/mobile visuals were
 inspected. LAN deployment preserved the exact active-world and saved-envelope hashes.
+
+With [neighbor visits](neighbor-visits.md) enabled, farming uses resident population
+minus outgoing day visitors plus incoming farm workers. Meals and demographic
+counts remain based on residents; visitors eat at home.

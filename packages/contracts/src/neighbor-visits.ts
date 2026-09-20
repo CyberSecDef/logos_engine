@@ -1,0 +1,9 @@
+import {z} from 'zod';
+const count=z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),tile=z.number().int().min(0).max(6761);
+import {DEFAULT_VISIT_SETTINGS} from './neighbor-visit-defaults.js';
+export {DEFAULT_VISIT_SETTINGS} from './neighbor-visit-defaults.js';
+export const VisitSettingsSchema=z.object({dailyPermille:z.number().int().min(0).max(1000),foodReserveDays:z.number().int().min(0).max(3650),foodTargetDays:z.number().int().min(0).max(3650),carryRationsPerVisitor:z.number().int().min(0).max(100)}).strict();
+export const VisitDaySchema=z.object({tick:count,beforeFood:count,afterFood:count,entries:z.array(z.object({from:tile,to:tile,purpose:z.enum(['food','work','explore']),visitors:count.positive(),rations:count}).strict()).max(121716)}).strict();
+export const NeighborVisitsSchema=z.object({model:z.literal('neighbor-visits-v1'),version:count.positive(),enabled:z.boolean(),settings:VisitSettingsSchema,lastDay:VisitDaySchema.optional()}).strict();
+export const visitOperations=[z.object({kind:z.literal('neighbor-visits-configure'),tileId:tile,expectedVersion:count,enabled:z.boolean(),settings:VisitSettingsSchema}).strict()] as const;
+export const defaultNeighborVisits=()=>({model:'neighbor-visits-v1' as const,version:1,enabled:true,settings:{...DEFAULT_VISIT_SETTINGS}});

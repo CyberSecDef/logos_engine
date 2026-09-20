@@ -6,12 +6,11 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5c3 timed journeys/migration is complete, deployed and published as `f962383`.
-Creator-directed land departures, carried food/cargo, shortage losses, blocked
-arrivals and reviewed recovery are implemented. Both player preferences are confirmed.
-All 154 tests, five browser checks and native Claude acceptance pass. Phase 5c is
-complete for its documented first scope. Next: 5d airflow and air pollution.
-Automatic famine migration, sea travel and market economies remain future work.
+Phase 5c4 automatic neighbor visits is complete and deployed; publication pending.
+Daily food collectors, farm workers and explorers return home without individual
+approvals or model calls. 161 tests, neighbor/migration browser checks and native
+Claude acceptance pass. Activated in the current world after a named checkpoint,
+without advancing day 1180. Next: 5d airflow and air pollution.
 
 ## Completed
 
@@ -1473,3 +1472,35 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published `f962383` to public `CyberSecDef/logos_engine` on `main`.
 - Timed journeys complete the first Phase 5c trade/movement scope; save-preserving
   deployment verified. Next milestone is Phase 5d airflow and air pollution.
+
+### 2026-09-20 — Phase 5c4 implemented, verification underway
+
+- Added versioned neighbor-visit settings and advisor operation/scope enforcement.
+- Automatic food collectors, farm workers and explorers use deterministic daily
+  budgets and return home; all labor and food effects are accounted.
+- Added inspector reports, activation/pause control, five-day preview and provider
+  capabilities v17. New web-created worlds enable the model; old replay is opt-in.
+- Documented defaults, aggregate desires, resident-based soil/meal rules and limits
+  in docs/neighbor-visits.md. Unit/integration and browser verification underway.
+
+### 2026-09-20 — Phase 5c4 verified and deployed
+
+- Final `npm run check`: 161 passed, zero failures/skips; types/build pass.
+  Initial restricted-sandbox run could not run listener-dependent tests; full
+  verification passed with the required local execution permissions.
+- Neighbor browser: preview/cancel/apply, automatic food collection and same-day
+  return, closures, reload/replay, desktop/mobile and zero autonomous model calls.
+  Existing migration browser also passes; mobile screenshot inspected.
+- Native Claude configuration passed schema, world scope, forecast and automatic
+  trip execution in an isolated fixture, leaving its saved state unchanged.
+- Final source extraction keeps browser defaults free of runtime schema imports.
+  The existing large-bundle advisory remains Phase 6 polish (640 kB bundle).
+- Restarted on 0.0.0.0:5180. Verified world and envelope hashes unchanged on restart.
+  Saved “Before automatic neighbor visits” checkpoint; previewed and applied the
+  requested activation via the normal validated API at day 1180, revision
+  1204 → 1205. Exact expected state hash matched, tile data unchanged, no ticks.
+- Evidence: /tmp/logos-visits-check-final.log, /tmp/logos-visits-browser.log,
+  /tmp/logos-visits-journeys-browser.log, /tmp/logos-visits-live.log and
+  /tmp/logos-visits-deploy.json; screenshots under ignored .local/screenshots.
+- Temporary visits and explicit travel closures use the stated recommended defaults;
+  no reply to the optional questions was received. Permanent migration is separate.

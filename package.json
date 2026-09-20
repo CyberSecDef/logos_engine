@@ -40,7 +40,8 @@
     "test:ecology": "npm run build && node tests/ecology-browser.mjs",
     "test:food-trade": "npm run build && node tests/food-trade-browser.mjs",
     "test:routes": "npm run build && node tests/routes-browser.mjs",
-    "test:journeys": "npm run build && node tests/journeys-browser.mjs"
+    "test:journeys": "npm run build && node tests/journeys-browser.mjs",
+    "test:neighbor-visits": "npm run build && node tests/neighbor-visits-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",

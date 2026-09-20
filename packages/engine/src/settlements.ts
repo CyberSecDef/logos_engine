@@ -1,4 +1,5 @@
-import {fertilityPermille} from './ecology.js';
+import {visitLabor} from './neighbor-visits.js';
+import {farmConditions} from './farm-conditions.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 import {DEFAULT_SETTLEMENT_SETTINGS,SETTLEMENT_LIMITS} from '../../contracts/src/settlements.js';
 export function validateSettlements(world:World):void {
@@ -33,12 +34,11 @@ export function applySettlement(world:World,op:Operation):void {
 // Pure integer stock/population accounting after weather, before custom rules.
 // Only explicitly activated tiles participate; legacy ticks remain byte-identical.
 export function advanceSettlements(world:World):void {
+ const visitors=visitLabor(world);
  for(const tile of world.tiles){const s=tile.settlement;if(!s)continue;const r=s.settings,pop=tile.population,before=s.foodRations;
-  const waterMm=tile.waterL/world.cells[tile.id].areaM2,temp=tile.temperatureC,land=tile.elevationM>0,flooded=waterMm>100;
-  const temperaturePermille=Math.max(0,Math.min(1000,Math.floor(temp<10?temp*100:temp<=30?1000:(45-temp)*1000/15)));
-  const moisturePermille=Math.max(0,Math.min(1000,Math.floor((tile.rainMm+Math.min(20,waterMm))*200)));
-  const potential=Math.min(r.farmRationsPerDay,pop*r.workerRationsPerDay);
-  const fertility=fertilityPermille(world,tile.id);
+  const {land,flooded,temperaturePermille,moisturePermille,fertility}=farmConditions(world,tile.id);
+  const labor=visitors.get(tile.id),workers=pop-(labor?.away??0)+(labor?.incoming??0);
+  const potential=Math.min(r.farmRationsPerDay,workers*r.workerRationsPerDay);
   const produced=land&&!flooded?Math.floor((potential*temperaturePermille*moisturePermille/1_000_000)*(world.soilEcology?.enabled?fertility/1000:1)):0;
   const overflow=Math.max(0,before+produced-SETTLEMENT_LIMITS.food),available=before+produced-overflow,consumed=Math.min(pop,available),unmet=pop-consumed;
   s.foodRations=available-consumed;let births=0,losses=0;
@@ -52,7 +52,7 @@ export function advanceSettlements(world:World):void {
    }else s.surplusDays=0;
   }
   tile.population=pop+births-losses;
-  s.lastDay={...(world.soilEcology?.enabled?{fertilityPermille:fertility}:{}),tick:world.tick,beforeFood:before,produced,overflow,consumed,unmet,afterFood:s.foodRations,beforePopulation:pop,births,losses,afterPopulation:tile.population,potential,temperaturePermille,moisturePermille,land,flooded};
+  s.lastDay={...(world.neighborVisits?.enabled?{workers,visitorsAway:labor?.away??0,visitingWorkers:labor?.incoming??0}:{}),...(world.soilEcology?.enabled?{fertilityPermille:fertility}:{}),tick:world.tick,beforeFood:before,produced,overflow,consumed,unmet,afterFood:s.foodRations,beforePopulation:pop,births,losses,afterPopulation:tile.population,potential,temperaturePermille,moisturePermille,land,flooded};
   if(births||losses){world.events.push({tick:world.tick,kind:'population',tileId:tile.id,amount:births||losses,message:births?`${s.label}: ${births} inhabitants added after sustained food reserves.`:`${s.label}: ${losses} inhabitants lost after sustained food shortage.`});if(world.events.length>200)world.events.shift();}
  }
 }

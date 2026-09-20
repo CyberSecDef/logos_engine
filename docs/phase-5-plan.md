@@ -7,7 +7,7 @@ The model is called only for creator prompts. No offline progression, autonomous
 model decisions, arbitrary engine edits during play or automatic provider repair.
 
 Status: **5a, 5b and 5c complete and deployed** for their documented first scope.
-Next: 5d airflow and air pollution. Milestones 5e–5i remain planned.
+5c4 automatic neighbor visits is also complete and deployed. Next: 5d airflow and air pollution. Milestones 5e–5i remain planned.
 
 ## Sequence and exit criteria
 
@@ -106,3 +106,11 @@ timed creator-directed land journeys are implemented and deployed. Whole-world
 population and stock totals include transit; movement/capacity/shortage outcomes
 are explained and recoverable. Automatic famine migration, sea travel and currency
 markets remain future extensions rather than part of this completed first scope.
+
+### Phase 5c4 — routine neighbor visits (complete)
+
+Requested after 5c3: populated zones autonomously visit adjacent zones for food,
+work and exploration without individual player approval. Implement temporary
+same-day trips, separate from migration, with default-open travel permissions,
+conserved food, reallocated labor and visible deterministic contact records.
+See [neighbor visits](neighbor-visits.md) for defaults, phase ordering and limits.

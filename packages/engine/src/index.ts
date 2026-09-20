@@ -1,3 +1,4 @@
+import {validateNeighborVisits,applyNeighborVisits,advanceNeighborVisits} from './neighbor-visits.js';
 import {validateJourneys,applyJourney,advanceJourneys} from './journeys.js';
 import {validateRoutes,applyRoute} from './routes.js';
 import {validateFoodTrade,applyFoodTrade,advanceFoodTrade} from './food-trade.js';
@@ -30,7 +31,7 @@ export function validateWorld(input:unknown):World {
     commands.add(p.id);
   }
   if(w.artwork&&new Set(w.artwork.images.map(i=>i.slot)).size!==w.artwork.images.length)throw Error('Duplicate artwork slot');
-  validateJourneys(w);validateRoutes(w);validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
+  validateNeighborVisits(w);validateJourneys(w);validateRoutes(w);validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
   return w;
 }
 function event(w:World,e:WorldEvent) { w.events.push(e); if(w.events.length>200) w.events.shift(); }
@@ -51,7 +52,7 @@ export function applyProposal(world:World,input:unknown):World {
       next.artwork=op.pack;
     }
     if(op.kind==='artwork-reset')delete next.artwork;
-    applyJourney(next,op);applyRoute(next,op);applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
+    applyNeighborVisits(next,op);applyJourney(next,op);applyRoute(next,op);applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
     if(op.kind==='elevation') tile.elevationM+=op.deltaM;
     if(op.kind==='communication') tile.communication=op.enabled;
     if(op.kind==='rainfall') {
@@ -84,6 +85,7 @@ function advanceDay(world:World,report?:WaterTransportReport):World {
   advanceJourneys(next);
   advanceEcology(next);
   advanceFoodTrade(next);
+  advanceNeighborVisits(next);
   advanceSettlements(next);
   advanceExtensions(next,advancePlugins(next));
   return validateWorld(next);
