@@ -5,10 +5,10 @@ Phase 5h is split into four deliveries:
 1. **5h1 — identities and territory:** named/color-coded factions, stable IDs,
    tile ownership, explicit symmetric relationships, a territory overlay and
    reviewed world/local edits. Ownership does not create or move inhabitants.
-2. **5h2 — borders and mobilization:** 5h2a border policy and 5h2b local resident garrisons are implemented; supplied troop movements are implemented in5h3a; battles follow in5h3b. connect explicit faction policy to defined
+2. **5h2 — borders and mobilization:** 5h2a border policy and 5h2b local resident garrisons are implemented; supplied troop movements are implemented in5h3a; automatic battles/capture are implemented in5h3b. connect explicit faction policy to defined
    travel/trade/knowledge channels, reserve existing inhabitants and provisions,
    and explain why movement or preparation stops. Avoid a second population ledger.
-3. **5h3 — conflict resolution:** 5h3a supplied troop movements are implemented; 5h3b adds automatic initiation under explicit world rules,
+3. **5h3 — conflict resolution:** 5h3a supplied troop movements are implemented; 5h3b implements automatic initiation under explicit world rules,
    bounded deterministic contests, explicit supplies/losses/territory changes and
    recovery. No autonomous LLM calls or invented abstract political scores.
 4. **5h4 — integration:** closures, stranded travelers, food/health/research,
@@ -24,7 +24,7 @@ mechanics are implemented in the following milestones.
 Identity and territory are implemented, together with separately enabled border
 rules. A hostile label alone does not close a border or cause casualties or war.
 Local resident garrisons and supplied troop movements prepare the labor/supply
-foundation; battle consequences and automatic initiation remain in5h3b. Existing worlds
+foundation; automatic adjacent battles/capture are implemented below in5h3b. Existing worlds
 remain factionless until reviewed setup. Save schema extensions must remain
 optional so existing replay remains unchanged.
 
@@ -172,7 +172,7 @@ generic transfers, local versus assisted research, scope/version checks, pure
 forecasts, checkpoint/export/replay and unchanged physical simulation.
 `npm run test:faction-borders` covers review/cancel/apply, settings, stranded
 travelers, pause/reopen, saved reload/replay, responsive layouts and no autonomous
-model calls. Phase **5h3b automatic conflict**, **5h4 combined acceptance**, and
+model calls. Phase **5h4 combined acceptance** and
 **5i whole-world tuning** remain to be implemented.
 
 
@@ -255,8 +255,8 @@ manual departure limits, safe ownership/removal, attrition, versions, malformed
 reports, scope, pure forecasts, deterministic replay, checkpoints and portable saves.
 `npm run test:garrisons` covers review/cancel/apply, staffing costs, food pause,
 demobilization, save/reload/replay, responsive layouts and zero autonomous model calls.
-Supplied troop movement is described below (5h3a). Automatic conflict is next
-(5h3b); explicit losses, capture and recovery must be implemented before battles run.
+Supplied troop movement is described below (5h3a). Automatic adjacent conflict is described below (5h3b), including losses, capture
+and recovery.
 
 
 ## Implemented: 5h3a supplied troop movements
@@ -268,9 +268,8 @@ own/allied open land; it does not cross neutral, unclaimed or hostile territory.
 Ordinary local travel closures and enabled faction border restrictions still apply.
 
 This delivery implements creator-directed reinforcement. It does not initiate
-attacks, capture territory, or automatically dispatch armies. The confirmed next
-step is automatic conflict under explicit world rules, with bounded combatant
-losses and civilian/infrastructure preservation. No LLM runs during ticks.
+attacks, capture territory, or automatically dispatch armies. The separate opt-in conflict policy below supports automatic adjacent attacks,
+with bounded combatant losses and civilian/infrastructure preservation. No LLM runs during ticks.
 
 ### Interface and departure accounting
 
@@ -342,8 +341,8 @@ journey restores service slots rather than discarding the troops.
 Faction removal rejects while any active army retains its identity, including
 zero-survivor parties awaiting recovery. Journey reports record the military faction
 for arrivals/losses after the active party is gone; historical report IDs remain
-valid even if that faction is subsequently removed. Battles, offensive entry,
-automatic deployments, capture, retreats and combat accounting remain5h3b.
+valid even if that faction is subsequently removed. Separately enabled automatic expeditions use the campaign rules below. Friendly
+reinforcement journeys retain their original access checks.
 
 `npm run check` covers exact departure/arrival accounting, healthy recruitment,
 provisions/home reserves, friendly access, ownership changes, recovery, capacity
@@ -351,3 +350,128 @@ waits, starvation/health totals, shared IDs, removal safeguards, full path scope
 pure previews, checkpoint/export and deterministic replay. `npm run test:armies`
 checks review/cancel/apply, debits, military identity, meals, arrival/reinforcement,
 saved transit reload/replay, responsive layouts and no autonomous model calls.
+
+
+## Implemented: 5h3b automatic adjacent conflict
+
+**Explicitly opt in** using **Conflict rules**. Configure the numeric rules and
+review the five-day forecast before Apply. Hostile relationships alone remain inert.
+The creator confirmed that invasions ignore civilian travel/border closures, and
+that battles kill combatants while preserving civilians and infrastructure.
+
+### World policy and defaults
+
+Optional `conflict` uses `adjacent-conflict-v1`, an independent version, `enabled`,
+settings, an ID sequence, per-zone cooldown timestamps and a daily battle/launch
+report. `conflict-configure` requires Entire world scope, an existing faction
+registry, current `expectedVersion` (0 initially), `enabled` and all settings.
+Configuration preserves sequence/cooldowns. Old saves without conflict stay unchanged.
+
+| Setting | Default | Meaning / bounds |
+| --- | --- | --- |
+| deploymentPermille | 500 | Deploy 50% of eligible healthy garrison workers; 0–1000 |
+| minimumTroops | 10 | Minimum expedition size; 1–1,000,000 |
+| daysPerHop | 2 | Days outward and again returning; 1–30 |
+| provisionDays | 7 | Rations per deployed person; 1–365, at least twice leg days plus1 |
+| cooldownDays | 30 | Minimum days since either zone's last launch/battle/cancellation; 1–3650 |
+| lossPermille | 100 | Battle loss rate, default10%; 0–500 |
+| requiredAdvantagePermille | 1250 | Planned troops must be at least125% of estimated defense; 1001–4000 |
+| maxDeparturesPerDay | 4 | Global launch cap; 0–16 |
+
+Settings are concrete world data, not changes to application code. The advisor can
+explain or propose settings; ticks never call a model. Example Entire world prompt:
+
+> Enable adjacent conflict with the default rules. Explain the likely population
+> losses and show me the preview before I apply it.
+
+### Launch and travel
+
+After resident meals/sanitation, evaluate a frozen snapshot of garrison staffing,
+health and food. Origins need a supplied, dry land settlement with healthy service
+members. Destinations must be hostile adjacent dry land settlements. Unclaimed,
+neutral and allied territory is not automatically attacked. Troop size is
+`floor(healthyService * deploymentPermille / 1000)`, subject to minimum size and
+required advantage. Defense estimates also exclude ill residents when disease is
+paused. The expedition debits real residents, garrison target and carried food;
+remaining residents keep their configured garrison food reserve plus one day.
+
+Ascending origin ID, then target ID, resolves competing choices. Fronts are
+**disjoint**: a zone cannot participate in another expedition while a campaign
+involving it is active. Cooldowns are stamped at launch and resolution/cancellation.
+The global daily cap and shared64-journey limit apply. This first model does not
+combine several armies into one battle or coordinate attacks across fronts.
+
+Campaign journeys carry `military.mission: assault | return | cancelled` while
+retaining faction identity, health and ordinary transit food/starvation accounting.
+Assaults take the configured outward leg before reporting `battle-ready`. Assaults
+and their returns bypass civilian travel flags and faction border restrictions;
+physical land requirements and own-faction recovery/capacity checks still apply.
+Friendly reinforcement journeys without a mission retain their existing gates.
+
+### Battle and capture
+
+Resolve ready campaigns after visit contact and garrison staffing, before research
+and farming. Strength is healthy surviving attackers versus healthy garrison
+members physically at home. Ill residents and residents away on visits cannot be
+combat casualties, even when disease progression is paused. Compute both losses
+from the same pre-battle strengths:
+
+```
+losses = min(ownStrength,
+             ceil(ownStrength * lossPermille / 1000),
+             ceil(opposingStrength * lossPermille / 1000))
+```
+
+Deaths reduce actual population and the corresponding susceptible/immune health
+compartments. There is no abstract damage score and no direct civilian or illness
+mortality. Integer rounding can remove a lone combatant; zero opposing strength
+or a zero loss rate causes no combat deaths. The stronger surviving healthy force
+wins; ties preserve the defender's ownership. A reinforcement or illness during
+travel can reverse the original launch advantage.
+
+Capture changes only ownership and demobilizes surviving defenders. Civilians,
+surviving residents, buildings, food, local research and custom inventory stay.
+There is no looting, forced displacement, conversion into a new army, or extra
+housing demand from occupiers. Secondary food shortages can still harm civilians
+through the existing settlement rules; preservation describes capture's direct
+consequences, not immunity from later simulation effects.
+
+Surviving attackers, whether victorious or repelled, spend a full return leg.
+Own-faction arrival transfers remaining people/health/food once and restores
+service slots under existing army arrival rules. Existing arrivals/food sharing
+precede battles; research, farming and subsequent permissions see captured ownership.
+Ready disjoint fronts have no shared troops or defenders, preventing double losses.
+
+### Pause, peace and recovery
+
+Pausing stops new expeditions and cancels pending assaults on the next tick.
+Ending hostility, removing the target settlement, submerged endpoints or an empty
+party also cancels an assault. Cancellation attempts recovery in the current home
+zone on the following tick; this avoids charging both transit and resident meals
+on the cancellation day. Existing return legs continue when conflict is paused.
+
+All parties retain food, health and population while waiting. Lost home ownership,
+submergence or insufficient home capacity can strand returns/cancelled parties.
+The creator can restore conditions or use reviewed local army recovery controls.
+Zero-survivor parties retain any inventory for manual recovery; no resources vanish.
+Return missions may leave hostile territory, but must recover into their own faction.
+Redirecting a campaign to a friendly route clears its campaign mission and uses
+ordinary reinforcement access. Changing policy travel days affects future launches;
+existing parties retain their saved leg duration. Battles use the current loss rate.
+
+### Diagnostics and acceptance
+
+Daily launch records identify origin, target, troops and provisions. Battle records
+show outcome, factions, pre/post combatant counts and exact losses. Capture/repulse
+also add world events. The inspector shows the latest report; previews collect
+**all five forecast days**, including launches and battles that finish before day5,
+and compare total population against the unchanged-policy baseline. Other births,
+starvation and movement remain part of those totals; a five-day preview is bounded.
+
+Unit coverage includes activation/version/scope, supply/force/cooldown limits,
+disjoint fronts, capture and ties, civilian/infrastructure preservation, health
+and visitor protection, closed civilian borders, pause/peace, stranded returns,
+pure forecasts, replay/checkpoint/export and malformed accounting. Browser
+acceptance is `npm run test:conflict`. Broader integrated acceptance (5h4) and
+whole-world balance/performance tuning (5i) remain; naval warfare, sieges,
+building damage and displacement are future scope.

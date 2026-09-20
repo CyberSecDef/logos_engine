@@ -286,4 +286,16 @@ service target and actual food; requires planned-trip provisions and remaining
 home reserves. Own/allied transit and own-faction arrival are enforced; survivors
 reinforce destination garrison. Existing provision/redirect/dock operations retain
 military checks. See [supplied troop movements](factions.md#implemented-5h3a-supplied-troop-movements).
-Automatic battle/capture operations are not implemented yet.
+Optional world `conflict` and world-scope `conflict-configure` now enable automatic
+adjacent expeditions, battles and capture. See the faction conflict policy below.
+
+
+`conflict-configure` supplies current independent `expectedVersion`, `enabled`, and
+all bounded `adjacent-conflict-v1` settings. Campaigns use optional journey
+`military.mission` (`assault`, `return`, `cancelled`), daily launch/battle ledgers,
+cooldowns and saved ID sequence. Civilian travel closures do not stop campaigns;
+land, supplies, healthy staffing and own-faction arrival capacity still apply.
+Combatant deaths are real population losses; capture preserves civilians/buildings,
+demobilizes surviving defenders and returns attackers. Pausing cancels pending
+assaults next tick. See [automatic conflict](factions.md#implemented-5h3b-automatic-adjacent-conflict)
+for formulas, timing, replay and recovery semantics.

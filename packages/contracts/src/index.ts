@@ -1,3 +1,4 @@
+import {ConflictSchema,conflictOperations} from './conflict.js';
 import {FactionsSchema,GarrisonSchema,factionOperations} from './factions.js';
 import {TechnologySchema,ResearchSchema,technologyOperations} from './technology.js';
 import {DiseaseSchema,HealthSchema,diseaseOperations} from './disease.js';
@@ -42,7 +43,7 @@ export const TemperatureRuleSchema = z.object({
 }).strict();
 export const RuleSchema = z.discriminatedUnion('kind', [RainRuleSchema, TemperatureRuleSchema]);
 export const OperationSchema = z.discriminatedUnion('kind', [
-  ...factionOperations,
+  ...conflictOperations,...factionOperations,
   ...technologyOperations,
   ...diseaseOperations,
   ...waterQualityOperations,
@@ -69,7 +70,7 @@ export const ProposalSchema = z.object({
   summary: z.string().min(1).max(500), operations: z.array(OperationSchema).min(1).max(32),
 }).strict();
 export const EventSchema = z.object({
-  tick:uint, kind:z.enum(['intervention','flood','flow','population']), tileId:uint,
+  tick:uint, kind:z.enum(['intervention','flood','flow','population','conflict']), tileId:uint,
   message:z.string(), amount:uint.optional(),
 }).strict();
 export const WorldSchema = z.object({
@@ -79,7 +80,7 @@ export const WorldSchema = z.object({
   tick:uint, revision:uint, cells:z.array(CellSchema).min(12).max(6762),
   tiles:z.array(TileSchema).min(12).max(6762), rules:z.array(RuleSchema),
   definitions:DefinitionsSchema,resourceLedger:ResourceLedgerSchema,plugins:z.array(PluginInstanceSchema).max(8),
-  factions:FactionsSchema.optional(),technology:TechnologySchema.optional(),disease:DiseaseSchema.optional(),waterQuality:WaterQualitySchema.optional(),air:AirSchema.optional(),migration:MigrationSchema.optional(),neighborVisits:NeighborVisitsSchema.optional(),journeys:JourneysSchema.optional(),resourceRoutes:ResourceRoutesSchema.optional(),foodTrade:FoodTradeSchema.optional(),soilEcology:SoilEcologySchema.optional(),artwork:ArtworkPackSchema.optional(),entities:EntitiesSchema.optional(),
+  conflict:ConflictSchema.optional(),factions:FactionsSchema.optional(),technology:TechnologySchema.optional(),disease:DiseaseSchema.optional(),waterQuality:WaterQualitySchema.optional(),air:AirSchema.optional(),migration:MigrationSchema.optional(),neighborVisits:NeighborVisitsSchema.optional(),journeys:JourneysSchema.optional(),resourceRoutes:ResourceRoutesSchema.optional(),foodTrade:FoodTradeSchema.optional(),soilEcology:SoilEcologySchema.optional(),artwork:ArtworkPackSchema.optional(),entities:EntitiesSchema.optional(),
   history:z.array(ProposalSchema), events:z.array(EventSchema).max(200),
   accounting:z.object({rainL:uint, evaporationL:uint, oceanDrainL:uint}).strict(),
 }).strict();

@@ -172,7 +172,13 @@ and territory; automatic conflict under explicit world rules. **5h1 implemented:
 identity, territory, symmetric relation records and visual inspection. **5h2a implemented:**
 independent hostile border policies across travel, trade and knowledge.
 **5h2b implemented:** local resident garrisons, healthy labor reservation and
-food eligibility using existing meal/health accounting. Supplied friendly troop movements are implemented in **5h3a**. **5h3b next:**
+food eligibility using existing meal/health accounting. Supplied friendly troop movements are implemented in **5h3a**. **5h3b implemented:**
 bounded automatic conflict/capture, with combatant losses and civilian/building
 preservation (confirmed by the creator). **5h4:**
 combined acceptance. Relationship labels alone do not initiate combat in 5h1.
+
+
+Automatic conflict is opt-in, adjacent and deterministic. Supplied expeditions ignore
+civilian closures, resolve bounded healthy-combatant losses, preserve civilians and
+infrastructure on capture, and return survivors home. See [conflict rules](factions.md#implemented-5h3b-automatic-adjacent-conflict).
+Next:5h4 integrated conflict/environment acceptance, followed by5i whole-world tuning.

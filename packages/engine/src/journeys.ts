@@ -19,7 +19,7 @@ export function validateJourneys(w:World):void {
  if(w.journeys.lastDay){if(w.journeys.lastDay.tick>w.tick)throw Error('Journey report is from the future');const ids=new Set<string>();for(const r of w.journeys.lastDay.entries){if(ids.has(r.journeyId)||r.beforePopulation-r.losses!==r.afterPopulation||r.beforeFood-r.consumed!==r.afterFood||r.status!=='arrived'&&r.consumed+r.unmet!==r.beforePopulation)throw Error('Invalid journey accounting');ids.add(r.journeyId);}}
 }
 function arrivalBlock(w:World,j:Journey,id:number):JourneyStatus|null {
- const t=w.tiles[id];if(j.military&&t.factionId!==j.military.factionId)return 'military-access';if(t.travelAllowed===false)return 'closed';if(t.elevationM<=0)return 'submerged';const s=t.settlement;if(!s)return 'no-settlement';
+ const t=w.tiles[id];if(j.military&&t.factionId!==j.military.factionId)return 'military-access';if(t.travelAllowed===false&&!j.military?.mission)return 'closed';if(t.elevationM<=0)return 'submerged';const s=t.settlement;if(!s)return 'no-settlement';
  if(t.population+j.population>s.settings.capacity)return 'population-capacity';if(s.foodRations+j.foodRations>1e9)return 'food-capacity';
  if(j.cargo.some(c=>units(fieldValue(w,id,c.fieldId))+units(c.amount)>units(w.definitions.fields.find(f=>f.id===c.fieldId)!.max)))return 'cargo-capacity';return null;
 }
@@ -55,7 +55,7 @@ export function applyJourney(w:World,op:Operation):void {
   w.journeys??={model:'land-journeys-v1',active:[]};w.journeys.active.push(j);w.journeys.active.sort((a,b)=>a.id<b.id?-1:1);
  }else if(op.kind==='journey-redirect'||op.kind==='journey-provision'||op.kind==='journey-dock'){
   const j=w.journeys?.active.find(j=>j.id===op.journeyId);if(!j||j.path[j.index]!==op.tileId)throw Error('Unknown journey or wrong current zone');
-  if(op.kind==='journey-redirect'){checkJourneyPath(w,op.path,op.tileId);if(!w.tiles[op.path.at(-1)!].settlement)throw Error('Redirect to an existing settlement');if(j.military&&(w.tiles[op.path.at(-1)!].factionId!==j.military.factionId||op.path.some(id=>!militaryAccess(w,j.military!.factionId,id))))throw Error('Army redirect requires own/allied territory and an own-faction destination');j.path=op.path;j.index=0;j.daysPerHop=op.daysPerHop;j.remainingDays=op.daysPerHop;}
+  if(op.kind==='journey-redirect'){checkJourneyPath(w,op.path,op.tileId);if(!w.tiles[op.path.at(-1)!].settlement)throw Error('Redirect to an existing settlement');if(j.military&&(w.tiles[op.path.at(-1)!].factionId!==j.military.factionId||op.path.some(id=>!militaryAccess(w,j.military!.factionId,id))))throw Error('Army redirect requires own/allied territory and an own-faction destination');if(j.military)delete j.military.mission;j.path=op.path;j.index=0;j.daysPerHop=op.daysPerHop;j.remainingDays=op.daysPerHop;}
   if(op.kind==='journey-provision'){if(j.military&&!militaryAccess(w,j.military.factionId,op.tileId))throw Error('Army provisioning requires own or allied territory');const s=w.tiles[op.tileId].settlement;if(!s||s.foodRations<op.foodRations||j.foodRations+op.foodRations>1e9)throw Error('Invalid journey provisioning balance');s.foodRations-=op.foodRations;j.foodRations+=op.foodRations;delete s.lastDay;}
   if(op.kind==='journey-dock'){const blocked=arrivalBlock(w,j,op.tileId);if(blocked)throw Error(`Cannot unload journey: ${blocked}`);unload(w,j,op.tileId);w.journeys!.active=w.journeys!.active.filter(x=>x.id!==j.id);}
  }
@@ -66,16 +66,18 @@ export function advanceJourneys(w:World):void {
  for(const j of [...data.active].sort((a,b)=>a.id<b.id?-1:1)){
   const beforePopulation=j.population,beforeFood=j.foodRations;let status:JourneyStatus='moving',consumed=0,unmet=0,losses=0,arrived=false;
   const from=w.tiles[j.path[j.index]],to=w.tiles[j.path[j.index+1]];
-  if(!j.population)status='no-travelers';else if(from.travelAllowed===false||to.travelAllowed===false)status='closed';else if(!factionBorderOpen(w,from.id,to.id,'travel')||j.cargo.some(c=>c.amount>0)&&!factionBorderOpen(w,from.id,to.id,'trade'))status='border-closed';else if(j.military&&(!militaryAccess(w,j.military.factionId,from.id)||!militaryAccess(w,j.military.factionId,to.id)))status='military-access';else if(from.elevationM<=0||to.elevationM<=0)status='submerged';else{
+  const mission=j.military?.mission;
+  if(mission==='cancelled'){const blocked=arrivalBlock(w,j,from.id);if(blocked)status=blocked;else{unload(w,j,from.id);status='arrived';arrived=true;}}
+  else if(!j.population)status='no-travelers';else if(!mission&&(from.travelAllowed===false||to.travelAllowed===false))status='closed';else if(!mission&&(!factionBorderOpen(w,from.id,to.id,'travel')||j.cargo.some(c=>c.amount>0)&&!factionBorderOpen(w,from.id,to.id,'trade')))status='border-closed';else if(j.military&&!mission&&(!militaryAccess(w,j.military.factionId,from.id)||!militaryAccess(w,j.military.factionId,to.id)))status='military-access';else if(from.elevationM<=0||to.elevationM<=0)status='submerged';else{
    j.remainingDays=Math.max(0,j.remainingDays-1);
-   if(j.remainingDays===0){if(j.index===j.path.length-2){const blocked=arrivalBlock(w,j,to.id);if(blocked)status=blocked;else{unload(w,j,to.id);status='arrived';arrived=true;}}
+   if(j.remainingDays===0){if(mission==='assault')status='battle-ready';else if(j.index===j.path.length-2){const blocked=arrivalBlock(w,j,to.id);if(blocked)status=blocked;else{unload(w,j,to.id);status='arrived';arrived=true;}}
     else{j.index++;j.remainingDays=j.daysPerHop;}}
   }
   if(!arrived){consumed=Math.min(j.population,j.foodRations);unmet=j.population-consumed;j.foodRations-=consumed;
    if(unmet){j.shortageDays++;if(j.shortageDays>=j.shortageIntervalDays){losses=j.lossPermille?Math.min(j.population,Math.max(1,Math.ceil(j.population*j.lossPermille/1000))):0;if(w.disease)takeHealth(j.health!,j.population,losses);j.population-=losses;j.shortageDays=0;}}else j.shortageDays=0;
    if(!j.population)status='no-travelers';remaining.push(j);
   }
-  data.lastDay.entries.push({...(j.military?{factionId:j.military.factionId}:{}),journeyId:j.id,label:j.label,origin:j.path[0],tileId:arrived?j.path.at(-1)!:j.path[j.index],destination:j.path.at(-1)!,status,beforePopulation,afterPopulation:j.population,beforeFood,afterFood:j.foodRations,consumed,unmet,losses});
+  data.lastDay.entries.push({...(j.military?{factionId:j.military.factionId}:{}),journeyId:j.id,label:j.label,origin:j.path[0],tileId:arrived?(mission==='cancelled'?from.id:j.path.at(-1)!):j.path[j.index],destination:mission==='cancelled'?from.id:j.path.at(-1)!,status,beforePopulation,afterPopulation:j.population,beforeFood,afterFood:j.foodRations,consumed,unmet,losses});
  }
  data.active=remaining;
 }

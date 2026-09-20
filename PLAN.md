@@ -652,3 +652,14 @@ move healthy resident garrison members through own/allied land, preserving facti
 identity and actual population/health/food, and reinforce own settlements. Automatic
 battles/capture follow in5h3b. Confirmed battle consequence: bounded combatant losses,
 with civilians and buildings preserved; later work may add displacement/damage.
+
+
+### Phase 5h3b implementation update
+
+[Automatic adjacent conflict](docs/factions.md#implemented-5h3b-automatic-adjacent-conflict)
+uses explicit world activation, supplied healthy garrison expeditions, disjoint
+fronts, cooldowns, timed travel, bounded simultaneous combatant losses and capture.
+Civilians/buildings/inventory survive direct capture; surviving attackers return
+home and defenders demobilize. Civilian closures do not stop invasion. Next:5h4
+integrated acceptance and5i whole-world tuning; naval/siege/damage/displacement
+systems remain future scope.

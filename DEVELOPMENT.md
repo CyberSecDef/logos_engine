@@ -17,8 +17,9 @@ tests/typecheck/build, browser and native Claude acceptance passed. Deployment
 verified with exact saved-world preservation; published milestone `cc7b237`.
 5h3a supplied troop movements are implemented; 251 tests/typecheck/build passed.
 Browser/native acceptance and unchanged-world LAN deployment passed; milestone
-`eb0dda6` is published. Automatic battles and
-capture (5h3b), integration (5h4) and tuning (5i) remain.
+`eb0dda6` is published. Automatic adjacent battles/capture (5h3b) are implemented;
+264 tests/typecheck/build, browser and native Claude acceptance passed.
+LAN deployment preserved the complete live save; publication is in progress. Integrated acceptance (5h4) and whole-world tuning (5i) remain.
 
 ## Completed
 
@@ -2078,3 +2079,64 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `eb0dda6` to public `CyberSecDef/logos_engine` main.
 - Next:5h3b automatic battles/capture. Supplied friendly movements do not fight yet.
+
+### 2026-09-20 — Phase 5h3b automatic conflict started
+
+- Implementing explicit optional conflict policy, supplied adjacent expeditions,
+  disjoint fronts/cooldowns, bounded healthy-combatant losses and capture that
+  preserves civilians, buildings, food and research. Survivors return home;
+  surviving defenders demobilize on capture. No autonomous model calls.
+- Confirmed prior decisions retained. Asked whether invasions ignore civilian
+  travel closures; implementation/validation is in progress.
+
+
+### 2026-09-20 — Phase 5h3b implementation and simulation acceptance
+
+- Creator confirmed hostile adjacent attacks under explicit activation; civilian
+  closures do not stop invasions. Implemented independent versioned conflict
+  policy, supplied healthy expeditions, stable/disjoint fronts, minimum force,
+  advantage checks, daily caps and cooldowns. Missing policy preserves old behavior.
+- Battles use simultaneous bounded healthy-combatant losses; ties defend. Capture
+  changes ownership and demobilizes defenders while preserving civilians, stores,
+  infrastructure and research. Survivors return on a full leg with ordinary health,
+  meals/starvation and recovery/capacity accounting. No autonomous model calls.
+- Pause/peace/invalid target cancels pending assaults; following-tick recovery avoids
+  duplicate meal charges. Returning parties retain identity and can wait for home
+  ownership, land or capacity. Campaigns and civilian/friendly journeys have separate
+  access rules; existing friendly movement keeps its previous permission gates.
+- Added reviewed rule controls, daily reports/events, all-five-day battle forecasts
+  with baseline population comparison, provider capabilities29 and world interface docs.
+- `npm run check`: **263 tests passed**, typecheck/build passed. Twelve new tests
+  cover activation, supplies, capture/repulse, simultaneous losses, civilian and
+  infrastructure preservation, paused/active health, visitor/contact protection,
+  cancellation/recovery, closures, stranded returns, disjoint fronts, cooldowns,
+  versions/scope, pure preview and deterministic replay/checkpoint/export.
+- Corrected one test expectation: food-starved defenders may legitimately attract
+  a smaller hostile neighbor. This is expected policy behavior, not a runtime defect.
+- Browser/native Claude acceptance running. Publication and live deploy pending.
+
+
+### 2026-09-20 — Phase 5h3b provider correction and deployment
+
+- Native Claude correctly declined to emit an operation missing from its response
+  schema. Added conflict operations to the separate provider schema, then added a
+  regression comparing every engine operation against the provider list exactly
+  once. This closes the discovery gap for future operation additions.
+- Final `npm run check`: **264 tests passed**, typecheck/build passed. Authenticated
+  native Claude then produced the correct conflict activation/default settings;
+  world scope and pure five-day forecast passed with the fixture save unchanged.
+- Conflict browser acceptance passed activation/cancel, full forecast losses,
+  automatic launch, pause/recovery, capture preserving civilians, return journeys,
+  saved reload/replay and responsive layouts. Inspected desktop/mobile screenshots.
+  Existing faction, friendly-army and disease-contact browser workflows passed;
+  none of these simulation/browser workflows called a model autonomously.
+- Deployed on `0.0.0.0:5180`, verified controls through LAN. Preserved first-world
+  day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete save envelope
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Conflict remains absent/inactive. No factions, expeditions or test ticks added.
+  Evidence: `/tmp/logos-conflict-deploy.json`.
+- Phase5h3b complete. Next:5h4 combined environment/population/conflict acceptance,
+  then5i long-run balance/tuning. Naval warfare, sieges, displacement and building
+  damage remain future scope. Existing bundle-size warning remains Phase6 work.

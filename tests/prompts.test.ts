@@ -87,3 +87,11 @@ test('Anthropic API adapter sends bounded context once and does not expose provi
  const failure=(async()=>new Response('private-provider-details',{status:401})) as typeof fetch;
  await assert.rejects(()=>new AnthropicProvider('secret','model',failure).generate(c,new AbortController().signal),e=>e instanceof Error&&e.message.includes('401')&&!e.message.includes('private-provider'));
 });
+
+test('model operation schema exposes every engine operation exactly once',async()=>{
+ const {OperationSchema}=await import('../packages/contracts/src/index.js');
+ const {modelReplyJsonSchema}=await import('../packages/contracts/src/prompts.js');
+ const runtime=OperationSchema.options.map(o=>o.shape.kind.value).sort();
+ const model=modelReplyJsonSchema.properties.operations.items.anyOf.map(o=>(o as {properties:{kind:{const:string}}}).properties.kind.const).sort();
+ assert.deepEqual(model,runtime);
+});

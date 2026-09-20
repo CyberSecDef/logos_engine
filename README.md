@@ -121,7 +121,9 @@ assign land and record relationships, with a territory overlay. Optional hostile
 border rules independently restrict travel, trade and knowledge exchange.
 Local resident garrisons reserve healthy labor while retaining normal meals and
 health accounting. Healthy troops can travel with supplies to reinforce their
-faction’s settlements through friendly land. Automatic battles and capture are next.
+faction’s settlements through friendly land. Explicit conflict rules enable supplied
+attacks between hostile neighbors, bounded combatant losses, capture and returns.
+Civilians and infrastructure survive capture; conflict starts only after activation.
 
 **Still planned:** richer erosion, broader trade and movement,
 conflict, and broader technology effects. This is an early playable foundation.
