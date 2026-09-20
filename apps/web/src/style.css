@@ -26,3 +26,5 @@ button:disabled{cursor:wait;opacity:.45;pointer-events:none}textarea{font:inheri
 .entity-preview p{overflow-wrap:anywhere;font-size:12px;line-height:1.6}
 
 .replay-editor label{display:block;margin:10px 0;font-size:11px}.replay-editor input,.replay-editor textarea{width:100%;background:#101d23;color:inherit;border:1px solid var(--line);border-radius:5px;padding:8px}.replay-editor textarea{font:11px monospace;resize:vertical}.replay-diff{width:100%;font-size:12px;overflow-wrap:anywhere}.replay-diff p{margin:8px 0}
+
+#water-preview{margin:12px 0 18px;padding:10px;border:1px solid var(--line);border-radius:7px}#water-preview .stat{gap:8px;align-items:baseline}#water-preview .stat strong{max-width:60%;text-align:right;overflow-wrap:anywhere}#water-preview p{overflow-wrap:anywhere}

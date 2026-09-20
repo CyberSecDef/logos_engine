@@ -1,3 +1,4 @@
+import {previewWater} from '../../../packages/engine/src/index.js';
 import {unpackBundle,MAX_BUNDLE_BYTES,artworkHashes} from './portable.js';
 import {parseArtwork,MAX_ARTWORK_BYTES} from './artwork.js';
 import type {SaveAction} from './journal.js';
@@ -94,6 +95,11 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(pathname==='/api/prompts/import')return json(res,200,await prompts.import(world,input));
       if(pathname==='/api/prompts/cancel'){const p=z.object({id:z.string()}).strict().parse(input);prompts.cancel(world,p.id);return json(res,200,{cancelled:true});}
       if(prompts.busy)throw Error('World is paused while the model responds; wait or cancel the request');
+      if(pathname==='/api/transport/preview'){
+        const p=z.object({worldId:Id,expectedRevision:z.number().int().nonnegative(),tileId:z.number().int().nonnegative()}).strict().parse(input);
+        if(p.worldId!==world.id)throw Error('Water preview belongs to another world');revision(p.expectedRevision);
+        return json(res,200,previewWater(world,p.tileId));
+      }
       if(pathname==='/api/artwork/preview'||pathname==='/api/artwork/apply'){
         const p=z.object({worldId:Id,expectedRevision:z.number().int(),bundle:z.unknown()}).strict().parse(input);if(p.worldId!==world.id)throw Error('Artwork belongs to another world');revision(p.expectedRevision);
         const parsed=parseArtwork(p.bundle),proposal:ReturnType<typeof ProposalSchema.parse>={id:`artwork-${randomUUID()}`,worldId:world.id,expectedRevision:world.revision,summary:`Activate artwork: ${parsed.pack.label} v${parsed.pack.version}`,operations:[{kind:'artwork-activate',tileId:0,pack:parsed.pack}]};

@@ -1,3 +1,4 @@
+import type {WaterPreview} from '../../../packages/contracts/src/transport.js';
 import type { Checkpoint } from '../../../packages/contracts/src/checkpoints.js';
 import { WorldGlobe } from './globe.js';
 import { appearance, matchingAppearance, type Overlay } from '../../../packages/globe/src/appearance.js';
@@ -35,6 +36,7 @@ async function action(fn:()=>Promise<void>) {
 }
 function setWorld(value:World) {const changed=world?.id!==value.id;world=value;if(changed){pending=null;$('proposal').hidden=true;selected=-1;$('conversation').hidden=true;document.body.classList.remove('chat-open');$('chat-history').replaceChildren();promptState(promptJobId);}updateCustomLayers();globe.setWorld(world);selectTile(selected);text('world-name',world.name);text('day',`DAY ${world.tick}`);text('save-status',`Saved locally · ${fmt(world.tiles.length)} places`);}
 function selectTile(id:number) {
+ $('water-preview').hidden=true;$('water-preview').replaceChildren();
  if(promptJobId&&id!==selected)return;
  const changed=id!==selected;selected=id;globe.select(id);
  if(changed&&!$('conversation').hidden)void loadChat();
@@ -56,6 +58,26 @@ function selectTile(id:number) {
  const events=world.events.filter(e=>e.tileId===id).slice(-2);for(const e of events){const p=document.createElement('p');p.className='muted';p.textContent=`Day ${e.tick} · ${e.message}`;container.append(p);}
  text('communication-change',t.communication?'Isolate communication':'Restore communication');
 }
+$('water-explain').onclick=()=>{setPlaying(false);void action(async()=>{
+ const source={worldId:world.id,expectedRevision:world.revision,tileId:selected};
+ const report=await api<WaterPreview>('transport/preview',source);
+ if(world.id!==source.worldId||world.revision!==source.expectedRevision||selected!==source.tileId)return;
+ const container=$('water-preview');container.replaceChildren();container.hidden=false;
+ const close=document.createElement('button');close.textContent='Close water preview';close.onclick=()=>{container.hidden=true;container.replaceChildren();};container.append(close);
+ const heading=document.createElement('p');heading.className='rule-note';heading.textContent=`Day ${report.sourceTick} → ${report.tick} · Preview only`;container.append(heading);
+ const note=document.createElement('p');note.className='muted';note.textContent='Current applied rules. Time and saved state are unchanged. Depths use this zone’s area.';container.append(note);
+ const b=report.budget;
+ for(const [label,value] of [['Starting water',b.beforeWaterL],['Rain added',b.rainL],['Evaporation removed',b.evaporationL],['Incoming runoff',b.incomingWaterL],['Outgoing runoff',b.outgoingWaterL],['Ocean drainage removed',b.oceanDrainL],['Ending water',b.afterWaterL]] as const){
+  const row=document.createElement('div');row.className='stat';const k=document.createElement('span'),v=document.createElement('strong');k.textContent=label;v.textContent=`${(value/report.areaM2).toFixed(2)} mm · ${fmt(value)} L`;row.append(k,v);container.append(row);
+ }
+ const sediment=document.createElement('p');sediment.className='muted';sediment.textContent=`Sediment: ${fmt(b.beforeSedimentKg)} kg + ${fmt(b.incomingSedimentKg)} kg incoming − ${fmt(b.outgoingSedimentKg)} kg outgoing = ${fmt(b.afterSedimentKg)} kg. Ocean drainage removes water only.`;container.append(sediment);
+ for(const flow of [...report.incoming,...report.outgoing]){
+  const incoming=flow.toTileId===selected,other=incoming?flow.fromTileId:flow.toTileId;
+  const row=document.createElement('p');row.className='water-route rule-note';row.textContent=`${incoming?'From':'To'} zone ${other}: ${fmt(flow.waterL)} L water · ${fmt(flow.sedimentKg)} kg sediment`;container.append(row);
+ }
+ if(!report.incoming.length&&!report.outgoing.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='No neighbor runoff on the next day.';container.append(empty);}
+ const timing=document.createElement('p');timing.className='muted';timing.textContent='Runoff moves one neighbor hop per day. Arriving water cannot flow onward until a later day. Communication settings do not block water.';container.append(timing);
+});};
 async function tick() {
  if(!world||document.hidden||!$('world-review').hidden){setPlaying(false);return;}
  await action(async()=>{setWorld(await api<World>('step',{expectedRevision:world.revision,days:1}));});
@@ -262,7 +284,7 @@ async function reviewProposal(proposal:Proposal) {
 }
 function promptState(id:string|null) {
  promptJobId=id;document.body.classList.toggle('prompt-running',!!id);$('chat-progress').hidden=!id;
- for(const name of ['chat-discuss','chat-propose','chat-export','chat-close','worlds-toggle','play','step','rain-change','elevation-change','temperature-change','temperature-reset','communication-change'])$<HTMLButtonElement>(name).disabled=!!id;
+ for(const name of ['chat-discuss','chat-propose','chat-export','chat-close','worlds-toggle','play','step','water-explain','rain-change','elevation-change','temperature-change','temperature-reset','communication-change'])$<HTMLButtonElement>(name).disabled=!!id;
  $<HTMLButtonElement>('temperature-reset').disabled=!!id||!world?.rules.some(r=>r.tileId===selected&&r.kind==='temperature');
  $<HTMLTextAreaElement>('chat-message').disabled=!!id;
  $<HTMLInputElement>('chat-import').disabled=!!id||busy;

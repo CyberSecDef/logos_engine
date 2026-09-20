@@ -1,6 +1,7 @@
 import {validateEntities,validateEntityMigrations,applyEntity,invalidateEntityReads} from './entities.js';
 import { ProposalSchema, WorldSchema, type World, type Proposal, type WorldEvent } from '../../contracts/src/index.js';
-import { random } from '../../worldgen/src/index.js';
+import {advanceHydrology} from './hydrology.js';
+import type {WaterTransportReport,WaterPreview} from '../../contracts/src/transport.js';
 import {validatePlugins,validateStateMappings,applyPlugin,advancePlugins} from './plugins.js';
 import { advanceTemperature, climateTemperatureC } from './temperature.js';
 import { validateExtensions, validateConversions, applyExtension, advanceExtensions } from './extensions.js';
@@ -70,50 +71,25 @@ export function applyProposal(world:World,input:unknown):World {
   return validateWorld(next);
 }
 export function depthMm(w:World,id:number):number { return w.tiles[id].waterL/w.cells[id].areaM2; }
-export function advance(world:World):World {
+function advanceDay(world:World,report?:WaterTransportReport):World {
   const next=structuredClone(world); next.tick++; next.revision++;
-  const rainRules=new Map(next.rules.filter(r=>r.kind==='rainfall').map(r=>[r.tileId,r.mmPerDay]));
   advanceTemperature(world,next);
-  // 1 L per square metre = 1 mm. Integer volumes account for unequal tile areas.
-  for(const tile of next.tiles) {
-    const cell=next.cells[tile.id];
-    tile.rainMm=rainRules.get(tile.id) ?? Math.floor(random(next.seed,'rain',next.tick,tile.id)*9);
-    const rain=tile.rainMm*cell.areaM2;
-    tile.waterL+=rain; next.accounting.rainL+=rain;
-    const evaporation=Math.min(tile.waterL,cell.areaM2*Math.max(0,Math.floor(tile.temperatureC/12)));
-    tile.waterL-=evaporation; next.accounting.evaporationL+=evaporation;
-  }
-  // Simultaneous one-hop flow reads the phase snapshot and cannot overspend water.
-  const waterDelta=next.tiles.map(()=>0), sedimentDelta=next.tiles.map(()=>0);
-  for(const tile of next.tiles) {
-    if(tile.elevationM<=0) continue;
-    const cell=next.cells[tile.id];
-    const available=Math.max(0,tile.waterL-cell.areaM2*20);
-    const destinations=cell.neighbors.filter(id=>next.tiles[id].elevationM<tile.elevationM);
-    if(!destinations.length || !available) continue;
-    const weights=destinations.map(id=>tile.elevationM-next.tiles[id].elevationM);
-    const weight=weights.reduce((a,b)=>a+b,0);
-    const budget=Math.floor(available/2);
-    let total=0;
-    for(const [i,id] of destinations.entries()) {
-      const volume=Math.floor(budget*(weights[i]/weight));
-      const sediment=Math.floor(tile.sedimentKg*(volume/Math.max(1,tile.waterL)));
-      waterDelta[tile.id]-=volume; waterDelta[id]+=volume;
-      sedimentDelta[tile.id]-=sediment; sedimentDelta[id]+=sediment;
-      total+=volume;
-    }
-    if(total>0 && rainRules.has(tile.id)) event(next,{tick:next.tick,kind:'flow',tileId:tile.id,amount:total,message:`Runoff reached ${destinations.length} lower neighbors.`});
-  }
-  for(const tile of next.tiles) {
-    tile.waterL+=waterDelta[tile.id]; tile.sedimentKg+=sedimentDelta[tile.id];
-    if(tile.elevationM<=0) {next.accounting.oceanDrainL+=tile.waterL; tile.waterL=0;}
-    const flooded=depthMm(next,tile.id)>100;
-    if(flooded && depthMm(world,tile.id)<=100) event(next,{tick:next.tick,kind:'flood',tileId:tile.id,message:'Standing water exceeded 100 mm.'});
-    if(tile.elevationM>0) tile.vegetation=Math.max(0,Math.min(1,Math.round((tile.vegetation+(flooded ? -0.005 : tile.temperatureC>45 ? -0.005 : tile.rainMm>2 && tile.temperatureC>0 ? 0.001:-0.001))*1000)/1000));
-    else tile.vegetation=0;
-  }
+  advanceHydrology(world,next,event,report);
   advanceExtensions(next,advancePlugins(next));
   return validateWorld(next);
+}
+export function advance(world:World):World {return advanceDay(world);}
+export function advanceWithWaterReport(world:World):{world:World;report:WaterTransportReport} {
+ const report:WaterTransportReport={worldId:world.id,sourceRevision:world.revision,sourceTick:world.tick,tick:world.tick+1,
+  tiles:world.tiles.map(tile=>({tileId:tile.id,beforeWaterL:tile.waterL,rainL:0,evaporationL:0,mixingWaterL:0,incomingWaterL:0,outgoingWaterL:0,oceanDrainL:0,afterWaterL:0,beforeSedimentKg:tile.sedimentKg,incomingSedimentKg:0,outgoingSedimentKg:0,afterSedimentKg:0})),transfers:[]};
+ return {world:advanceDay(world,report),report};
+}
+export function previewWater(world:World,tileId:number):WaterPreview {
+ if(!Number.isInteger(tileId)||!world.tiles[tileId])throw Error('Unknown tile');
+ const {report}=advanceWithWaterReport(world);
+ return {worldId:report.worldId,sourceRevision:report.sourceRevision,sourceTick:report.sourceTick,tick:report.tick,
+  tileId,areaM2:world.cells[tileId].areaM2,budget:report.tiles[tileId],
+  incoming:report.transfers.filter(t=>t.toTileId===tileId),outgoing:report.transfers.filter(t=>t.fromTileId===tileId)};
 }
 export function preview(world:World,p:Proposal,ticks=5):World {
   if(!Number.isInteger(ticks)||ticks<0||ticks>30) throw Error('Preview must be 0–30 ticks');

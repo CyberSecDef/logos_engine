@@ -44,6 +44,8 @@ home network; this milestone has no user login.
 - Seeded fictional globe with stable tiles, terrain relief, picking, and overlays.
 - Deterministic daily weather, evaporation, runoff, sediment transport, and
   vegetation response, with explicit water accounting.
+- Read-only [next-day water budgets](docs/water-transport.md), with exact neighbor
+  runoff routes, sediment transfers and visible sources/sinks.
 - One-time or sustained heat/cold, deterministic neighbor influence, evaporation
   and vegetation effects, temperature overlay and inspector tracking.
 - Validated creator transactions, five-day previews, saved rules, and reload.
@@ -82,8 +84,10 @@ All five [Phase 4 items](docs/phase-4-completion.md) are complete. See the
 [final acceptance matrix](docs/phase-4-acceptance.md) for live provider checks,
 compatibility evidence and limits.
 
-**Still planned:** richer erosion, trade,
-population, conflict, and technology. The communication flag is persisted but
+Phase 5 is underway; see the [milestones and agreed decisions](docs/phase-5-plan.md).
+
+**Still planned:** food and population dynamics, richer erosion, trade,
+conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 
 ## Verify and use the CLI

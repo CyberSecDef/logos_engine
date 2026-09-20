@@ -1,20 +1,20 @@
 # Development log
 
-Updated: 2026-09-19. This file records actual implementation progress; proposed
+Updated: 2026-09-20. This file records actual implementation progress; proposed
 features live in [PLAN.md](PLAN.md). Update this log at task transitions and
 before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 4 is complete, deployed on the LAN and published as `59842f0`. All five agreed areas plus the requested Codex provider passed
-verification. See [acceptance evidence](docs/phase-4-acceptance.md): 113 tests,
-15 browser/regression scripts, live Claude/Cursor/Codex Discuss and Propose, and
-mocked Anthropic API coverage. No paid direct API credentials are configured.
+Phase 5 has started. The [milestone plan](docs/phase-5-plan.md) defines 5a–5i:
+water transport/explanations, food/population, trade/movement, air pollution,
+water contamination/sanitation, disease, technology, conflict and final tuning.
 
-Next: Phase 5 planning for tangible food/population, movement/trade, knowledge,
-technology and conflict, followed by pollution and disease transport. No Phase 5
-mechanics are being implemented in this milestone. Detailed prior activity below
-is chronological; old test counts and pending lists describe their dated milestone.
+**5a is complete and deployed:** actual water transport and next-day explanations.
+It preserves existing physics and save hashes while exposing reusable edge flows
+and per-zone budgets. All 118 tests and water/prompt/selective browser checks pass.
+**Next: 5b food and population**, with no settlement mechanics implemented yet. For 5b the player confirmed creator-placed settlements, actual inhabitants and
+daily food reserves, with sustained shortages/surpluses driving demographic change.
 
 ## Completed
 
@@ -42,7 +42,7 @@ is chronological; old test counts and pending lists describe their dated milesto
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
-| 5. Broader simulation | Pending | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
+| 5. Broader simulation | In progress: 5a | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
@@ -1156,3 +1156,37 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - 113 tests, 15 browser/cache regressions and live Claude/Cursor/Codex acceptance
   passed. LAN deployment preserved the exact day-826/revision-840 world hash.
 - All five agreed Phase 4 completion items are closed. Phase 5 planning is next.
+
+### 2026-09-20 — Phase 5 started
+
+- Documented milestones 5a–5i, dependencies, acceptance criteria and compatibility
+  requirements in docs/phase-5-plan.md. Asked about initial settlement placement
+  and food-driven population change before implementing 5b.
+- Starting a reusable actual-water-transfer report and read-only next-day budget
+  inspector. This establishes contamination transport inputs without changing
+  current physics, saved world schemas, replay history or model authority.
+- Captured two pre-refactor 100-day state hashes as compatibility fixtures.
+
+### 2026-09-20 — Water transport verification
+
+- Extracted hydrology without changing arithmetic, event ordering or saved state.
+  Ordinary ticks allocate no report; diagnostic ticks expose actual edge volumes,
+  sediment, mixing snapshots and per-zone source/sink budgets.
+- Added authenticated revision/world-checked preview and inspector explanation.
+  It pauses play, never persists data, and discards stale selection responses.
+- All 118 tests passed, including two original 100-day hashes, 40-day zone balances,
+  one-hop timing, ocean sediment retention, plugin failure and read-only API checks.
+- Player confirmed creator placement and food-driven population change for 5b.
+  Documented these decisions plus the calculation/API in docs/water-transport.md.
+- Browser acceptance, documentation review and deployment remain in progress.
+
+### 2026-09-20 — Phase 5a acceptance and deployment
+
+- Browser acceptance passed preview/pause, exact next-day correspondence, route
+  labels, stale-selection rejection, close/reload and desktop/mobile layout.
+  Inspected both screenshots; prompt and selective-replay regressions also passed.
+- Deployed on 0.0.0.0:5180 after checking no player prompt was active.
+- Verified exact saved hash at shutdown/restart and after a LAN water preview:
+  first-world remains day 826/revision 840. Preview did not mutate the world.
+- Publishing Phase 5a and the complete milestone plan. Phase 5b food/population
+  is next, using the player's confirmed placement and demographic decisions.

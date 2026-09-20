@@ -511,3 +511,11 @@ direct API acceptance requires credentials and is not implied by mock tests.
 Phase 4 is complete. The [final acceptance matrix](docs/phase-4-acceptance.md)
 records 113 passing tests, all browser regressions, live Claude/Cursor/Codex checks,
 and mocked direct API coverage. Phase 5 is the next development phase.
+
+## Phase 5 execution plan — 2026-09-20
+
+Phase 5 has started. [Milestones 5a–5i](docs/phase-5-plan.md) specify dependencies,
+activation/versioning decisions and acceptance gates. The first implementation
+extracts actual water transfers and exposes read-only next-day budgets while
+preserving Phase 4 simulation outputs. Food/population follows after its initial
+placement and demographic rules are agreed.

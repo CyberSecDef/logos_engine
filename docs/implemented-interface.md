@@ -217,3 +217,11 @@ Recorded interventions support omission or replacement followed by bounded repla
 into a reviewed independent world. Later input failures are reported, never skipped.
 The new branch retains its rewritten input journal. See [selective replay](selective-replay.md)
 for endpoint bodies, review guarantees, snapshot boundaries and recovery behavior.
+
+## Actual water-transport preview (Phase 5a)
+
+Authenticated `POST /api/transport/preview` takes
+`{worldId, expectedRevision, tileId}` and returns the selected zone's next-day
+water/sediment budget and exact neighbor transfers. It runs the existing engine
+on a copy, makes no model call, writes no state/history, and rejects stale or
+wrong-world requests. See [calculation, types and limits](water-transport.md).

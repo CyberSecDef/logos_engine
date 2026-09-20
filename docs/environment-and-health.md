@@ -1,7 +1,8 @@
 # Planned environmental pollution and disease
 
-Status: future work, requested September 19, 2026. None of these systems is
-implemented yet. This extends the broader-simulation roadmap; it does not change
+Status: pollution/disease remain future work, requested September 19, 2026.
+Phase 5a now exposes [actual water transfers](water-transport.md) for their future
+transport calculations; contaminant and illness state are not implemented yet. This extends the broader-simulation roadmap; it does not change
 the running game's capabilities. All mechanics are abstract fantasy gameplay,
 with world-defined balance values rather than real-world pollutant or pathogen models.
 
@@ -115,3 +116,10 @@ when distant arrivals occur after the preview ends.
 
 Detailed units, coefficients, wind generation, route timing, and illness progression
 remain implementation choices to review when their prerequisites are developed.
+
+## Current delivery sequence
+
+The [Phase 5 execution plan](phase-5-plan.md) now governs milestone order: actual
+water-transfer accounting first, creator-placed settlements and food/population
+next, then movement and the environmental/health systems with their prerequisites.
+The scenarios and separate-channel requirements above remain the acceptance goals.
