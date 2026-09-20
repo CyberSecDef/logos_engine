@@ -1116,3 +1116,10 @@ runoff with sediment conservation, and checksummed storage/path validation.
   or experimental changes were created in the player's world directory.
 - Publishing Phase 4 item 4. Final provider integration, compatibility and recovery
   acceptance remains, including automatic Cursor CLI support.
+
+### 2026-09-19 — Selective replay publication
+
+- Published `f028a35` to public `CyberSecDef/logos_engine` on `main`.
+- 103 tests, selective replay and historical-branch browser checks passed.
+- Exact live-world hash preserved across deployment at day 826/revision 840.
+- Phase 4 items 1–4 complete; final integration/compatibility acceptance is next.
