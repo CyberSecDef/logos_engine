@@ -1021,3 +1021,11 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Read-only LAN export produced a valid v2 bundle; replay validation checked its
   two recorded saves without modifying or importing the player's world.
 - Publishing the completed second item. Generic entities are next.
+
+### 2026-09-19 — Portable bundle publication
+
+- Published `82fc9c3` to public `CyberSecDef/logos_engine` on `main`.
+- All 90 tests and portable/checkpoint browser acceptance passed; LAN export
+  verified and the player's latest day 792/revision 805 preserved.
+- Phase 4 items 1–2 complete; generic entities, selective replay and final
+  integration/compatibility acceptance remain.
