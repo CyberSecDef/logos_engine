@@ -25,7 +25,8 @@
     "test:resources": "npm run build && node tests/resources-browser.mjs",
     "test:checkpoints": "npm run build && node tests/checkpoints-browser.mjs",
     "test:plugins": "npm run build && node tests/plugins-browser.mjs",
-    "test:textures": "npm run build && node tests/textures-browser.mjs"
+    "test:textures": "npm run build && node tests/textures-browser.mjs",
+    "test:appearance": "npm run build && node tests/appearance-rules-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",

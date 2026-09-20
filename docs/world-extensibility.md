@@ -85,7 +85,7 @@ precision policy and bounds policy. Preview never writes live values; any invali
 operation rejects the entire transaction. Stock conversions require a positive
 scale and zero offset. Index conversions also permit offsets and negative scales.
 
-Every existing rule or plugin reading or writing the property must be explicitly
+Every existing rule, plugin, or appearance rule reading or writing the property must be explicitly
 updated or removed in the same transaction, including disabled ones. Review its
 thresholds, constants, output amounts, and saved plugin counters. The engine does
 not infer their units or rewrite them. Plugin updates explicitly choose preserve/reset or a bounded

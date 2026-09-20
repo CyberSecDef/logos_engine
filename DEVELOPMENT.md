@@ -6,6 +6,11 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
+Implementing world-specific appearance rules driven by built-in/custom properties.
+Rules select labels, colors and existing artwork through reviewed proposals.
+All 66 tests, appearance/texture browser checks, and native Claude acceptance
+passed. The milestone is live on the LAN server; publication is in progress.
+
 Plugin saved-state mappings are implemented: rename/reorder counters, convert
 units, add initial values, and explicitly discard retired keys. All 61 tests and
 browser acceptance pass, native Claude acceptance passed, and the milestone is
@@ -436,7 +441,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   implemented and verified; arbitrary migration code and JavaScript/native plugins
   are not enabled.
 - 4d: shared painterly terrain pack, actual atlas rendering, 1,000-day staggered
-  reveal and applied-action reveal — complete, verified, live, and published. Layering and world-local packs remain future work.
+  reveal and applied-action reveal — complete, verified, live, and published.
+  World-specific conditional appearance rules are now implemented and verified.
+  Layering and external world-local image packs remain future work.
 - 4e: world checkpoints, branches, restore, and portable state import/export —
   complete, live, and published. Restricted plugin definitions/state already travel
   with world exports; external artwork bundles and selective event replay remain
@@ -745,3 +752,36 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - All 61 tests, browser migration acceptance and native Claude acceptance passed.
 - User world preserved. Full replay history, general entities and world-local/layered
   artwork remain outstanding Phase 4 work.
+
+### 2026-09-19 — World appearance rules started
+
+- Connecting custom world properties to deterministic terrain appearance.
+- Versioned conditional styles will reuse the installed artwork pack and preserve
+  birth colors, staggered reveal and overlay readability.
+- Validation, prompt/preview/inspector integration and acceptance tests are pending.
+
+### 2026-09-19 — Appearance-rule engine checks passed
+
+- All 66 tests, typecheck and production build passed.
+- Added stable priority/ID precedence, custom/physical conditions, scope validation,
+  reference/version checks, conversion dependencies and an evaluation budget.
+- Pure appearance selection leaves simulation results and overlay colors unchanged.
+- Added inspector rule status, bounded immediate before/after review, prompt
+  capabilities, and the crystal-land example. Browser verification is in progress.
+
+### 2026-09-19 — Appearance-rule acceptance
+
+- Browser acceptance passed full prompt/review/Apply/reload flow, actual state-based
+  appearance changes and threshold fallback, desktop/mobile layouts and no extra
+  model calls. Existing texture GPU/reveal/fallback regressions also passed.
+- Native Claude generated a valid appearance-only proposal with the expected
+  crystal-rich zone in its preview, using a temporary world.
+- Inspected the rendered crystal landscape. Documentation explains installed-art
+  reuse, color behavior, priorities, reveal timing, physics separation and limits.
+
+### 2026-09-19 — Appearance-rule deployment
+
+- Deployed at `0.0.0.0:5180`; LAN check preserved Aethra at day 792/revision 803.
+- No user world edits, styles or simulation steps were applied by deployment.
+- Publishing the verified milestone with 66 passing tests, two browser suites,
+  native Claude acceptance and a documented crystal-appearance example.

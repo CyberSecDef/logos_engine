@@ -1,3 +1,4 @@
+import {appearance} from '../../../packages/globe/src/appearance.js';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import type { World, Proposal } from '../../../packages/contracts/src/index.js';
@@ -9,7 +10,7 @@ import { advance, applyProposal, depthMm } from '../../../packages/engine/src/in
 import { WorldStore } from './store.js';
 import {pluginTargets,PluginExecutionError} from '../../../packages/engine/src/plugins.js';
 import { resourceTotals } from '../../../packages/engine/src/resources.js';
-import { ruleAffectedTargets, fieldValue } from '../../../packages/engine/src/extensions.js';
+import { ruleTargets, ruleAffectedTargets, fieldValue } from '../../../packages/engine/src/extensions.js';
 
 export function configuredProvider():ModelProvider {
  const name=process.env.LLM_PROVIDER??'claude-code';
@@ -72,6 +73,11 @@ export class PromptService {
    if((op.kind==='plugin-define'||op.kind==='plugin-toggle'||op.kind==='plugin-remove')&&job.request.scope!=='world')throw Error('Plugin changes require Entire world scope');
    if(op.kind==='field-transfer'&&!ids.includes(op.toTileId))throw Error('Transfer destination is outside the selected scope');
    if((op.kind==='field-define'||op.kind==='field-remove')&&job.request.scope!=='world')throw Error('Property definitions require Entire world scope');
+   if(op.kind==='appearance-define'||op.kind==='appearance-remove') {
+    const old=world.definitions.appearance?.find(r=>r.id===(op.kind==='appearance-define'?op.rule.id:op.ruleId));
+    if(old&&ruleTargets(world,old).some(id=>!ids.includes(id)))throw Error('Existing appearance rule affects tiles outside the selected scope');
+    if(op.kind==='appearance-define'&&ruleTargets(world,op.rule).some(id=>!ids.includes(id)))throw Error('Appearance rule affects tiles outside the selected scope');
+   }
    if(op.kind==='rule-define'||op.kind==='rule-remove') {
     const old=world.definitions.rules.find(r=>r.id===(op.kind==='rule-define'?op.rule.id:op.ruleId));
     if(old&&ruleAffectedTargets(world,old).some(id=>!ids.includes(id)))throw Error('Existing rule affects tiles outside the selected scope');
@@ -124,6 +130,8 @@ export function forecast(world:World,proposal:Proposal) {
   if(op.kind==='plugin-define')for(const id of pluginTargets(candidate,op.definition))ids.add(id);
   if(op.kind==='plugin-define'||op.kind==='plugin-toggle'||op.kind==='plugin-remove'){const old=world.plugins.find(p=>p.definition.id===(op.kind==='plugin-define'?op.definition.id:op.pluginId));if(old)for(const id of pluginTargets(world,old.definition))ids.add(id);}
   if(op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
+  if(op.kind==='appearance-define')for(const id of ruleTargets(world,op.rule))ids.add(id);
+  if(op.kind==='appearance-define'||op.kind==='appearance-remove'){const old=world.definitions.appearance?.find(r=>r.id===(op.kind==='appearance-define'?op.rule.id:op.ruleId));if(old)for(const id of ruleTargets(world,old))ids.add(id);}
   if(op.kind==='rule-define')for(const id of ruleAffectedTargets(world,op.rule))ids.add(id);
   if(op.kind==='rule-define'||op.kind==='rule-remove') {
    const old=world.definitions.rules.find(r=>r.id===(op.kind==='rule-define'?op.rule.id:op.ruleId));
@@ -142,5 +150,7 @@ export function forecast(world:World,proposal:Proposal) {
   const values=(instance:typeof old,tileId:number)=>Object.fromEntries(instance.definition.stateFields.map((f,i)=>[f.id,instance.state.find(s=>s.tileId===tileId)?.values[i]??f.initial]));
   return [{id:op.definition.id,label:op.definition.label,totalTiles:targets.length,tiles:targets.slice(0,6).map(tileId=>({tileId,before:values(old,tileId),after:values(next,tileId)}))}];
  });
- return {pluginMigrations,tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,baselineUnit:baseline.definitions.fields.find(b=>b.id===f.id)?.unit??null,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
+ const describeAppearance=(w:World,id:number)=>{const a=appearance(w,w.tiles[id],'terrain',1);return {label:a.label,color:a.color,asset:a.assetId??'none'};};
+ const visualChanges=[...ids].map(tileId=>({tileId,before:describeAppearance(world,tileId),after:describeAppearance(applied,tileId)})).filter(t=>JSON.stringify(t.before)!==JSON.stringify(t.after));
+ return {appearanceChanges:{total:visualChanges.length,tiles:visualChanges.slice(0,24)},pluginMigrations,tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,baselineUnit:baseline.definitions.fields.find(b=>b.id===f.id)?.unit??null,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
 }

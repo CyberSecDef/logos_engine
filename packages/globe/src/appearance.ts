@@ -1,3 +1,4 @@
+import {readValue} from '../../engine/src/extensions.js';
 import type { Tile, World } from '../../contracts/src/index.js';
 export type Overlay='terrain'|'water'|'rain'|'temperature'|'communication'|`custom:${string}`;
 export type Appearance={label:string;color:string;assetId?:string;variant:number;textureOpacity:number};
@@ -17,7 +18,8 @@ export function textureReveals(world:World):number[] {
 export function appearance(w:World,t:Tile,overlay:Overlay='terrain',reveal?:number):Appearance {
  const depth=t.waterL/w.cells[t.id].areaM2;
  const entry=catalog.find(e=>e.conditions.every(c=>{const n=t[c.field];return c.comparison==='lt'?n<c.value:c.comparison==='lte'?n<=c.value:c.comparison==='gt'?n>c.value:n>=c.value;}))??catalog[catalog.length-1];
- let color=entry.color;
+ const custom=matchingAppearance(w,t);
+ let color=custom?.style.color??entry.color;
  if(overlay==='water') color=t.elevationM<=0?'#174863':depth>100?'#59c1e3':depth>20?'#387e9b':'#aeb28c';
  if(overlay==='rain') color=`hsl(${190+Math.min(t.rainMm,100)/100*35}, 55%, ${22+Math.min(t.rainMm,100)/100*50}%)`;
  if(overlay==='temperature') {
@@ -30,5 +32,13 @@ export function appearance(w:World,t:Tile,overlay:Overlay='terrain',reveal?:numb
  }
  if(overlay==='communication') color=t.communication?'#469783':'#d8956b';
  const textureOpacity=overlay==='terrain'?(reveal??textureReveals(w)[t.id]):0;
- return {label:entry.label,color,assetId:textureOpacity>0?entry.id:undefined,variant:hash(`${terrainPack.id}:${t.id}`),textureOpacity};
+ return {label:custom?.style.label??entry.label,color,assetId:textureOpacity>0?(custom?(custom.style.asset==='none'?undefined:custom.style.asset):entry.id):undefined,variant:hash(`${terrainPack.id}:${t.id}`),textureOpacity};
+}
+
+export function matchingAppearance(world:World,tile:Tile) {
+ return [...(world.definitions.appearance??[])].sort((a,b)=>b.priority-a.priority||(a.id<b.id?-1:a.id>b.id?1:0)).find(rule=>
+  rule.enabled&&(rule.scope==='world'||tile.id===rule.tileId||rule.scope==='neighbors'&&world.cells[rule.tileId].neighbors.includes(tile.id))&&rule.conditions.every(c=>{
+   const n=readValue(world,tile.id,c.read);
+   return c.comparison==='lt'?n<c.value:c.comparison==='lte'?n<=c.value:c.comparison==='eq'?n===c.value:c.comparison==='gte'?n>=c.value:n>c.value;
+  }));
 }

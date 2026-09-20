@@ -62,9 +62,29 @@ export function validateExtensions(world:World):void {
   if(ledgerIds.has(entry.fieldId)||entry.afterMilli-entry.beforeMilli!==entry.createdMilli-entry.removedMilli)throw Error('Invalid resource ledger');
   ledgerIds.add(entry.fieldId);
  }
+ const styleIds=new Set<string>();let styleEvaluations=0;
+ for(const rule of world.definitions.appearance??[]) {
+  if(styleIds.has(rule.id))throw Error('Duplicate appearance rule');styleIds.add(rule.id);
+  const targets=ruleTargets(world,rule);if(rule.enabled)styleEvaluations+=targets.length;
+  for(const {read} of rule.conditions)if(read.source==='custom'?!read.fieldId||!fields.has(read.fieldId):read.fieldId!==undefined)throw Error('Invalid appearance property reference');
+ }
+ if(styleEvaluations>100000)throw Error('World exceeds appearance evaluation budget');
  if(evaluations>100000)throw Error('World exceeds custom rule evaluation budget');
 }
 export function applyExtension(world:World,op:Operation):void {
+ if(op.kind==='appearance-define') {
+  if(op.tileId!==op.rule.tileId)throw Error('Appearance origin must match operation tile');
+  const old=world.definitions.appearance?.find(r=>r.id===op.rule.id);
+  if(old&&old.tileId!==op.tileId)throw Error('Appearance update cannot move its origin');
+  const previous=world.history.flatMap(p=>p.operations).reduce((max,o)=>o.kind==='appearance-define'&&o.rule.id===op.rule.id?Math.max(max,o.rule.version):max,old?.version??0);
+  if(op.rule.version!==previous+1)throw Error(`Appearance version must be ${previous+1}`);
+  world.definitions.appearance=[...(world.definitions.appearance??[]).filter(r=>r.id!==op.rule.id),op.rule].sort((a,b)=>a.id<b.id?-1:1);
+ }
+ if(op.kind==='appearance-remove') {
+  const old=world.definitions.appearance?.find(r=>r.id===op.ruleId);
+  if(!old||old.tileId!==op.tileId)throw Error('Unknown appearance rule or mismatched origin');
+  world.definitions.appearance=world.definitions.appearance!.filter(r=>r.id!==op.ruleId);
+ }
  if(op.kind==='field-transfer')transferOnce(world,op.tileId,op.toTileId,op.fieldId,op.amount);
  if(op.kind==='field-define') {
   const old=world.definitions.fields.find(f=>f.id===op.definition.id);
@@ -172,6 +192,10 @@ export function validateConversions(world:World,operations:Operation[]):void {
   for(const rule of world.definitions.rules) {
    if(!rule.effects.some(e=>e.fieldId===id)&&!reads(rule).some(r=>r.fieldId===id))continue;
    if(!operations.some(o=>o.kind==='rule-define'&&o.rule.id===rule.id||o.kind==='rule-remove'&&o.ruleId===rule.id))throw Error(`Conversion requires an explicit update or removal of rule ${rule.id}`);
+  }
+  for(const rule of world.definitions.appearance??[]) {
+   if(!rule.conditions.some(c=>c.read.fieldId===id))continue;
+   if(!operations.some(o=>o.kind==='appearance-define'&&o.rule.id===rule.id||o.kind==='appearance-remove'&&o.ruleId===rule.id))throw Error(`Conversion requires an explicit update or removal of appearance rule ${rule.id}`);
   }
   for(const {definition:plugin} of world.plugins) {
    if(!plugin.program.some(i=>i.op==='emit'&&i.fieldId===id||i.op==='read'&&i.read.fieldId===id))continue;

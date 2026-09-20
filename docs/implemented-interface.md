@@ -174,3 +174,7 @@ successful baseline day, and the browser displays that limitation.
 Custom property updates also support reviewed [scale/offset conversions](world-extensibility.md#converting-an-existing-property), with explicit precision policy and coordinated dependent rule/plugin updates.
 
 Restricted plugin upgrades support [explicit saved-state mappings](world-plugins.md#mapping-saved-memory-on-update): renames, scale/offset conversions, initialization and acknowledged discards with unchanged scope.
+
+[World-specific appearance rules](world-appearance.md) now select cosmetic labels,
+colors and installed artwork from bounded conditions, with versioned proposals,
+scope validation and unchanged physics/texture reveal.

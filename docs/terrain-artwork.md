@@ -96,3 +96,7 @@ Run `npm run test:textures`. It compares actual WebGL pixels for texture toggles
 and overlays, checks day-zero action reveal and reload, exercises all six images,
 and verifies desktop/mobile layouts, missing-image fallback, and unchanged world
 hashes. Unit tests cover the reveal schedule, copies, assets and padded UVs.
+
+World-specific [conditional appearance rules](world-appearance.md) can now select
+existing artwork, labels and colors from physical or custom values. External
+artwork bundles and layered composition remain future work.
