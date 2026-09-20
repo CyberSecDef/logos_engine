@@ -7,7 +7,7 @@ before each milestone commit. Never mark unverified functionality complete.
 ## Current work
 
 Phase 5c5 automatic relocation and Phase 5d air transport are implemented and
-deployed; publication pending. Automatic relocation is activated in the current
+deployed and published as `837b498`. Automatic relocation is activated in the current
 world after a checkpoint; air transport awaits creator activation in its controls.
 174 tests and three browser scenarios pass. Native Claude acceptance is unverified:
 the provider refused the benign fantasy-world request with a biology safety tag,
@@ -1562,3 +1562,6 @@ runoff with sediment conservation, and checksummed storage/path validation.
   /tmp/logos-air-neighbor-regression.log, /tmp/logos-air-journey-regression.log and
   /tmp/logos-air-migration-deploy.json. Failed provider logs are ignored/local only.
 - Existing Vite large-bundle warning remains a Phase 6 optimization (648 kB).
+
+- Published milestone `837b498` to the public repository on main. This follow-up
+  records the successful push; real-provider acceptance remains explicitly unverified.
