@@ -6,11 +6,9 @@ deterministic tests, persistence/replay checks, readable previews and a usable U
 The model is called only for creator prompts. No offline progression, autonomous
 model decisions, arbitrary engine edits during play or automatic provider repair.
 
-Status: **5a–5e implemented and deployed**, including automatic visits and
-relocation follow-ups. Phase 5e passes engine, browser and native Claude source
-acceptance. Historical provider refusal for the earlier combined air/migration
-request is documented in DEVELOPMENT.md. Phase 5f1 health accounting and 5f2 contact transmission are implemented.
-Phase 5g [knowledge and technology](technology.md) is implemented. [5h factions and conflict](factions.md) is implemented through 5h4 integrated acceptance. Next: 5i whole-world balance/performance tuning.
+Status: **5a–5i implemented and verified**. See the [final acceptance matrix](phase-5-acceptance.md)
+for full-suite, scale, balance, restart, browser and compatibility evidence, plus
+explicit scope limits. No final-milestone gameplay defaults were changed.
 
 ## Sequence and exit criteria
 
@@ -23,8 +21,8 @@ Phase 5g [knowledge and technology](technology.md) is implemented. [5h factions 
 | 5e. Water contamination and sanitation — implemented | Reuse 5a water volumes for load transfer. Define dissolved load, dry deposits, dilution, wash-off and ocean export. Add explicit sanitation/infrastructure links after 5b; famine affects these through documented rules. | Evaporation does not delete contaminant mass; dry zones avoid division by zero; runoff carries load downstream; sources/sinks and ocean export balance. |
 | 5f. Generic disease — implemented | After 5b/5c: susceptible/ill/immune people, local contact, recovery, no direct disease deaths. Carry health state with travelers. Environmental exposure is separate from infectious spread. | Empty zones cannot gain sick inhabitants spontaneously; distant arrivals spread illness only on arrival; people and health compartments reconcile. |
 | 5g. Knowledge and technology — implemented | Tangible research costs, progress and unlocked bounded production/infrastructure effects. Communication permits defined knowledge exchange; completion activates effects at a documented tick boundary. | Knowledge does not teleport across closed channels; costs debit once; unlocks survive saves/replay; no model call is needed for progress. |
-| 5h. Factions and conflict | World-defined ownership, explicit relationships and resource-backed conflict over zones/routes. Concrete manpower, supplies, damage and repair rules; no abstract “freedom” settings. | Stable simultaneous resolution, accounted losses/displacement, explicit travel/trade effects, recovery and deterministic replay. |
-| 5i. Integration and tuning | Long-run scenarios combining weather, food, movement, environment, health, knowledge and conflict. Reconcile documentation, overlays and explanations. | Scenario replay, conservation, old-world compatibility, interruption recovery, bounded cost and browser acceptance; publish a final evidence matrix. |
+| 5h. Factions and conflict — complete | Creator-defined ownership/relationships, resident garrisons, supplied friendly movement and opt-in adjacent conflict. Confirmed civilian/building preservation; damage and displacement remain future scope. | Stable resolution, accounted combatant losses, explicit border effects, recovery and deterministic replay. |
+| 5i. Integration and tuning — complete | Long-run scenarios combining weather, food, movement, environment, health, knowledge and conflict. Reconcile documentation, overlays and explanations. | Scenario replay, conservation, old-world compatibility, interruption recovery, bounded cost and browser acceptance; publish a final evidence matrix. |
 
 5d can proceed independently after 5a. Water contamination can be tested with
 creator releases before sanitation exists. Disease waits for population and
@@ -163,7 +161,7 @@ require reviewed health activation; no model calls occur during simulation.
   knowledge inputs and combined 200-day acceptance. Worker-time is the tangible
   research cost; construction/material recipes remain future extensions. See [technology contracts](technology.md).
 
-Phase 5g is complete within the documented fixed effects. Phase 5h is next.
+Phase 5g is complete within the documented fixed effects; Phase 5h and final acceptance are documented below.
 
 ### Phase 5h substeps and decisions
 
@@ -181,4 +179,15 @@ combined acceptance and the expedition/migration reservation fix. Relationship l
 Automatic conflict is opt-in, adjacent and deterministic. Supplied expeditions ignore
 civilian closures, resolve bounded healthy-combatant losses, preserve civilians and
 infrastructure on capture, and return survivors home. See [conflict rules](factions.md#implemented-5h3b-automatic-adjacent-conflict).
-Next:5i whole-world tuning. The [5h4 evidence matrix](factions.md#phase-5h4-combined-acceptance) covers combined ledgers, recovery and persisted replay.
+Phase 5i acceptance is complete. The [5h4 evidence matrix](factions.md#phase-5h4-combined-acceptance) covers combined ledgers, recovery and persisted replay.
+
+
+### Phase 5i final substeps
+
+- **5i1 complete:** reproducible multi-size long runs, frozen reference hashes,
+  demographic and physical budgets, default growth/shortage/recovery controls,
+  and active-system restart/resume verification.
+- **5i2 complete:** standard-size combined browser acceptance, territory legend
+  clarification, final evidence matrix, measurement record and scope reconciliation.
+- See [final acceptance](phase-5-acceptance.md) for commands, measurements and
+  limitations. Further scale/polish and new mechanics are subsequent work.

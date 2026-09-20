@@ -6,23 +6,13 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5h factions and conflict is underway. [The plan](docs/factions.md) separates
-identities/territory (5h1), borders/mobilization (5h2), conflict (5h3) and integrated
-acceptance (5h4). Confirmed creator-established factions/territory and automatic
-conflict under explicit rules. 5h1 registry, territory/relationships and review UI
-are deployed and published. 5h2a independent hostile border rules are implemented
-and deployed; 233 tests, typecheck/build, browser and native Claude acceptance
-passed and published (`120f23a`). 5h2b resident garrisons are implemented; 242
-tests/typecheck/build, browser and native Claude acceptance passed. Deployment
-verified with exact saved-world preservation; published milestone `cc7b237`.
-5h3a supplied troop movements are implemented; 251 tests/typecheck/build passed.
-Browser/native acceptance and unchanged-world LAN deployment passed; milestone
-`eb0dda6` is published. Automatic adjacent battles/capture (5h3b) are implemented;
-264 tests/typecheck/build, browser and native Claude acceptance passed.
-LAN deployment preserved the complete live save; milestone `224aa00` is published. Phase 5h4 integrated acceptance is complete: expedition/migration reservation
-fix, combined environment/health/economy/conflict ledgers, recovery and persisted
-replay passed. All 267 tests, typecheck/build and three browser workflows passed;
-LAN deployment preserved the complete live save. Whole-world tuning (5i) is next.
+Phase 5 is complete within the agreed simulation scope. The [final acceptance
+matrix](docs/phase-5-acceptance.md) records 269 passing tests, typecheck/build,
+combined browser acceptance, multi-size long runs, saved restart recovery and
+compatibility evidence. Phase 5i measured the current defaults without changing
+rules or saved schemas. Deployment on `0.0.0.0:5180` preserved the live world and
+complete save envelope exactly. Subsequent work is scale/polish or newly agreed
+mechanics; scope and performance limits are documented in the acceptance matrix.
 
 ## Completed
 
@@ -34,6 +24,8 @@ LAN deployment preserved the complete live save. Whole-world tuning (5i) is next
 - Phase 4: versioned definitions, conserved transfers, restricted plugins, artwork,
   entities, complete portable bundles, checkpoints, replay/branches, and automatic
   Claude/Cursor/Codex provider integration.
+- Phase 5: deterministic environment, population, trade/movement, pollution,
+  disease, technology, factions/conflict, and final integration/scale acceptance.
 - Public GitHub repository created; prior milestones published.
 
 - Reviewed the reference globe source and documented the product decisions.
@@ -2182,3 +2174,47 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published milestone `a4a2008` to public `CyberSecDef/logos_engine` main.
 - Phase 5h is complete within the documented adjacent-land conflict scope.
   Next: Phase 5i whole-world balance and performance tuning.
+
+
+### 2026-09-20 — Phase 5i1 scale and balance acceptance (in progress)
+
+- Split remaining integration work into reproducible scale/balance scenarios (5i1),
+  followed by final acceptance/documentation reconciliation (5i2).
+- Baseline engine probes: standard 1,442-zone inactive worlds roughly 18–22 ms/day;
+  maximum 6,762-zone inactive worlds roughly 73–91 ms/day on this host.
+- Building an isolated 24-settlement combined-system fixture with normal births
+  and starvation enabled, daily population/health/water/pollution reconciliation,
+  deterministic replay, and bounded multi-size timing/forecast measurements.
+- Gameplay defaults and live world remain unchanged; timings are measurements,
+  not hardware-independent pass/fail thresholds.
+
+
+### 2026-09-20 — Phase 5i final verification
+
+- Added `npm run test:simulation`: bounded 92/1,442/6,762-zone scenarios with
+  24 settlements for 1,000/200/30 days; separate daily replay, frozen final hashes,
+  population/health/water/pollution reconciliation and active journey/front caps.
+- Normal births and starvation are enabled. The small long run ends with 3,760
+  people = 3,600 initial + 204 births - 44 combatant losses. Supplied fixture has
+  no starvation; separate drought and stranded-party tests exercise that path.
+- Added default growth/crop-failure/recovery control and combined-world restart:
+  60 days, two clean server restarts with exact unchanged save bytes, then 60 more
+  days matching uninterrupted advancement and saved history. No model calls.
+- All 269 tests, typecheck/build passed. Combined standard-size browser scenario
+  passed stepping, replay, built-in overlays, active inspectors, forecast/cancel,
+  reload and responsive layout; desktop/mobile screenshots inspected.
+- Corrected territory legend to explain enabled travel/trade/knowledge policies.
+- Added `docs/phase-5-acceptance.md`; reconciled roadmap/README and recorded
+  scale limitations. No default rules, saved schemas or provider operations changed.
+- Final scale verification passed all frozen hashes. Measurements recorded in
+  `docs/phase-5-benchmarks.json`: standard p95 43.14 ms/day, maximum p95 190.05
+  ms/day; five-day forecast 434/2,031 ms respectively. Excludes I/O/rendering;
+  24-settlement density, 30 days at maximum size, no worst-case guarantee.
+- Deployment verified through LAN, including corrected frontend asset. Preserved
+  first-world day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete save envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Evidence: `/tmp/logos-phase5-deploy.json`. No test activation or ticks on live save.
+- Phase 5 complete. Existing frontend bundle warning, denser profiling and broader
+  UI/performance polish remain subsequent work; no new mechanics implied.

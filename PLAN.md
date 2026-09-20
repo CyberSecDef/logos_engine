@@ -673,3 +673,13 @@ including persisted replay/checkpoints/export and stranded survivor recovery.
 Fixed same-day migration incorrectly releasing the remaining home garrison after
 an expedition departs. Phase 5i balance/performance tuning follows; displacement
 and building damage remain future scope.
+
+
+### Phase 5i completion
+
+Phase 5 is complete within its agreed simulation scope. The [final acceptance
+matrix](docs/phase-5-acceptance.md) records long-run multi-size replay/conservation,
+default balance controls, saved restart recovery, combined browser acceptance and
+measured latency/size limits. No balance defaults or world schemas changed.
+Further scale/polish and new mechanics remain subsequent work; maximum-size
+measurements do not imply fully populated/custom-rule worst-case performance.

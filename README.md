@@ -84,7 +84,9 @@ All five [Phase 4 items](docs/phase-4-completion.md) are complete. See the
 [final acceptance matrix](docs/phase-4-acceptance.md) for live provider checks,
 compatibility evidence and limits.
 
-Phase 5 is underway; see the [milestones and agreed decisions](docs/phase-5-plan.md).
+Phase 5 is complete within the [agreed simulation scope](docs/phase-5-plan.md).
+See the [final acceptance matrix](docs/phase-5-acceptance.md) for reproducible
+long-run, balance, scale, restart and browser checks.
 
 Creator-placed [settlements](docs/settlements.md) now track food reserves, weather-limited
 harvest, shortage losses and gradual growth, with reviewed prompts and overlays.

@@ -1,0 +1,71 @@
+{
+  "node": "v22.22.1",
+  "cpu": "AMD Ryzen 9 8940HX with Radeon Graphics",
+  "measuredAt": "2026-09-20T23:32:30.397Z",
+  "notes": "Engine-only timings include validation; exclude fixture creation, hash checks, persistence, network and rendering. Cold samples retained; no hardware-dependent pass threshold.",
+  "reports": [
+    {
+      "frequency": 3,
+      "zones": 92,
+      "settlements": 24,
+      "days": 1000,
+      "births": 204,
+      "starvation": 0,
+      "transitLosses": 0,
+      "combatLosses": 44,
+      "battles": 11,
+      "finalPopulation": 3760,
+      "finalFood": 2895443,
+      "tickMs": {
+        "median": 5.51,
+        "p95": 9.01,
+        "max": 14.32
+      },
+      "forecastMs": 88,
+      "serializedBytes": 244398,
+      "stateHash": "980e1333c51971051baaed3ecff2569b2549d0281da20e87f16b3c13a4318678"
+    },
+    {
+      "frequency": 12,
+      "zones": 1442,
+      "settlements": 24,
+      "days": 200,
+      "births": 9,
+      "starvation": 0,
+      "transitLosses": 0,
+      "combatLosses": 44,
+      "battles": 11,
+      "finalPopulation": 3565,
+      "finalFood": 359961,
+      "tickMs": {
+        "median": 36.15,
+        "p95": 43.14,
+        "max": 48.83
+      },
+      "forecastMs": 434,
+      "serializedBytes": 2326591,
+      "stateHash": "53990b46e186b05c45a7d188a24ba25cbcc2e551b722a146e172c878de85bc61"
+    },
+    {
+      "frequency": 26,
+      "zones": 6762,
+      "settlements": 24,
+      "days": 30,
+      "births": 2,
+      "starvation": 0,
+      "transitLosses": 0,
+      "combatLosses": 40,
+      "battles": 10,
+      "finalPopulation": 3562,
+      "finalFood": 186810,
+      "tickMs": {
+        "median": 160.72,
+        "p95": 190.05,
+        "max": 205.11
+      },
+      "forecastMs": 2031,
+      "serializedBytes": 10382410,
+      "stateHash": "be4202090014fb2b37702fdbbe7ae6be66ba30c9b757f949dbadc7051a2fa9cb"
+    }
+  ]
+}

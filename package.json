@@ -53,7 +53,9 @@
     "test:knowledge": "npm run build && node tests/knowledge-browser.mjs",
     "test:technology": "npm run build && node tests/technology-browser.mjs",
     "test:disease-contact": "npm run build && node tests/disease-contact-browser.mjs",
-    "test:disease": "npm run build && node tests/disease-browser.mjs"
+    "test:disease": "npm run build && node tests/disease-browser.mjs",
+    "test:simulation": "tsc && node tests/simulation-benchmark.mjs",
+    "test:simulation-browser": "npm run build && node tests/simulation-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",
