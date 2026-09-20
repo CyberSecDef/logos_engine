@@ -77,6 +77,8 @@ export class PromptService {
      if(!packs.some(pack=>JSON.stringify(pack)===JSON.stringify(op.pack)))throw Error('Import and review artwork before selecting it through a prompt');
     }
    }
+   if((op.kind==='entity-type-define'||op.kind==='entity-type-remove')&&job.request.scope!=='world')throw Error('Entity type definitions require Entire world scope');
+   if(op.kind==='entity-update'&&op.toTileId!==undefined&&!ids.includes(op.toTileId))throw Error('Entity destination is outside the selected scope');
    if((op.kind==='plugin-define'||op.kind==='plugin-toggle'||op.kind==='plugin-remove')&&job.request.scope!=='world')throw Error('Plugin changes require Entire world scope');
    if(op.kind==='field-transfer'&&!ids.includes(op.toTileId))throw Error('Transfer destination is outside the selected scope');
    if((op.kind==='field-define'||op.kind==='field-remove')&&job.request.scope!=='world')throw Error('Property definitions require Entire world scope');
@@ -137,6 +139,8 @@ export function forecast(world:World,proposal:Proposal) {
   if(op.kind==='plugin-define')for(const id of pluginTargets(candidate,op.definition))ids.add(id);
   if(op.kind==='plugin-define'||op.kind==='plugin-toggle'||op.kind==='plugin-remove'){const old=world.plugins.find(p=>p.definition.id===(op.kind==='plugin-define'?op.definition.id:op.pluginId));if(old)for(const id of pluginTargets(world,old.definition))ids.add(id);}
   if(op.kind==='artwork-activate'||op.kind==='artwork-reset')for(const tile of world.tiles)ids.add(tile.id);
+  if(op.kind==='entity-update'&&op.toTileId!==undefined)ids.add(op.toTileId);
+  if(op.kind==='entity-type-define'||op.kind==='entity-type-remove')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='appearance-define')for(const id of ruleTargets(world,op.rule))ids.add(id);
   if(op.kind==='appearance-define'||op.kind==='appearance-remove'){const old=world.definitions.appearance?.find(r=>r.id===(op.kind==='appearance-define'?op.rule.id:op.ruleId));if(old)for(const id of ruleTargets(world,old))ids.add(id);}
@@ -160,5 +164,7 @@ export function forecast(world:World,proposal:Proposal) {
  });
  const describeAppearance=(w:World,id:number)=>{const a=appearance(w,w.tiles[id],'terrain',1);return {label:a.label,color:a.color,asset:a.assetId??'none',layers:a.layers};};
  const visualChanges=[...ids].map(tileId=>({tileId,before:describeAppearance(world,tileId),after:describeAppearance(applied,tileId)})).filter(t=>JSON.stringify(t.before)!==JSON.stringify(t.after));
- return {appearanceChanges:{total:visualChanges.length,tiles:visualChanges.slice(0,24)},pluginMigrations,tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,baselineUnit:baseline.definitions.fields.find(b=>b.id===f.id)?.unit??null,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
+ const describeEntity=(w:World,id:string)=>{const e=w.entities?.instances.find(e=>e.id===id);if(!e)return null;const type=w.entities!.types.find(t=>t.id===e.typeId)!;return {...e,summary:`${e.label} in zone ${e.tileId}: ${type.properties.map(f=>`${f.label} ${e.properties[f.id]??f.defaultValue} ${f.unit}`).join(', ')||'no numeric properties'}`,properties:Object.fromEntries(type.properties.map(f=>[f.id,e.properties[f.id]??f.defaultValue]))};};
+ const entityRows=[...new Set([...(world.entities?.instances??[]),...(applied.entities?.instances??[])].map(e=>e.id))].sort().map(id=>({id,before:describeEntity(world,id),after:describeEntity(applied,id),forecast:describeEntity(candidate,id),baseline:describeEntity(baseline,id)})).filter(row=>JSON.stringify(row.before)!==JSON.stringify(row.after)||JSON.stringify(row.forecast)!==JSON.stringify(row.baseline));
+ return {entityChanges:{total:entityRows.length,rows:entityRows.slice(0,24)},appearanceChanges:{total:visualChanges.length,tiles:visualChanges.slice(0,24)},pluginMigrations,tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,baselineUnit:baseline.definitions.fields.find(b=>b.id===f.id)?.unit??null,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
 }

@@ -1,0 +1,128 @@
+{
+  "id": "example-cistern",
+  "worldId": "first-world",
+  "expectedRevision": 0,
+  "summary": "Build a rain cistern that collects 10 rain units daily; expose its previous-day stored total as a tile supply index.",
+  "operations": [
+    {
+      "kind": "entity-type-define",
+      "tileId": 0,
+      "migration": "preserve",
+      "discardProperties": [],
+      "definition": {
+        "id": "rain-cistern",
+        "version": 1,
+        "label": "Rain cistern",
+        "description": "A building storing an abstract collected-rain index, without subtracting from physical runoff.",
+        "properties": [
+          {
+            "id": "stored",
+            "label": "Stored rain",
+            "unit": "rain units",
+            "min": 0,
+            "max": 200,
+            "defaultValue": 0
+          }
+        ]
+      }
+    },
+    {
+      "kind": "entity-create",
+      "tileId": 0,
+      "entity": {
+        "id": "first-cistern",
+        "typeId": "rain-cistern",
+        "tileId": 0,
+        "label": "First rain cistern",
+        "properties": {}
+      }
+    },
+    {
+      "kind": "rainfall",
+      "tileId": 0,
+      "mmPerDay": 10
+    },
+    {
+      "kind": "field-define",
+      "tileId": 0,
+      "migration": "preserve",
+      "definition": {
+        "id": "cistern-supply",
+        "version": 1,
+        "label": "Cistern supply",
+        "description": "Previous-day sum of stored rain in local cisterns; an index, not conserved physical water.",
+        "unit": "rain units",
+        "min": 0,
+        "max": 3200,
+        "defaultValue": 0
+      }
+    },
+    {
+      "kind": "rule-define",
+      "tileId": 0,
+      "rule": {
+        "id": "collect-rain",
+        "version": 1,
+        "label": "Cistern rain collection",
+        "tileId": 0,
+        "scope": "world",
+        "enabled": true,
+        "everyDays": 1,
+        "conditions": [],
+        "effects": [
+          {
+            "entityTypeId": "rain-cistern",
+            "fieldId": "stored",
+            "kind": "add",
+            "value": {
+              "constant": 0,
+              "terms": [
+                {
+                  "read": {
+                    "source": "rainMm",
+                    "sample": "self"
+                  },
+                  "coefficient": 1
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "rule-define",
+      "tileId": 0,
+      "rule": {
+        "id": "cistern-supply",
+        "version": 1,
+        "label": "Read cistern supply",
+        "tileId": 0,
+        "scope": "world",
+        "enabled": true,
+        "everyDays": 1,
+        "conditions": [],
+        "effects": [
+          {
+            "fieldId": "cistern-supply",
+            "kind": "set",
+            "value": {
+              "constant": 0,
+              "terms": [
+                {
+                  "read": {
+                    "source": "entity-sum",
+                    "entityTypeId": "rain-cistern",
+                    "fieldId": "stored",
+                    "sample": "self"
+                  },
+                  "coefficient": 1
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -10,7 +10,7 @@ function hash(text:string):number {let n=2166136261;for(const c of text)n=Math.i
 // Pure visual schedule: no simulation RNG draws or fields are changed.
 export function textureReveals(world:World):number[] {
  const order=world.tiles.map(t=>({id:t.id,key:hash(`${terrainPack.id}:${world.seed}:${t.id}`)})).sort((a,b)=>a.key-b.key||a.id-b.id);
- const acted=new Set(world.history.flatMap(p=>p.operations.flatMap(op=>op.kind==='artwork-activate'||op.kind==='artwork-reset'?[]:op.kind==='field-transfer'?[op.tileId,op.toTileId]:[op.tileId])));
+ const acted=new Set(world.history.flatMap(p=>p.operations.flatMap(op=>op.kind==='artwork-activate'||op.kind==='artwork-reset'?[]:op.kind==='field-transfer'||op.kind==='entity-update'&&op.toTileId!==undefined?[op.tileId,op.toTileId!]:[op.tileId])));
  const progress=world.tick*world.tiles.length/terrainPack.revealDays,result=world.tiles.map(()=>0);
  for(const [rank,tile] of order.entries())result[tile.id]=acted.has(tile.id)?1:Math.max(0,Math.min(1,progress-rank));
  return result;

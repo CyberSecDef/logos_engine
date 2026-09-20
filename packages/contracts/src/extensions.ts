@@ -8,8 +8,8 @@ export const FieldDefinitionSchema=z.object({
  description:z.string().max(300),quantity:z.enum(['index','stock']).optional(),min:scalar,max:scalar,defaultValue:scalar,
 }).strict();
 export const ReadSchema=z.object({
- source:z.enum(['temperatureC','rainMm','waterMm','vegetation','elevationM','population','custom']),
- fieldId:id.optional(),sample:z.enum(['self','neighbors-average','neighbors-min','neighbors-max']),
+ source:z.enum(['temperatureC','rainMm','waterMm','vegetation','elevationM','population','custom','entity-count','entity-sum']),
+ fieldId:id.optional(),entityTypeId:id.optional(),sample:z.enum(['self','neighbors-average','neighbors-min','neighbors-max']),
 }).strict();
 export const FormulaSchema=z.object({
  constant:scalar,min:scalar.optional(),max:scalar.optional(),terms:z.array(z.object({read:ReadSchema,coefficient:z.number().finite().min(-1000).max(1000)}).strict()).max(8),
@@ -19,7 +19,7 @@ export const CustomRuleSchema=z.object({
  id,version:z.number().int().min(1),label:z.string().min(1).max(80),tileId:z.number().int().nonnegative(),
  scope:z.enum(['tile','neighbors','world']),enabled:z.boolean(),everyDays:z.number().int().min(1).max(365),
  conditions:z.array(ConditionSchema).max(8),
- effects:z.array(z.object({fieldId:id,kind:z.enum(['add','set','transfer']),value:FormulaSchema,destination:z.enum(['neighbors','lower-neighbors']).optional()}).strict()).min(1).max(4),
+ effects:z.array(z.object({fieldId:id,entityTypeId:id.optional(),kind:z.enum(['add','set','transfer']),value:FormulaSchema,destination:z.enum(['neighbors','lower-neighbors']).optional()}).strict()).min(1).max(4),
 }).strict();
 export const AppearanceRuleSchema=z.object({
  id,version:z.number().int().min(1),label:z.string().min(1).max(80),tileId:z.number().int().nonnegative(),

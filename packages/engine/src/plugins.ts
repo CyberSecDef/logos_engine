@@ -1,14 +1,15 @@
+import {validRead,outputProperty} from './entities.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 import {PLUGIN_LIMITS,type PluginDefinition,type PluginInstance} from '../../contracts/src/plugins.js';
 import {executePlugin} from '../../plugin-host/src/index.js';
 import {readValue,ruleTargets} from './extensions.js';
-export type PluginChange={tileId:number;fieldId:string;value:number;kind:'add'|'set'};
+export type PluginChange={tileId:number;entityTypeId?:string;fieldId:string;value:number;kind:'add'|'set'};
 export const pluginTargets=(world:World,p:PluginDefinition)=>ruleTargets(world,p);
 const outputs=(p:PluginDefinition)=>p.program.filter(i=>i.op==='emit');
 export function validatePlugins(world:World):void {
  const ids=new Set<string>(),writers=new Map<string,'add'|'set'>();let worstFuel=0;
- const register=(tileId:number,fieldId:string,kind:'add'|'set')=>{const key=`${tileId}:${fieldId}`,old=writers.get(key);if(old&&(old==='set'||kind==='set'))throw Error('Conflicting plugin/rule set writes; use additive effects or disjoint scopes');writers.set(key,kind);};
- for(const rule of world.definitions.rules)if(rule.enabled)for(const tile of ruleTargets(world,rule))for(const effect of rule.effects)if(effect.kind!=='transfer')register(tile,effect.fieldId,effect.kind);
+ const register=(tileId:number,fieldId:string,kind:'add'|'set',entityTypeId?:string)=>{const key=`${tileId}:${entityTypeId??''}:${fieldId}`,old=writers.get(key);if(old&&(old==='set'||kind==='set'))throw Error('Conflicting plugin/rule set writes; use additive effects or disjoint scopes');writers.set(key,kind);};
+ for(const rule of world.definitions.rules)if(rule.enabled)for(const tile of ruleTargets(world,rule))for(const effect of rule.effects)if(effect.kind!=='transfer')register(tile,effect.fieldId,effect.kind,effect.entityTypeId);
  for(const instance of world.plugins) {
   const p=instance.definition;if(ids.has(p.id))throw Error('Duplicate plugin');ids.add(p.id);
   const targets=pluginTargets(world,p),targetSet=new Set(targets),keys=new Set<string>();
@@ -16,15 +17,15 @@ export function validatePlugins(world:World):void {
   for(const ins of p.program) {
    if((ins.op==='jump'||ins.op==='jump-zero')&&ins.target>=p.program.length)throw Error('Plugin jump outside program');
    if((ins.op==='state-get'||ins.op==='state-set')&&!keys.has(ins.key))throw Error('Unknown plugin state key');
-   if(ins.op==='read'&&(ins.read.source==='custom'?!world.definitions.fields.some(f=>f.id===ins.read.fieldId):ins.read.fieldId!==undefined))throw Error('Unknown plugin read property');
-   if(ins.op==='emit'&&!world.definitions.fields.some(f=>f.id===ins.fieldId))throw Error('Unknown plugin output property');
+   if(ins.op==='read'&&!validRead(world,ins.read))throw Error('Unknown plugin read property');
+   if(ins.op==='emit'&&!outputProperty(world,ins.fieldId,ins.entityTypeId))throw Error('Unknown plugin output property');
   }
   const stateIds=new Set<number>();for(const entry of instance.state){if(!targetSet.has(entry.tileId)||stateIds.has(entry.tileId)||entry.values.length!==p.stateFields.length)throw Error('Invalid plugin state targets/shape');stateIds.add(entry.tileId);for(const [i,value] of entry.values.entries())if(value<p.stateFields[i].min||value>p.stateFields[i].max||Math.round(value*1000)/1000!==value)throw Error('Invalid saved plugin state');}
   if(!p.enabled)continue;
   // Static worst-case reservation makes budget acceptance independent of branches.
   worstFuel+=targets.length*PLUGIN_LIMITS.instructions;
-  const outputKinds=new Map<string,'add'|'set'>();for(const ins of outputs(p)){const prior=outputKinds.get(ins.fieldId);if(prior&&prior!==ins.mode)throw Error('Plugin cannot mix set and add for one output');outputKinds.set(ins.fieldId,ins.mode);}
-  for(const tileId of targets)for(const [fieldId,kind] of outputKinds)register(tileId,fieldId,kind);
+  const outputKinds=new Map<string,'add'|'set'>();for(const ins of outputs(p)){const key=`${ins.entityTypeId??''}:${ins.fieldId}`,prior=outputKinds.get(key);if(prior&&prior!==ins.mode)throw Error('Plugin cannot mix set and add for one output');outputKinds.set(key,ins.mode);}
+  for(const tileId of targets)for(const [key,kind] of outputKinds){const [type,fieldId]=key.split(':');register(tileId,fieldId,kind,type===''?undefined:type);}
  }
  if(worstFuel>PLUGIN_LIMITS.worldFuel)throw Error('World exceeds reserved plugin instruction budget; narrow plugin scope');
 }
@@ -93,7 +94,7 @@ export function advancePlugins(world:World):PluginChange[] {
    try {
     const result=executePlugin(p,{tick:world.tick,state:state.get(tileId)??p.stateFields.map(f=>f.initial),read:read=>readValue(world,tileId,read)},budget);
     state.set(tileId,result.state);const setters=new Set<string>();
-    for(const effect of result.effects){if(effect.kind==='set'&&setters.has(effect.fieldId))throw Error('multiple set effects on one tile');setters.add(effect.fieldId);changes.push({...effect,tileId});}
+    for(const effect of result.effects){const key=`${effect.entityTypeId??''}:${effect.fieldId}`;if(effect.kind==='set'&&setters.has(key))throw Error('multiple set effects on one tile');setters.add(key);changes.push({...effect,tileId});}
    }catch(error){throw new PluginExecutionError(`Plugin ${p.id} v${p.version}, zone ${tileId}: ${error instanceof Error?error.message:'execution failed'}. Tick was not saved. Disable, update, or restore this plugin to continue.`);}
   }
   instance.state=[...state].sort(([a],[b])=>a-b).map(([tileId,values])=>({tileId,values}));

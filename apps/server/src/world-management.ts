@@ -20,4 +20,4 @@ export function copyWorld(input:World,id:string,name:string):World {
  for(const proposal of world.history)proposal.worldId=id;
  return validateWorld(world);
 }
-export function worldSummary(world:World) {return {id:world.id,name:world.name,tick:world.tick,revision:world.revision,tiles:world.tiles.length,fields:world.definitions.fields.length,plugins:world.plugins.length,rules:world.definitions.rules.length,interventions:world.history.length};}
+export function worldSummary(world:World) {return {id:world.id,name:world.name,tick:world.tick,revision:world.revision,tiles:world.tiles.length,fields:world.definitions.fields.length,plugins:world.plugins.length,rules:world.definitions.rules.length,interventions:world.history.length,entityTypes:world.entities?.types.length??0,entities:world.entities?.instances.length??0};}

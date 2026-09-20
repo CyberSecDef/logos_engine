@@ -1029,3 +1029,42 @@ runoff with sediment conservation, and checksummed storage/path validation.
   verified and the player's latest day 792/revision 805 preserved.
 - Phase 4 items 1–2 complete; generic entities, selective replay and final
   integration/compatibility acceptance remain.
+
+### 2026-09-19 — Generic entities in progress
+
+- Added optional world entity types/instances, bounded numeric properties,
+  stable-ID lifecycle operations, movement and explicit preserve/clamp migrations.
+- Integrating indexed entity count/sum reads into rules, appearance and plugins;
+  rule/plugin add/set outputs target matching instances on each tile.
+- Added prompt scope enforcement, entity inspection and bounded Apply/day+5 diffs.
+- Next: cistern example, deterministic/migration/persistence/browser acceptance.
+
+### 2026-09-19 — Entity integration verification
+
+- 97 engine/API tests passed, including entity lifecycle, scope/migration rejection,
+  default preservation, shared-snapshot updates, appearance and plugin integration.
+- Entity browser passed prompted creation, readable Apply/day+5 preview, daily
+  rain collection/tile supply, reload, reviewed capacity clamp and mobile inspection.
+- Native logged-in Claude Code generated a valid type/create/rule proposal for an
+  isolated in-memory world; one deterministic day produced the requested value.
+- Added documented rain-cistern example. Its rain units are an abstract index,
+  explicitly separate from conserved physical runoff or entity stock transfers.
+- Final checks include entity counts in world-copy/import summaries.
+
+### 2026-09-19 — Generic entity acceptance
+
+- Final 97-test suite and production build passed.
+- Entity browser and complete portable-bundle browser regression passed; inspected
+  readable before/Apply/day+5 entity preview and desktop/mobile presentation.
+- Native Claude Code acceptance passed without touching the player's world.
+- Completion item 3 (minimal generic entities) is complete. Selective replay and
+  final integration/compatibility acceptance remain before Phase 4 can close.
+
+### 2026-09-19 — Entity milestone deployment
+
+- Deployed to 0.0.0.0:5180 after confirming all player prompts were complete.
+- LAN validation preserved first-world at day 792/revision 805, with no entities
+  added to the player's world by tests or deployment.
+- Publishing the entity interface, cistern example and acceptance evidence.
+- Next: omit/replace an intervention and replay later inputs into a reviewed
+  independent branch, with explicit dependency failures and bounded work.

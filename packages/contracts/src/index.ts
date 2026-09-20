@@ -1,3 +1,4 @@
+import {EntitiesSchema,entityOperations} from './entities.js';
 import {ArtworkPackSchema,artworkOperations} from './artwork.js';
 import { z } from 'zod';
 import {PluginInstanceSchema,pluginOperations} from './plugins.js';
@@ -31,6 +32,7 @@ export const RuleSchema = z.discriminatedUnion('kind', [RainRuleSchema, Temperat
 export const OperationSchema = z.discriminatedUnion('kind', [
   ...extensionOperations,
   ...artworkOperations,
+  ...entityOperations,
   ...pluginOperations,
   z.object({kind:z.literal('elevation'), tileId:uint, deltaM:z.number().int().min(-2000).max(2000)}).strict(),
   z.object({kind:z.literal('rainfall'), tileId:uint, mmPerDay:uint.max(500)}).strict(),
@@ -53,7 +55,7 @@ export const WorldSchema = z.object({
   tick:uint, revision:uint, cells:z.array(CellSchema).min(12).max(6762),
   tiles:z.array(TileSchema).min(12).max(6762), rules:z.array(RuleSchema),
   definitions:DefinitionsSchema,resourceLedger:ResourceLedgerSchema,plugins:z.array(PluginInstanceSchema).max(8),
-  artwork:ArtworkPackSchema.optional(),
+  artwork:ArtworkPackSchema.optional(),entities:EntitiesSchema.optional(),
   history:z.array(ProposalSchema), events:z.array(EventSchema).max(200),
   accounting:z.object({rainL:uint, evaporationL:uint, oceanDrainL:uint}).strict(),
 }).strict();

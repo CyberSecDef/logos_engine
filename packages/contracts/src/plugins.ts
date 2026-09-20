@@ -9,7 +9,7 @@ export const InstructionSchema=z.discriminatedUnion('op',[
  z.object({op:z.literal('state-set'),key:id}).strict(),
  z.object({op:z.literal('jump'),target:z.number().int().min(0).max(127)}).strict(),
  z.object({op:z.literal('jump-zero'),target:z.number().int().min(0).max(127)}).strict(),
- z.object({op:z.literal('emit'),fieldId:id,mode:z.enum(['add','set'])}).strict(),
+ z.object({op:z.literal('emit'),fieldId:id,entityTypeId:id.optional(),mode:z.enum(['add','set'])}).strict(),
  ...(['add','subtract','multiply','divide','modulo','min','max','less','greater','equal','floor','dup','drop','tick','stop'] as const).map(op=>z.object({op:z.literal(op)}).strict()),
 ]);
 export const PluginDefinitionSchema=z.object({

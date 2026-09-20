@@ -1,3 +1,4 @@
+import {validateEntities,validateEntityMigrations,applyEntity,invalidateEntityReads} from './entities.js';
 import { ProposalSchema, WorldSchema, type World, type Proposal, type WorldEvent } from '../../contracts/src/index.js';
 import { random } from '../../worldgen/src/index.js';
 import {validatePlugins,validateStateMappings,applyPlugin,advancePlugins} from './plugins.js';
@@ -23,7 +24,7 @@ export function validateWorld(input:unknown):World {
     commands.add(p.id);
   }
   if(w.artwork&&new Set(w.artwork.images.map(i=>i.slot)).size!==w.artwork.images.length)throw Error('Duplicate artwork slot');
-  validateExtensions(w);validatePlugins(w);
+  validateEntities(w);validateExtensions(w);validatePlugins(w);
   return w;
 }
 function event(w:World,e:WorldEvent) { w.events.push(e); if(w.events.length>200) w.events.shift(); }
@@ -32,7 +33,7 @@ export function applyProposal(world:World,input:unknown):World {
   if(p.worldId!==world.id) throw Error('Proposal belongs to another world');
   if(world.history.some(h=>h.id===p.id)) throw Error('Proposal has already been applied');
   if(p.expectedRevision!==world.revision) throw Error('Stale proposal: refresh and review again');
-  validateConversions(world,p.operations);validateStateMappings(world,p.operations);
+  validateEntityMigrations(world,p.operations);validateConversions(world,p.operations);validateStateMappings(world,p.operations);
   const next=structuredClone(world);
   for(const op of p.operations) {
     const tile=next.tiles[op.tileId];
@@ -43,7 +44,7 @@ export function applyProposal(world:World,input:unknown):World {
       next.artwork=op.pack;
     }
     if(op.kind==='artwork-reset')delete next.artwork;
-    applyExtension(next,op);applyPlugin(next,op);
+    applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
     if(op.kind==='elevation') tile.elevationM+=op.deltaM;
     if(op.kind==='communication') tile.communication=op.enabled;
     if(op.kind==='rainfall') {

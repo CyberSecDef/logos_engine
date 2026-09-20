@@ -1,3 +1,4 @@
+import {validRead,outputProperty,readEntities,invalidateEntityReads} from './entities.js';
 import type { World, Operation } from '../../contracts/src/index.js';
 import { stockUnits, transferOnce, settleTransfers, type TransferRequest } from './resources.js';
 import type { CustomRule, FieldDefinition, Read } from '../../contracts/src/extensions.js';
@@ -36,13 +37,13 @@ export function validateExtensions(world:World):void {
   if(ids.has(rule.id))throw Error('Duplicate custom rule');ids.add(rule.id);
   const targets=ruleTargets(world,rule);
   for(const read of reads(rule)) {
-   if(read.source==='custom'?!read.fieldId||!fields.has(read.fieldId):read.fieldId!==undefined)throw Error('Invalid rule property reference');
+   if(!validRead(world,read))throw Error('Invalid rule property reference');
   }
   for(const effect of rule.effects) {
-   const field=fields.get(effect.fieldId);if(!field)throw Error('Unknown rule output property');
+   const field=outputProperty(world,effect.fieldId,effect.entityTypeId);if(!field)throw Error('Unknown rule output property');
    if(effect.value.min!==undefined&&effect.value.max!==undefined&&effect.value.min>effect.value.max)throw Error('Invalid formula clamp');
    if(effect.kind==='transfer') {
-    if(field.quantity!=='stock'||!effect.destination)throw Error('Transfer rules require a stock property and a destination');
+    if(effect.entityTypeId||!('quantity' in field)||field.quantity!=='stock'||!effect.destination)throw Error('Transfer rules require a stock property and a destination');
     if(rule.enabled)transferEdges+=targets.reduce((sum,id)=>sum+world.cells[id].neighbors.length,0);
    }else if(effect.destination!==undefined)throw Error('Only transfer effects have destinations');
   }
@@ -50,7 +51,7 @@ export function validateExtensions(world:World):void {
   evaluations+=targets.length;
   for(const id of targets)for(const effect of rule.effects) {
    if(effect.kind==='transfer')continue;
-   const key=`${id}:${effect.fieldId}`,prior=writers.get(key);
+   const key=`${id}:${effect.entityTypeId??''}:${effect.fieldId}`,prior=writers.get(key);
    if(prior&&(prior==='set'||effect.kind==='set'))throw Error('Conflicting set/add rules target the same property; use additive rules or disjoint scopes');
    writers.set(key,effect.kind);
   }
@@ -66,7 +67,7 @@ export function validateExtensions(world:World):void {
  for(const rule of world.definitions.appearance??[]) {
   if(styleIds.has(rule.id))throw Error('Duplicate appearance rule');styleIds.add(rule.id);
   const targets=ruleTargets(world,rule);if(rule.enabled)styleEvaluations+=targets.length;
-  for(const {read} of rule.conditions)if(read.source==='custom'?!read.fieldId||!fields.has(read.fieldId):read.fieldId!==undefined)throw Error('Invalid appearance property reference');
+  for(const {read} of rule.conditions)if(!validRead(world,read))throw Error('Invalid appearance property reference');
  }
  if(styleEvaluations>100000)throw Error('World exceeds appearance evaluation budget');
  if(evaluations>100000)throw Error('World exceeds custom rule evaluation budget');
@@ -116,7 +117,7 @@ export function applyExtension(world:World,op:Operation):void {
  }
  if(op.kind==='field-remove') {
   if(!world.definitions.fields.some(f=>f.id===op.fieldId))throw Error('Unknown property');
-  if(world.definitions.rules.some(r=>r.effects.some(e=>e.fieldId===op.fieldId)||reads(r).some(read=>read.fieldId===op.fieldId)))throw Error('Remove dependent rules before removing a property');
+  if(world.definitions.rules.some(r=>r.effects.some(e=>!e.entityTypeId&&e.fieldId===op.fieldId)||reads(r).some(read=>read.source==='custom'&&read.fieldId===op.fieldId)))throw Error('Remove dependent rules before removing a property');
   world.definitions.fields=world.definitions.fields.filter(f=>f.id!==op.fieldId);
   for(const tile of world.tiles)delete tile.properties[op.fieldId];
  }
@@ -137,18 +138,18 @@ export function applyExtension(world:World,op:Operation):void {
  }
 }
 export function readValue(world:World,tileId:number,read:Read):number {
- const at=(id:number)=>read.source==='custom'?fieldValue(world,id,read.fieldId!):read.source==='waterMm'?world.tiles[id].waterL/world.cells[id].areaM2:world.tiles[id][read.source];
+ const at=(id:number)=>read.source==='entity-count'||read.source==='entity-sum'?readEntities(world,id,read):read.source==='custom'?fieldValue(world,id,read.fieldId!):read.source==='waterMm'?world.tiles[id].waterL/world.cells[id].areaM2:world.tiles[id][read.source];
  if(read.sample==='self')return at(tileId);
  const ids=[...world.cells[tileId].neighbors].sort((a,b)=>a-b),values=ids.map(at);
  return read.sample==='neighbors-min'?Math.min(...values):read.sample==='neighbors-max'?Math.max(...values):values.reduce((sum,n)=>sum+n,0)/ids.length;
 }
-export function advanceExtensions(world:World,pluginChanges:{tileId:number;fieldId:string;value:number;kind:'add'|'set'}[]=[]):void {
+export function advanceExtensions(world:World,pluginChanges:{tileId:number;entityTypeId?:string;fieldId:string;value:number;kind:'add'|'set'}[]=[]):void {
  // Rules read the completed built-in phase and one common custom-state snapshot.
  // Aggregate writes before committing: no rule can observe another rule's writes.
  const before=new Map(world.definitions.fields.filter(f=>f.quantity==='stock').map(f=>[f.id,world.tiles.map(t=>stockUnits(world,t.id,f))]));
  const transfers:TransferRequest[]=[];
- const changes=new Map<string,{tileId:number;fieldId:string;value:number;kind:'add'|'set'}>();
- for(const change of pluginChanges){const key=`${change.tileId}:${change.fieldId}`,prior=changes.get(key);changes.set(key,{...change,value:change.value+(prior?.value??0)});}
+ const changes=new Map<string,{tileId:number;entityTypeId?:string;fieldId:string;value:number;kind:'add'|'set'}>();
+ for(const change of pluginChanges){const key=`${change.tileId}:${change.entityTypeId??''}:${change.fieldId}`,prior=changes.get(key);changes.set(key,{...change,value:change.value+(prior?.value??0)});}
  for(const rule of [...world.definitions.rules].sort((a,b)=>a.id<b.id?-1:1)) {
   if(!rule.enabled||world.tick%rule.everyDays!==0)continue;
   for(const tileId of ruleTargets(world,rule)) {
@@ -169,17 +170,19 @@ export function advanceExtensions(world:World,pluginChanges:{tileId:number;field
      if(amountMilli)transfers.push({ruleId:rule.id,effectIndex,from:tileId,destinations,fieldId:field.id,amountMilli});
      continue;
     }
-    const key=`${tileId}:${effect.fieldId}`,prior=changes.get(key);
-    changes.set(key,{tileId,fieldId:effect.fieldId,value:value+(prior?.value??0),kind:effect.kind});
+    const key=`${tileId}:${effect.entityTypeId??''}:${effect.fieldId}`,prior=changes.get(key);
+    changes.set(key,{tileId,entityTypeId:effect.entityTypeId,fieldId:effect.fieldId,value:value+(prior?.value??0),kind:effect.kind});
    }
   }
  }
  for(const change of changes.values()) {
-  const field=world.definitions.fields.find(f=>f.id===change.fieldId)!;
+  const field=outputProperty(world,change.fieldId,change.entityTypeId)!;
   if(!Number.isFinite(change.value))throw Error('Non-finite combined custom output');
+  if(change.entityTypeId){for(const e of world.entities?.instances??[]){if(e.tileId!==change.tileId||e.typeId!==change.entityTypeId)continue;const value=change.kind==='add'?(e.properties[field.id]??field.defaultValue)+change.value:change.value;e.properties[field.id]=round(Math.max(field.min,Math.min(field.max,value)));}continue;}
   const value=change.kind==='add'?fieldValue(world,change.tileId,change.fieldId)+change.value:change.value;
   world.tiles[change.tileId].properties[change.fieldId]=round(Math.max(field.min,Math.min(field.max,value)));
  }
+ invalidateEntityReads(world);
  settleTransfers(world,transfers,before);
 }
 
@@ -190,15 +193,15 @@ export function validateConversions(world:World,operations:Operation[]):void {
   const id=op.definition.id;
   if(operations.filter(o=>o.kind==='field-define'&&o.definition.id===id).length!==1)throw Error('Convert a property at most once per proposal');
   for(const rule of world.definitions.rules) {
-   if(!rule.effects.some(e=>e.fieldId===id)&&!reads(rule).some(r=>r.fieldId===id))continue;
+   if(!rule.effects.some(e=>!e.entityTypeId&&e.fieldId===id)&&!reads(rule).some(r=>r.source==='custom'&&r.fieldId===id))continue;
    if(!operations.some(o=>o.kind==='rule-define'&&o.rule.id===rule.id||o.kind==='rule-remove'&&o.ruleId===rule.id))throw Error(`Conversion requires an explicit update or removal of rule ${rule.id}`);
   }
   for(const rule of world.definitions.appearance??[]) {
-   if(!rule.conditions.some(c=>c.read.fieldId===id))continue;
+   if(!rule.conditions.some(c=>c.read.source==='custom'&&c.read.fieldId===id))continue;
    if(!operations.some(o=>o.kind==='appearance-define'&&o.rule.id===rule.id||o.kind==='appearance-remove'&&o.ruleId===rule.id))throw Error(`Conversion requires an explicit update or removal of appearance rule ${rule.id}`);
   }
   for(const {definition:plugin} of world.plugins) {
-   if(!plugin.program.some(i=>i.op==='emit'&&i.fieldId===id||i.op==='read'&&i.read.fieldId===id))continue;
+   if(!plugin.program.some(i=>i.op==='emit'&&!i.entityTypeId&&i.fieldId===id||i.op==='read'&&i.read.source==='custom'&&i.read.fieldId===id))continue;
    if(!operations.some(o=>o.kind==='plugin-define'&&o.definition.id===plugin.id||o.kind==='plugin-remove'&&o.pluginId===plugin.id))throw Error(`Conversion requires an explicit update or removal of plugin ${plugin.id}`);
   }
  }

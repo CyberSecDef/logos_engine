@@ -37,7 +37,7 @@ re-export, source-history browsing, custom plugin memory, corruption handling an
 failed-publication cleanup are covered by 90 passing tests plus portable and
 checkpoint browser acceptance. See [limits and compatibility](portable-worlds.md).
 
-## 3. Minimal generic entities — pending
+## 3. Minimal generic entities — complete
 
 - Add world-defined entity types and stable instances within tiles, with bounded
   properties, creation/update/removal, migrations and generic inspection.
@@ -46,6 +46,13 @@ checkpoint browser acceptance. See [limits and compatibility](portable-worlds.md
 - Demonstrate a tangible building-like entity introduced through a prompt,
   participating in deterministic simulation without application edits during play.
 - Verify persistence, recovery and invalid/dependent migration rejection.
+
+Verified: bounded world-defined types/instances, lifecycle and movement, explicit
+property migrations, indexed count/sum reads and rule/plugin property outputs.
+97 engine/API tests pass, including persistence/replay/isolated import and invalid
+dependencies. Entity and portable browser acceptance pass. Native Claude Code
+generated a valid building-like type/instance/rule and its deterministic tick was
+verified in memory. See [entity interface and limits](world-entities.md).
 
 ## 4. Selective replay — pending
 

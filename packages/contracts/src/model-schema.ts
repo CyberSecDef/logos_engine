@@ -12,6 +12,7 @@ export function modelSchema(schema:z.ZodTypeAny):Record<string,unknown> {
   }
   return {type:'object',additionalProperties:false,properties,required};
  }
+ if(schema instanceof z.ZodRecord)return {type:'object',additionalProperties:modelSchema(schema.valueSchema)};
  if(schema instanceof z.ZodArray)return {type:'array',items:modelSchema(schema.element),...(schema._def.minLength?{minItems:schema._def.minLength.value}:{}),...(schema._def.maxLength?{maxItems:schema._def.maxLength.value}:{})};
  if(schema instanceof z.ZodEnum)return {type:'string',enum:schema.options};
  if(schema instanceof z.ZodLiteral)return {const:schema.value};

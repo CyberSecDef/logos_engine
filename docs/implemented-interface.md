@@ -201,3 +201,11 @@ World packs now accept eight slots, including optional settlement and condition.
 See [artwork interface](world-artwork-packs.md#layered-composition).
 
 Complete bundles and retained original source history: see [portable worlds](portable-worlds.md).
+
+## Generic entities
+
+World-local types and instances now support bounded numeric properties, stable
+IDs, create/update/move/remove operations and explicit type migrations. Rules,
+appearance and restricted plugins can read counts/sums; rule/plugin add/set outputs
+can write matching instances. See [world entities](world-entities.md) for the
+fixed contract, limits, model scopes, preview semantics and cistern example.

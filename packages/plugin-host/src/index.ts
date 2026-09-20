@@ -1,6 +1,6 @@
 import {PLUGIN_LIMITS,type PluginDefinition} from '../../contracts/src/plugins.js';
 import type {Read} from '../../contracts/src/extensions.js';
-export type PluginEffect={fieldId:string;kind:'add'|'set';value:number};
+export type PluginEffect={fieldId:string;entityTypeId?:string;kind:'add'|'set';value:number};
 // No eval, imports, callbacks from world data, clock, I/O or ambient randomness.
 // The only host read is a validated numeric read supplied by the engine.
 export function executePlugin(definition:PluginDefinition,input:{tick:number;state:number[];read:(read:Read)=>number},budget:{remaining:number}) {
@@ -22,7 +22,7 @@ export function executePlugin(definition:PluginDefinition,input:{tick:number;sta
    case 'dup':{const value=pop();push(value);push(value);break;}
    case 'drop':pop();break;
    case 'floor':push(Math.floor(pop()));break;
-   case 'emit':if(effects.length>=PLUGIN_LIMITS.emissions)throw Error('effect limit exceeded');effects.push({fieldId:ins.fieldId,kind:ins.mode,value:pop()});break;
+   case 'emit':if(effects.length>=PLUGIN_LIMITS.emissions)throw Error('effect limit exceeded');effects.push({fieldId:ins.fieldId,...(ins.entityTypeId?{entityTypeId:ins.entityTypeId}:{}),kind:ins.mode,value:pop()});break;
    default:{const b=pop(),a=pop();switch(ins.op){
     case 'add':push(a+b);break;case 'subtract':push(a-b);break;case 'multiply':push(a*b);break;
     case 'divide':if(b===0)throw Error('division by zero');push(a/b);break;
