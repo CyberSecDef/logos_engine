@@ -37,7 +37,8 @@
     "test:providers:live": "tsc && node tests/providers-live.mjs",
     "test:transport": "npm run build && node tests/transport-browser.mjs",
     "test:settlements": "npm run build && node tests/settlements-browser.mjs",
-    "test:ecology": "npm run build && node tests/ecology-browser.mjs"
+    "test:ecology": "npm run build && node tests/ecology-browser.mjs",
+    "test:food-trade": "npm run build && node tests/food-trade-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",

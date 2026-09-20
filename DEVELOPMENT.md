@@ -6,11 +6,12 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5a and 5b are complete. The soil ecology follow-up is implemented, verified
-and deployed: reviewed activation connects fertility to harvests, weather changes
-soil, farmer populations improve it and urban pressure reduces soil/vegetation.
-All 132 tests, four browser checks and a native Claude activation check pass.
-Published as `226584b`; next planned phase is 5c trade and movement.
+Phase 5c1 adjacent food sharing is complete and deployed; publishing this milestone.
+Confirmed automatic sharing on reviewed world activation conserves food, protects
+reserves, obeys daily limits and independent zone permissions, and explains routes.
+All 139 tests, four browser checks and native Claude acceptance pass. Settlement
+balance settings are confirmed adjustable per settlement through reviewed prompts.
+Next: 5c2 resource routes and travel permissions, then 5c3 timed journeys/migration.
 
 ## Completed
 
@@ -1302,3 +1303,56 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published `226584b` to public `CyberSecDef/logos_engine` on `main`.
 - Verified deployment and exact player save preservation. Soil activation remains
   an explicit reviewed world change; Phase 5c trade/movement remains next.
+
+### 2026-09-20 — Phase 5c started
+
+- Split 5c into 5c1 adjacent food sharing; 5c2 resource routes and travel permissions;
+  5c3 timed journeys and migration. Do not mark the whole milestone complete after 5c1.
+- Asked whether food should share automatically on activation or use creator routes.
+  Common implementation uses start-of-day food, protected current meal plus reserves,
+  bounded donor/recipient/edge capacity, stable priority and no same-day forwarding.
+- World activation is versioned and reviewed. Food trade permissions are independent
+  of communication and do not claim to restrict future people/travel channels.
+
+### 2026-09-20 — Phase 5c decisions confirmed
+
+- Player confirmed automatic neighboring-settlement food sharing after world activation.
+- Player also confirmed per-settlement balance settings adjustable through reviewed
+  prompts, resolving the earlier optional 5b preference question.
+- Engine, validated operations, provider schema/context, activation/permission controls,
+  route preview and per-zone transfer inspection are implemented. Acceptance ongoing.
+
+### 2026-09-20 — Phase 5c1 initial acceptance
+
+- All 139 tests pass after correcting a narrow literal type in a test helper.
+  Covers exact balances, limits, permission/communication independence, no forwarding,
+  same-day meals / next-day harvest exports, checkpoints, portable replay and scope.
+- Daily inspector shows actual routes; preview shows bounded next-day routes and
+  before/after sharing totals alongside the existing five-day settlement forecast.
+- Provider context advertises the model and limits route context to the selected
+  neighborhood. Final checks also cover competing donors and ledger capacity bounds.
+- Browser/native provider checks, final documentation and publication in progress.
+
+### 2026-09-20 — Phase 5c1 browser and final test acceptance
+
+- Final full check: 139 tests pass with zero failures/skips; TypeScript/build pass.
+- Food-sharing browser passed next-day route preview, activation/cancel/Apply,
+  same-day feeding, prompted closure, direct reopening, conserved ledgers,
+  reload/replay and desktop/mobile layout. Mobile screenshot inspected.
+- Settlement, ecology and prompt browser regressions all passed.
+- Documented exact timing, formulas, limits, fixed-priority fairness limitations,
+  scope, permission independence and recovery in docs/food-sharing.md.
+- Native Claude acceptance and save-preserving deployment/publication remain.
+
+### 2026-09-20 — Phase 5c1 deployment
+
+- Native Claude world-scope activation proposal passed schema, forecast and copy
+  Apply, with exactly 400 rations conserved between two fixture settlements.
+  Saved fixture unchanged; no testing interventions touched the player world.
+- Deployed to 0.0.0.0:5180 with Claude Code selected. Exact saved envelope and active
+  state survived restart: first-world day 1152/revision 1170,
+  `5ac18c31f7eb4d96d7a64f29a17b114b73b848de9384e6b5116b13c197d8a057`.
+- Existing food sharing remains inactive pending reviewed activation. Two existing
+  player settlements and all soil/world data are preserved.
+- Phase 5c1 is complete; later resource routing and population movement remain
+  open. Publishing code, tests, updated plan and docs/food-sharing.md.

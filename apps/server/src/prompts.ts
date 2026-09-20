@@ -82,6 +82,7 @@ export class PromptService {
      if(!packs.some(pack=>JSON.stringify(pack)===JSON.stringify(op.pack)))throw Error('Import and review artwork before selecting it through a prompt');
     }
    }
+   if(op.kind==='food-trade-configure'&&job.request.scope!=='world')throw Error('Food trade configuration requires Entire world scope');
    if(op.kind==='soil-ecology-configure'&&job.request.scope!=='world')throw Error('Soil ecology configuration requires Entire world scope');
    if((op.kind==='entity-type-define'||op.kind==='entity-type-remove')&&job.request.scope!=='world')throw Error('Entity type definitions require Entire world scope');
    if(op.kind==='entity-update'&&op.toTileId!==undefined&&!ids.includes(op.toTileId))throw Error('Entity destination is outside the selected scope');
@@ -138,8 +139,8 @@ export class PromptService {
 }
 export function forecast(world:World,proposal:Proposal) {
  let baseline=structuredClone(world),candidate=applyProposal(world,proposal),baselineError:string|null=null;
- const applied=candidate;
- for(let i=0;i<5;i++){if(!baselineError)try{baseline=advance(baseline);}catch(error){if(!(error instanceof PluginExecutionError))throw error;baselineError=error.message;}candidate=advance(candidate);}
+ const applied=candidate;let tradePreview:NonNullable<World['foodTrade']>['lastDay'];
+ for(let i=0;i<5;i++){if(!baselineError)try{baseline=advance(baseline);}catch(error){if(!(error instanceof PluginExecutionError))throw error;baselineError=error.message;}candidate=advance(candidate);if(i===0&&candidate.foodTrade?.enabled)tradePreview=candidate.foodTrade.lastDay;}
  const ids=new Set(proposal.operations.flatMap(o=>[o.tileId,...world.cells[o.tileId].neighbors]));
  for(const op of proposal.operations) {
   if(op.kind==='plugin-define')for(const id of pluginTargets(candidate,op.definition))ids.add(id);
@@ -147,7 +148,7 @@ export function forecast(world:World,proposal:Proposal) {
   if(op.kind==='artwork-activate'||op.kind==='artwork-reset')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='entity-update'&&op.toTileId!==undefined)ids.add(op.toTileId);
   if(op.kind==='entity-type-define'||op.kind==='entity-type-remove')for(const tile of world.tiles)ids.add(tile.id);
-  if(op.kind==='soil-ecology-configure'||op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
+  if(op.kind==='food-trade-permission'||op.kind==='food-trade-configure'||op.kind==='soil-ecology-configure'||op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='appearance-define')for(const id of ruleTargets(world,op.rule))ids.add(id);
   if(op.kind==='appearance-define'||op.kind==='appearance-remove'){const old=world.definitions.appearance?.find(r=>r.id===(op.kind==='appearance-define'?op.rule.id:op.ruleId));if(old)for(const id of ruleTargets(world,old))ids.add(id);}
   if(op.kind==='rule-define')for(const id of ruleAffectedTargets(world,op.rule))ids.add(id);
@@ -173,5 +174,5 @@ export function forecast(world:World,proposal:Proposal) {
  const describeEntity=(w:World,id:string)=>{const e=w.entities?.instances.find(e=>e.id===id);if(!e)return null;const type=w.entities!.types.find(t=>t.id===e.typeId)!;return {...e,summary:`${e.label} in zone ${e.tileId}: ${type.properties.map(f=>`${f.label} ${e.properties[f.id]??f.defaultValue} ${f.unit}`).join(', ')||'no numeric properties'}`,properties:Object.fromEntries(type.properties.map(f=>[f.id,e.properties[f.id]??f.defaultValue]))};};
  const entityRows=[...new Set([...(world.entities?.instances??[]),...(applied.entities?.instances??[])].map(e=>e.id))].sort().map(id=>({id,before:describeEntity(world,id),after:describeEntity(applied,id),forecast:describeEntity(candidate,id),baseline:describeEntity(baseline,id)})).filter(row=>JSON.stringify(row.before)!==JSON.stringify(row.after)||JSON.stringify(row.forecast)!==JSON.stringify(row.baseline));
  const settlementRows=[...ids].filter(id=>world.tiles[id].settlement||applied.tiles[id].settlement).map(tileId=>({tileId,before:settlementSummary(world,tileId),after:settlementSummary(applied,tileId),forecast:settlementSummary(candidate,tileId),baseline:settlementSummary(baseline,tileId)}));
- return {settlementChanges:{total:settlementRows.length,rows:settlementRows.slice(0,24)},entityChanges:{total:entityRows.length,rows:entityRows.slice(0,24)},appearanceChanges:{total:visualChanges.length,tiles:visualChanges.slice(0,24)},pluginMigrations,tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,baselineUnit:baseline.definitions.fields.find(b=>b.id===f.id)?.unit??null,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
+ return {foodTradePreview:tradePreview?{...tradePreview,routeCount:tradePreview.transfers.length,transfers:tradePreview.transfers.slice(0,24)}:null,settlementChanges:{total:settlementRows.length,rows:settlementRows.slice(0,24)},entityChanges:{total:entityRows.length,rows:entityRows.slice(0,24)},appearanceChanges:{total:visualChanges.length,tiles:visualChanges.slice(0,24)},pluginMigrations,tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,baselineUnit:baseline.definitions.fields.find(b=>b.id===f.id)?.unit??null,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
 }

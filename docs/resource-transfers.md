@@ -107,3 +107,10 @@ resource-ledger state starts empty. The first normal save preserves the previous
 format as `state.v1.backup.json` or `state.v2.backup.json` before atomically writing
 schema 3. Loading alone does not rewrite a save. Older engine versions cannot read
 the new format; run only one writer per world directory.
+
+## Food sharing is a separate channel
+
+[Phase 5c1 food sharing](food-sharing.md) now moves built-in settlement rations
+between eligible neighbors. Its open/closed permission and reserve/edge settings
+apply only to food. Existing custom-stock transfers keep their own validated rules;
+closing food sharing does not silently disable mana or other stock movement.

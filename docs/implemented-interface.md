@@ -240,3 +240,11 @@ for exact operation bodies, limits, tick ordering, defaults and compatibility.
 proposal flow. Optional `world.soilEcology`, `tile.soilDay` and the settlement daily
 `fertilityPermille` field preserve old states when inactive. See [soil ecology](soil-ecology.md)
 for exact settings, dependencies, writer conflicts, tick ordering and activation.
+
+## Adjacent food sharing (5c1)
+
+`food-trade-configure` requires world scope and version matching;
+`food-trade-permission` opens/closes the selected zone to incoming/outgoing food.
+Optional `world.foodTrade` stores settings and bounded exact route accounting.
+Preview returns a bounded first-day `foodTradePreview`; normal settlement comparison
+still shows day +5. See [food sharing](food-sharing.md) for bodies and semantics.

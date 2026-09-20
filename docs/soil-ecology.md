@@ -30,7 +30,7 @@ adds its weather effects on top of the old fertility weather rules.
 
 ## Daily calculation
 
-Order: temperature → hydrology/natural vegetation → soil ecology → settlement
+Order: temperature → hydrology/natural vegetation → soil ecology → optional neighbor food sharing → settlement
 harvest/food/population → custom rules/plugins. Soil uses the population at the
 start of that day; births/losses affect stewardship and urban pressure tomorrow.
 All land participates, including unpopulated land. Ocean soil values remain saved

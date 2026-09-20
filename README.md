@@ -90,8 +90,10 @@ Creator-placed [settlements](docs/settlements.md) now track food reserves, weath
 harvest, shortage losses and gradual growth, with reviewed prompts and overlays.
 [Soil ecology](docs/soil-ecology.md) connects fertility to harvest, weather, farmer
 stewardship and urban soil/vegetation loss through reviewed world activation.
+[Neighbor food sharing](docs/food-sharing.md) moves surplus between settlements
+with protected reserves, daily limits and independent local permissions.
 
-**Still planned:** richer erosion, trade,
+**Still planned:** richer erosion, broader trade and movement,
 conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 

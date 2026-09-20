@@ -12,7 +12,7 @@ inhabitants use the existing `tile.population` field; there is no second competi
 population count. Generic world entities remain independent: creating an entity
 called “town” does not silently activate this system.
 
-One inhabitant consumes one ration per day. Each day after weather/hydrology:
+One inhabitant consumes one ration per day. Each day after weather/hydrology and any activated neighbor food sharing:
 
 1. Compute potential production as the lesser of farm capacity and population
    times the per-worker production setting. Empty settlements produce nothing.
@@ -133,7 +133,8 @@ calculation. Settlement-free states remain byte-identical; saves with settlement
 require a build supporting this feature. New model versions must retain old model
 semantics for replay. There is no population ticking while the application is closed.
 
-No trade, migration, sanitation, pollution or disease is active yet. Food aid is
+[Adjacent food sharing](food-sharing.md) is available through separate reviewed world
+activation. Migration, sanitation, pollution and disease remain planned. Food aid is
 explicit creator intervention. Generic entities named farms/towns do not automatically participate. Custom soil
 fertility participates when explicitly bound through [soil ecology](soil-ecology.md).
 

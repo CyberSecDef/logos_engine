@@ -535,3 +535,11 @@ world model. Rain/temperature affect soil; farmer-sized populations improve it,
 while urban populations reduce soil and vegetation. All population thresholds and
 rates are bounded world settings. See [soil ecology](docs/soil-ecology.md) for defaults,
 activation, writer conflicts, ordering, compatibility and verification.
+
+### Phase 5c1 execution — adjacent food sharing
+
+Automatic sharing after world activation is confirmed. Implemented bounded reserves,
+import/export/edge limits, exact conserved routes, local permissions separate from
+communication, next-day route previews and inspection. See [food sharing](docs/food-sharing.md).
+Resource routes, general travel permissions, timed journeys and migration remain
+separate 5c substeps. DEVELOPMENT.md records verification and publication.
