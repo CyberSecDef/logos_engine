@@ -74,7 +74,7 @@ home network; this milestone has no user login.
 The agreed [Phase 4 finish line](docs/phase-4-completion.md) includes all five
 remaining areas; the artwork item is in progress.
 
-**Still planned:** automatic Cursor CLI launching, layered artwork and complete portable bundles, optional JavaScript/native plugins, richer erosion, trade,
+**Still planned:** automatic Cursor CLI launching, generic entities, selective replay, richer erosion, trade,
 population, conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 
@@ -119,3 +119,6 @@ imagery or live feeds are required. See [LICENSE](LICENSE).
 World artwork supports two ordered transparent layers above terrain, selected by
 reviewed appearance rules. For example, ask to keep forest terrain and overlay
 city artwork at 35% opacity. See [artwork packs and composition](docs/world-artwork-packs.md).
+
+Complete [portable bundles](docs/portable-worlds.md) preserve world artwork and
+original replay histories when importing into an independent world.

@@ -980,3 +980,44 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published `e170b8f` to public `CyberSecDef/logos_engine` on `main`.
 - Post-restart LAN verification preserved first-world at day 792/revision 804.
 - Item 1 complete; next milestone is complete portable world bundles (item 2).
+
+### 2026-09-19 — Portable bundles in progress
+
+- Implementing version-2 exports with all committed replay records/snapshots and
+  referenced artwork, including images used by historical states.
+- Imports retain source history under its original identity and begin an independent
+  active journal. Re-export carries retained source histories forward.
+- Adding bounded size/replay validation, explicit legacy-state-only handling,
+  source-history inspection and isolated-directory acceptance tests.
+
+### 2026-09-19 — Portable validation and UI acceptance
+
+- Version-2 bundle exporter gathers committed snapshots/records and current plus
+  historical artwork; importer validates hashes, schemas, compatibility and replay.
+- Source histories retain original identity in immutable files referenced by the
+  new world's state envelope. Re-export and ordinary branches preserve them.
+- Review displays verified image/record counts; Worlds can page through original
+  source histories. Legacy v1 imports are explicitly marked state-only.
+- Isolated import/re-export works after removing the original directory. Corrupt
+  and incomplete bundles reject; handled publication failures remove new artifacts.
+- Final tests now also cover custom properties/plugin memory and replay tampering.
+
+### 2026-09-19 — Complete portable bundle acceptance
+
+- All 90 engine/API tests and typecheck/build passed. Plugin fixture proposals
+  use the same canonical schema order as accepted API proposals for journal hashes.
+- Portable browser passed full download/review/cancel/import, GPU image equality,
+  reload, original source-history inspection, re-export, mobile and zero model calls.
+- Existing checkpoint/restore/branch/import browser regression passed.
+- Inspected the source-history UI; documented bundle limits, original identity,
+  legacy state-only imports, excluded checkpoint labels and crash recovery limits.
+- Completion item 2 is complete. Next: minimal generic entities (item 3), followed
+  by selective replay and final integration/compatibility acceptance.
+
+### 2026-09-19 — Portable bundle deployment
+
+- Deployed on 0.0.0.0:5180 after confirming no active model request.
+- Preserved the player's latest world at day 792/revision 805.
+- Read-only LAN export produced a valid v2 bundle; replay validation checked its
+  two recorded saves without modifying or importing the player's world.
+- Publishing the completed second item. Generic entities are next.

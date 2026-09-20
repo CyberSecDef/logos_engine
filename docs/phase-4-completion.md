@@ -19,9 +19,9 @@ settlement/condition image slots; bounded rendering; missing-image fallback;
 world switching, checkpoint/branch persistence, replay and unchanged physics.
 86 engine/API tests pass, with artwork, layer and appearance browser acceptance.
 Dedicated new production overlay paintings can be added through packs; existing
-images already work as layers. The other four agreed areas remain required.
+images already work as layers. The remaining agreed areas are tracked below.
 
-## 2. Complete portable world bundles — pending
+## 2. Complete portable world bundles — complete
 
 - Export/import required artwork and replay history alongside world state,
   definitions, plugins and accepted proposals.
@@ -29,6 +29,13 @@ images already work as layers. The other four agreed areas remain required.
 - Preserve source history clearly when importing into an independent world.
 - Prove an exported world can be opened from an isolated world directory with its
   artwork and required history intact; exclude credentials and conversations by default.
+
+Verified: version-2 bundles contain committed replay snapshots/records and all
+referenced world artwork. Imports validate and replay before publication, retain
+original source identities, and begin an independent active journal. Isolated
+re-export, source-history browsing, custom plugin memory, corruption handling and
+failed-publication cleanup are covered by 90 passing tests plus portable and
+checkpoint browser acceptance. See [limits and compatibility](portable-worlds.md).
 
 ## 3. Minimal generic entities — pending
 

@@ -107,7 +107,8 @@ all other API routes require `Authorization: Bearer <token>`.
 | POST `/api/checkpoints/preview` | `{id, expectedRevision}`; restore summary, no state change. |
 | POST `/api/checkpoints/restore` | `{id, expectedRevision}`; backup current state, restore, increment revision. |
 | POST `/api/worlds/branch` | `{id, name, expectedRevision, checkpointId?}`; independent copy, then open it. |
-| GET `/api/worlds/export` | Portable version-1 `logos-world` JSON archive. |
+| GET `/api/worlds/sources` | Retained original source identities; `?index=N&before=hash` pages their read-only records. |
+| GET `/api/worlds/export` | Complete version-2 `logos-world` bundle including artwork and replay history. |
 | POST `/api/worlds/import/preview` | `{archive, id, name}`; validate and summarize a new copy. |
 | POST `/api/worlds/import` | Same input; validate again, create and open a new world. |
 | POST `/api/step` | `{expectedRevision, days?}`; 1–10 days, default 1. |
@@ -122,7 +123,7 @@ all other API routes require `Authorization: Bearer <token>`.
 | POST `/api/prompts/import` | `{requestId, reply}`; validates an external response. |
 
 Most JSON requests are limited to 64,000 bytes; world import and import preview
-allow up to 32 MiB. World management is a player/server interface, not a model
+allow up to 128 MiB (artwork imports remain 32 MiB). World management is a player/server interface, not a model
 operation.
 
 The browser sends one step at a time while playing and visible. There is no
@@ -198,3 +199,5 @@ Layered artwork: optional appearance `style.layers` composes at most two image
 layers in array order with opacity 0–1; base `asset: "terrain"` retains the biome.
 World packs now accept eight slots, including optional settlement and condition.
 See [artwork interface](world-artwork-packs.md#layered-composition).
+
+Complete bundles and retained original source history: see [portable worlds](portable-worlds.md).

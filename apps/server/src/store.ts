@@ -1,3 +1,4 @@
+import {bundle,artworkHashes,SourcesSchema,MAX_BUNDLE_BYTES,validateSource,memoryJournal,type PortableSource} from './portable.js';
 import {pngInfo} from './artwork.js';
 import {ReplayJournal,type SaveAction} from './journal.js';
 import { mkdir, open, readFile, rename, realpath, lstat, readdir, unlink, link, rm } from 'node:fs/promises';
@@ -26,7 +27,7 @@ export class WorldStore {
     if((await lstat(path)).isSymbolicLink() || dirname(await realpath(path))!==root) throw Error('World path escapes storage');
     return path;
   }
-  async save(input:World,action?:SaveAction):Promise<void> {
+  async save(input:World,action?:SaveAction,originHash?:string):Promise<void> {
     const world=validateWorld(input), dir=await this.directory(world.id);
     let previous:World|undefined,journalHead:string|undefined;
     // Preserve the prior save format before the first schema-4 commit. Reads never rewrite it.
@@ -35,6 +36,7 @@ export class WorldStore {
       if((await lstat(current)).isSymbolicLink())throw Error('Save cannot be a symlink');
       const source=await readFile(current,'utf8'),old=JSON.parse(source);
       if(stateHash(old.world)!==old.hash)throw Error('Save integrity check failed');
+      if(old.originHash!==undefined)originHash=Digest.parse(old.originHash);
       previous=validateWorld(migrateWorld(old.world));if(previous.id!==world.id)throw Error('Save belongs to another world');
       if(old.journalHead!==undefined)journalHead=Digest.parse(old.journalHead);
       if(old.world?.schemaVersion===1||old.world?.schemaVersion===2||old.world?.schemaVersion===3) {
@@ -56,7 +58,7 @@ export class WorldStore {
     }catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
     await this.pluginArtifacts(world);
     const head=await (await this.journal(world.id)).append(world,previous,journalHead,action);
-    const serialized=JSON.stringify({hash:stateHash(world),world,journalHead:head});
+    const serialized=JSON.stringify({hash:stateHash(world),world,journalHead:head,...(originHash?{originHash}: {})});
     const tmp=join(dir,`.state-${randomUUID()}.tmp`);
     const file=await open(tmp,'wx',0o600);
     try {await file.writeFile(serialized); await file.sync();} finally {await file.close();}
@@ -78,14 +80,19 @@ export class WorldStore {
   async exists(id:string):Promise<boolean> {
     Id.parse(id);try{await lstat(join(this.root,id));return true;}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return false;throw error;}
   }
-  async createNew(input:World,artworkSource?:string):Promise<void> {
+  async createNew(input:World,artworkSource?:string,imported?:{origins:PortableSource[];images:Buffer[]}):Promise<void> {
     const world=validateWorld(input),dir=await this.directory(world.id,true);
     try{
+      const origins=imported?.origins??(artworkSource?await this.readOrigins(artworkSource):[]);
       if(artworkSource){
         const hashes=new Set([...(world.artwork?.images??[]),...world.history.flatMap(p=>p.operations.flatMap(o=>o.kind==='artwork-activate'?o.pack.images:[]))].map(i=>i.hash));
+        for(const hash of artworkHashes(origins))hashes.add(hash);
         for(const hash of hashes){try{await this.saveArtwork(world.id,[await this.readArtwork(artworkSource,hash)]);}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}}
       }
-      await this.save(world);
+      if(imported)await this.saveArtwork(world.id,imported.images);
+      let originHash:string|undefined;
+      if(origins.length){originHash=digest(origins);await this.immutable(dir,`origins-${originHash}.json`,{hash:originHash,origins});}
+      await this.save(world,undefined,originHash);
     }catch(error){await rm(dir,{recursive:true,force:true});throw error;}
   }
   private async artifactDirectory(worldId:string,name:'snapshots'|'definitions'|'checkpoints'|'plugins'|'journal'|'assets'):Promise<string> {
@@ -138,6 +145,34 @@ export class WorldStore {
     return journal.reconstruct(head,world,recordId,{checkpoint:async hash=>{const point=checkpoints.get(hash);return point?(await this.readCheckpoint(id,point)).world:undefined;}});
   }
   async verifyHistory(id:string,maxDays=10000){const {world,head,journal}=await this.journalContext(id);return journal.verify(head,world,maxDays);}
+  async readOrigins(id:string):Promise<PortableSource[]> {
+    const dir=await this.directory(id),envelope=JSON.parse(await readFile(join(dir,'state.json'),'utf8'));
+    if(envelope.originHash===undefined)return [];
+    const hash=Digest.parse(envelope.originHash),path=join(dir,`origins-${hash}.json`),stat=await lstat(path);
+    if(!stat.isFile()||stat.isSymbolicLink()||stat.size>MAX_BUNDLE_BYTES)throw Error('Invalid source history file');
+    const raw=JSON.parse(await readFile(path,'utf8'));
+    if(raw.hash!==hash||digest(raw.origins)!==hash)throw Error('Source history integrity check failed');
+    return SourcesSchema.parse(raw.origins);
+  }
+  async exportBundle(id:string){
+    const {world,head,journal}=await this.journalContext(id),source={world,history:await journal.portable(head,world)},origins=await this.readOrigins(id);
+    let days=0,records=0;
+    if(origins.length>=16)throw Error('Bundle exceeds 16 retained source histories');
+    for(const item of [...origins,source]){const result=await validateSource(item);days+=result.days;records+=result.records;}
+    if(days>10000||records>10000)throw Error('Bundle exceeds total verification budget (10000 replay days / 10000 records)');
+    const images:{hash:string;data:string}[]=[];let bytes=Buffer.byteLength(JSON.stringify({source,origins}));
+    for(const hash of artworkHashes([...origins,source])){
+      let data:Buffer;try{data=await this.readArtwork(id,hash);}catch(error){throw Error(`Cannot export required artwork ${hash}: ${(error as Error).message}`);}
+      const encoded=data.toString('base64');bytes+=encoded.length;if(bytes>MAX_BUNDLE_BYTES-4096)throw Error('Complete world bundle exceeds 128 MiB');images.push({hash,data:encoded});
+    }
+    return bundle(source,origins,images);
+  }
+  async sourceHistory(id:string,index?:number,before?:string){
+    const sources=await this.readOrigins(id);
+    if(index===undefined)return sources.map((source,index)=>{const world=validateWorld(source.world);return {index,id:world.id,name:world.name,tick:world.tick,revision:world.revision,records:source.history.records.length,hash:digest(world)};});
+    if(!Number.isInteger(index)||index<0||index>=sources.length)throw Error('Unknown source history');
+    const source=sources[index],world=validateWorld(source.world);return memoryJournal(source.history).recent(source.history.head??undefined,world,50,before);
+  }
   private async pluginArtifacts(world:World):Promise<void> {
     const definitions=[...world.plugins.map(p=>p.definition),...world.history.flatMap(h=>h.operations).flatMap(op=>op.kind==='plugin-define'?[op.definition]:[])];
     if(!definitions.length)return;

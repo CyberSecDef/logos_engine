@@ -42,7 +42,7 @@ IDs cannot be overwritten.
 
 This branches at recorded **save boundaries**. A multi-day step has one boundary
 at its end; choosing an intermediate day, skipping/editing past interventions,
-portable journal bundles and overwriting the source from a journal record remain
+overwriting the source from a journal record remains
 future work. The current UI searches/paginates within the newest 10,000 records.
 
 ## Verify a world
@@ -94,16 +94,16 @@ proof against someone who can rewrite the entire world directory.
 Restoring a checkpoint appends a snapshot boundary to the same chain, retaining
 the abandoned path. General store writes without step/proposal metadata use an
 explicit replacement snapshot. Branches and portable world imports start independent
-journals from their copied states. The current world export includes its normal
-proposal history but **does not bundle the replay journal**. Back up the whole
-world directory to retain it.
+journals from their copied states. Version-2 [portable bundles](portable-worlds.md)
+include the complete committed journal and artwork. Imported original histories
+remain separately inspectable under their original world identities.
 
 Journal records are retained indefinitely in this milestone. Ordinary days store
 small records rather than full world snapshots; initialization/adoption, restores
 and explicit replacements store snapshots. This retention is independent of the
 100-day automatic checkpoint policy, which still keeps ten automatic checkpoints.
 Automatic checkpoint pruning never deletes journal artifacts. Journal compaction,
-portable journal bundles, editing/skipping replay events and arbitrary historical restore
+editing/skipping replay events and arbitrary historical restore
 remain future work.
 
 Older engine builds do not maintain `journalHead`; avoid using them as writers on

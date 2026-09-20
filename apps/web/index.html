@@ -23,6 +23,7 @@
 <form id="save-checkpoint"><label>Checkpoint name<input id="checkpoint-label" required maxlength="80" placeholder="Before the next experiment"></label><button type="submit">Save checkpoint</button></form>
 <p class="muted">Automatic checkpoints: start of play and every 100 days; latest 10 retained. Named checkpoints and restore backups are kept.</p><div id="checkpoint-list"></div>
 <details id="world-history"><summary>Recent world history</summary><p id="history-status" class="muted"></p><div id="history-list"></div><button id="history-more" hidden>Load earlier history</button></details>
+<details id="source-history"><summary>Imported source histories</summary><p class="muted">Original recorded history stays read-only. This world records its own new history separately.</p><div id="source-list"></div></details>
 <label>Copy name<input id="copy-name" maxlength="80" value="A new branch"></label><button id="branch-world">Branch current world</button>
 <div class="section-title">WORLD ARTWORK</div><p id="world-artwork-status" class="muted"></p><label>Import artwork pack (.json)<input id="import-artwork" type="file" accept=".json,application/json"></label><button id="reset-artwork">Review built-in artwork</button>
 <button id="export-world">Export this world</button><label>Import a world (.json)<input id="import-world" type="file" accept=".json,application/json"></label>

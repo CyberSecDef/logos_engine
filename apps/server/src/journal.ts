@@ -37,6 +37,27 @@ export class ReplayJournal {
   if(world.tick!==old.tick||world.revision!==old.revision+1||world.history.length!==old.history.length+1||digest(world.history.slice(0,-1))!==digest(old.history)||digest(world.history.at(-1))!==digest(action.proposal))throw Error('Proposal journal metadata does not match save');
   return this.write({...common,kind:'proposal',proposal:action.proposal});
  }
+ async portable(head:string|undefined,world:World) {
+  if(!head)return {head:null,records:[],snapshots:[]};
+  await this.head(head,world);
+  const records:{id:string;record:Record}[]=[],snapshots:{hash:string;world:World}[]=[],seen=new Set<string>();
+  let cursor:string|null=head,expected:string|undefined=digest(world),bytes=0;
+  const count=(value:unknown)=>{bytes+=Buffer.byteLength(JSON.stringify(value));if(bytes>128*1024*1024)throw Error('Portable history exceeds 128 MiB');};
+  while(cursor){
+   if(seen.size>=10000)throw Error('Portable history exceeds 10000 records');
+   if(seen.has(cursor))throw Error('Cyclic journal');seen.add(cursor);
+   const record=await this.record(cursor);
+   if(record.worldId!==world.id||expected!==undefined&&record.hash!==expected)throw Error('Broken journal chain');
+   count(record);records.push({id:cursor,record});
+   if(record.kind==='snapshot'){
+    const snapshot=await this.replayRecord(record,undefined,world.id);
+    if(!snapshots.some(s=>s.hash===record.snapshot)){count(snapshot);snapshots.push({hash:record.snapshot,world:snapshot});}
+   }
+   expected=record.kind==='snapshot'?undefined:record.before;cursor=record.previous;
+  }
+  if(records.at(-1)?.record.kind!=='snapshot')throw Error('History has no starting snapshot');
+  return {head,records,snapshots};
+ }
  async recent(head:string|undefined,world:World,limit=50,before?:string):Promise<{entries:JournalEntry[];hasMore:boolean}>{
   if(before)Digest.parse(before);
   if(!head){if(before)throw Error('History cursor is not committed');return {entries:[],hasMore:false};}await this.head(head,world);

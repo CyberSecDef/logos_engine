@@ -122,6 +122,12 @@ async function refreshWorlds() {
  const worlds=await api<{id:string;name:string;tick:number}[]>('worlds');$('world-list').replaceChildren();
  for(const w of worlds){const b=document.createElement('button');b.textContent=`${w.name} · day ${w.tick}${w.id===world.id?' · current':''}`;b.onclick=()=>void action(async()=>{setWorld(await api<World>('worlds/open',{id:w.id}));$('worlds').hidden=true;});$('world-list').append(b);}
  await loadHistory();
+ const sources=await api<{index:number;id:string;name:string;tick:number;records:number}[]>('worlds/sources');$('source-history').hidden=!sources.length;$('source-list').replaceChildren();
+ for(const source of sources){
+  const section=document.createElement('details'),heading=document.createElement('summary'),rows=document.createElement('div'),more=document.createElement('button');heading.textContent=`${source.name} (${source.id}) · day ${source.tick} · ${source.records} records`;more.textContent='Load source records';section.append(heading,rows,more);$('source-list').append(section);
+  let cursor:string|undefined;
+  more.onclick=()=>void action(async()=>{const result=await api<{entries:{id:string;tick:number;revision:number;summary:string}[];hasMore:boolean}>(`worlds/sources?index=${source.index}${cursor?`&before=${cursor}`:''}`);for(const entry of result.entries){const row=document.createElement('p');row.textContent=`Day ${entry.tick} · revision ${entry.revision} · ${entry.summary}`;rows.append(row);}cursor=result.entries.at(-1)?.id;more.hidden=!result.hasMore;more.textContent='Load earlier source records';if(!rows.children.length)rows.textContent='No replay records existed at export.';});
+ }
  const checkpoints=await api<Checkpoint[]>('checkpoints');$('checkpoint-list').replaceChildren();
  for(const checkpoint of checkpoints) {
   const row=document.createElement('div');row.className='checkpoint-row';const label=document.createElement('p');label.textContent=`${checkpoint.label} · day ${checkpoint.tick} · ${checkpoint.kind==='manual'?'named':checkpoint.kind==='automatic'?'automatic':'restore backup'}`;
@@ -163,10 +169,10 @@ $('reset-artwork').onclick=()=>void action(async()=>{
 });
 $('import-world').onchange=()=>void action(async()=>{
  const input=$<HTMLInputElement>('import-world'),file=input.files?.[0];input.value='';if(!file)return;
- if(file.size>32*1024*1024)throw Error('World archives must be under 32 MiB');
+ if(file.size>128*1024*1024)throw Error('World bundles must be under 128 MiB');
  const archive=JSON.parse(await file.text()),body={archive,id:`world-${requestId()}`,name:$<HTMLInputElement>('copy-name').value};
- const summary=await api<WorldSummary>('worlds/import/preview',body);
- reviewWorld('Import an independent world?',summary,'This creates a separate world using the copy name above. It includes saved state, rules, and change history. Conversations and other checkpoints are not included.','Import world','worlds/import',body);
+ const summary=await api<WorldSummary&{bundle:{legacy:boolean;images:number;sources:number;records:number}}>('worlds/import/preview',body);
+ reviewWorld('Import an independent world?',summary,summary.bundle.legacy?'Legacy state-only archive: artwork files and replay records are absent. This creates a separate world with new history. Conversations and checkpoints are not included.':`Verified complete bundle: ${summary.bundle.images} images and ${summary.bundle.records} replay records across ${summary.bundle.sources} source histories. This creates an independent world; original history stays read-only. Conversations and named checkpoints are not included.`,'Import world','worlds/import',body);
 });
 $('new-world').onsubmit=e=>{e.preventDefault();void action(async()=>{setWorld(await api<World>('worlds/create',{id:`world-${requestId()}`,name:$<HTMLInputElement>('new-name').value,seed:$<HTMLInputElement>('new-seed').value,frequency:12}));$('worlds').hidden=true;});};
 function describeRead(read:Read):string {const labels={temperatureC:'temperature (°C)',rainMm:'rainfall (mm)',waterMm:'standing water (mm)',vegetation:'vegetation fraction',elevationM:'elevation (m)',population:'population'};return `${read.sample==='neighbors-average'?'neighbor average of ':read.sample==='neighbors-min'?'neighbor minimum of ':read.sample==='neighbors-max'?'neighbor maximum of ':''}${read.source==='custom'?(world.definitions.fields.find(f=>f.id===read.fieldId)?.label??read.fieldId):labels[read.source]}`;}

@@ -1,3 +1,4 @@
+import {unpackBundle,MAX_BUNDLE_BYTES} from './portable.js';
 import {parseArtwork,MAX_ARTWORK_BYTES} from './artwork.js';
 import type {SaveAction} from './journal.js';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
@@ -11,8 +12,8 @@ import { z } from 'zod';
 import { createWorld } from '../../../packages/worldgen/src/index.js';
 import { advance, applyProposal, validateWorld } from '../../../packages/engine/src/index.js';
 import { CreateWorldSchema, ProposalSchema, Id, type World } from '../../../packages/contracts/src/index.js';
-import { Digest, MAX_ARCHIVE_BYTES } from '../../../packages/contracts/src/checkpoints.js';
-import { archiveWorld, unpackWorld, copyWorld, worldSummary } from './world-management.js';
+import { Digest } from '../../../packages/contracts/src/checkpoints.js';
+import { copyWorld, worldSummary } from './world-management.js';
 import { WorldStore } from './store.js';
 import { PromptService, configuredProvider, forecast } from './prompts.js';
 import type { ModelProvider } from '../../../packages/agent-bridge/src/context.js';
@@ -80,13 +81,14 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(req.method==='GET' && pathname==='/api/world') return json(res,200,world);
       if(req.method==='GET' && pathname==='/api/history') return json(res,200,await store.history(world.id,new URL(req.url??'/',`http://${host}`).searchParams.get('before')??undefined));
       if(req.method==='GET' && pathname==='/api/checkpoints') return json(res,200,await store.checkpoints(world.id));
-      if(req.method==='GET' && pathname==='/api/worlds/export') return json(res,200,archiveWorld(world));
+      if(req.method==='GET' && pathname==='/api/worlds/export') return json(res,200,await store.exportBundle(world.id));
+      if(req.method==='GET' && pathname==='/api/worlds/sources'){const query=new URL(req.url??'/',`http://${host}`).searchParams;return json(res,200,await store.sourceHistory(world.id,query.has('index')?Number(query.get('index')):undefined,query.get('before')??undefined));}
       if(req.method==='GET' && pathname==='/api/worlds') return json(res,200,await store.list());
       if(req.method==='GET' && pathname==='/api/prompts/config')return json(res,200,prompts.configuration);
       if(req.method==='GET' && pathname==='/api/prompts/history')return json(res,200,await prompts.history(world));
       if(req.method==='GET' && pathname.startsWith('/api/prompts/jobs/'))return json(res,200,await prompts.get(world,pathname.slice('/api/prompts/jobs/'.length)));
       if(req.method!=='POST') return json(res,404,{error:'Unknown route'});
-      const input=await body(req,['/api/worlds/import','/api/worlds/import/preview','/api/artwork/preview','/api/artwork/apply'].includes(pathname)?Math.max(MAX_ARCHIVE_BYTES,MAX_ARTWORK_BYTES):64000);
+      const input=await body(req,['/api/worlds/import','/api/worlds/import/preview','/api/artwork/preview','/api/artwork/apply'].includes(pathname)?pathname.startsWith('/api/worlds/import')?MAX_BUNDLE_BYTES:MAX_ARTWORK_BYTES:64000);
       if(pathname==='/api/prompts')return json(res,202,await prompts.start(world,input));
       if(pathname==='/api/prompts/export')return json(res,200,await prompts.export(world,input));
       if(pathname==='/api/prompts/import')return json(res,200,await prompts.import(world,input));
@@ -139,9 +141,9 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(pathname==='/api/worlds/import/preview'||pathname==='/api/worlds/import') {
         const p=z.object({archive:z.unknown(),id:Id,name:z.string().min(1).max(80)}).strict().parse(input);
         if(await store.exists(p.id))throw Error('World already exists');
-        const next=copyWorld(unpackWorld(p.archive),p.id,p.name);
-        if(pathname.endsWith('/preview'))return json(res,200,worldSummary(next));
-        await store.createNew(next);await activate(next);return json(res,200,world);
+        const parsed=await unpackBundle(p.archive),next=copyWorld(parsed.world,p.id,p.name);
+        if(pathname.endsWith('/preview'))return json(res,200,{...worldSummary(next),bundle:{legacy:parsed.legacy,images:parsed.images.length,sources:parsed.origins.length,records:parsed.records}});
+        await store.createNew(next,undefined,parsed);await activate(next);return json(res,200,world);
       }
       if(pathname==='/api/worlds/create') {
         const next=createWorld(CreateWorldSchema.parse(input));await store.createNew(next);await activate(next);return json(res,200,world);

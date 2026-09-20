@@ -78,9 +78,8 @@ Both require Entire world scope. Image creation/upload is a separate user-review
 workflow, not a model filesystem capability. Model Apply also checks referenced
 images are available. Game ticks do not depend on decoding images.
 
-Current state-only world exports include manifest references but **do not yet
-bundle image bytes**. Back up the whole world directory to preserve its artwork.
-Complete portable bundles are the next agreed Phase 4 item. Older engine builds
+Version-2 [portable bundles](portable-worlds.md) include all referenced image bytes
+and replay history. Legacy version-1 archives contain only state and references. Older engine builds
 without the artwork contract cannot load worlds containing these manifests/operations.
 
 ## Layered composition
