@@ -974,3 +974,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Completion item 1 (world-local artwork and composition) is complete.
 - Next: item 2, complete portable bundles including image assets and replay journal.
   Entities, selective replay and final acceptance also remain required.
+
+### 2026-09-19 — Layered artwork publication
+
+- Published `e170b8f` to public `CyberSecDef/logos_engine` on `main`.
+- Post-restart LAN verification preserved first-world at day 792/revision 804.
+- Item 1 complete; next milestone is complete portable world bundles (item 2).
