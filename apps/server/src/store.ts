@@ -112,7 +112,12 @@ export class WorldStore {
     const world=await this.load(id),dir=await this.directory(id),envelope=JSON.parse(await readFile(join(dir,'state.json'),'utf8'));
     return {world,head:envelope.journalHead===undefined?undefined:Digest.parse(envelope.journalHead),journal:await this.journal(id)};
   }
-  async history(id:string){const {world,head,journal}=await this.journalContext(id);return journal.recent(head,world);}
+  async history(id:string,before?:string){const {world,head,journal}=await this.journalContext(id);return journal.recent(head,world,50,before);}
+  async historicalState(id:string,recordId:string) {
+    const {world,head,journal}=await this.journalContext(id);
+    const checkpoints=new Map((await this.checkpoints(id)).map(point=>[point.hash,point.id]));
+    return journal.reconstruct(head,world,recordId,{checkpoint:async hash=>{const point=checkpoints.get(hash);return point?(await this.readCheckpoint(id,point)).world:undefined;}});
+  }
   async verifyHistory(id:string,maxDays=10000){const {world,head,journal}=await this.journalContext(id);return journal.verify(head,world,maxDays);}
   private async pluginArtifacts(world:World):Promise<void> {
     const definitions=[...world.plugins.map(p=>p.definition),...world.history.flatMap(h=>h.operations).flatMap(op=>op.kind==='plugin-define'?[op.definition]:[])];

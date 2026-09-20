@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { createWorld } from '../../../packages/worldgen/src/index.js';
 import { advance, applyProposal, validateWorld } from '../../../packages/engine/src/index.js';
 import { CreateWorldSchema, ProposalSchema, Id, type World } from '../../../packages/contracts/src/index.js';
-import { MAX_ARCHIVE_BYTES } from '../../../packages/contracts/src/checkpoints.js';
+import { Digest, MAX_ARCHIVE_BYTES } from '../../../packages/contracts/src/checkpoints.js';
 import { archiveWorld, unpackWorld, copyWorld, worldSummary } from './world-management.js';
 import { WorldStore } from './store.js';
 import { PromptService, configuredProvider, forecast } from './prompts.js';
@@ -73,7 +73,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(req.method==='GET' && pathname==='/api/session') return json(res,200,{token});
       if(req.headers.authorization!==`Bearer ${token}`) return json(res,401,{error:'Session required'});
       if(req.method==='GET' && pathname==='/api/world') return json(res,200,world);
-      if(req.method==='GET' && pathname==='/api/history') return json(res,200,await store.history(world.id));
+      if(req.method==='GET' && pathname==='/api/history') return json(res,200,await store.history(world.id,new URL(req.url??'/',`http://${host}`).searchParams.get('before')??undefined));
       if(req.method==='GET' && pathname==='/api/checkpoints') return json(res,200,await store.checkpoints(world.id));
       if(req.method==='GET' && pathname==='/api/worlds/export') return json(res,200,archiveWorld(world));
       if(req.method==='GET' && pathname==='/api/worlds') return json(res,200,await store.list());
@@ -108,6 +108,16 @@ export async function startServer(options:{port?:number; host?:string; root?:str
         const next=validateWorld({...saved.world,revision:world.revision+1});
         await store.checkpoint(world,`Before restore · day ${world.tick}`,'before-restore');
         await commit(next,{kind:'snapshot',reason:'restore'});return json(res,200,world);
+      }
+      if(pathname==='/api/history/preview'||pathname==='/api/history/branch') {
+        const schema=z.object({worldId:Id,recordId:Digest,id:Id,name:z.string().trim().min(1).max(80),expectedRevision:z.number().int().nonnegative()}).strict();
+        const p=(pathname.endsWith('/branch')?schema.extend({reviewedHash:Digest}):schema).parse(input);
+        if(p.worldId!==world.id)throw Error('Historical branch belongs to another active world');revision(p.expectedRevision);
+        if(await store.exists(p.id))throw Error('World already exists');
+        const reconstructed=await store.historicalState(world.id,p.recordId),next=copyWorld(reconstructed.world,p.id,p.name);
+        if(pathname.endsWith('/preview'))return json(res,200,{summary:worldSummary(next),hash:reconstructed.hash,days:reconstructed.days,baseTick:reconstructed.baseTick,baseKind:reconstructed.baseKind});
+        if(!('reviewedHash' in p)||p.reviewedHash!==reconstructed.hash)throw Error('Historical state differs from reviewed state');
+        await store.createNew(next);await activate(next);return json(res,200,world);
       }
       if(pathname==='/api/worlds/branch') {
         const p=z.object({id:Id,name:z.string().min(1).max(80),expectedRevision:z.number().int(),checkpointId:Id.optional()}).strict().parse(input);revision(p.expectedRevision);

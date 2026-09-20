@@ -83,6 +83,8 @@ test('recent history is bounded and CLI verification operates on an isolated sav
   await store.save(world);
   for(let i=0;i<51;i++){world=advance(world);await store.save(world,{kind:'step',days:1});}
   const recent=await store.history(world.id);assert.equal(recent.entries.length,50);assert.equal(recent.hasMore,true);assert.equal(recent.entries[0].tick,51);
+  const older=await store.history(world.id,recent.entries.at(-1)!.id);assert.deepEqual(older.entries.map(e=>e.tick),[1,0]);assert.equal(older.hasMore,false);
+  await assert.rejects(()=>store.history(world.id,'0'.repeat(64)),/not committed/);
   const path=join(root,'worlds',world.id,'state.json'),before=await readFile(path,'utf8');
   const good=spawnSync(process.execPath,[resolve('dist/apps/server/src/cli.js'),'verify-history',world.id,'51'],{cwd:root,encoding:'utf8'});assert.equal(good.status,0,good.stderr);assert.match(good.stdout,/verified: true/);assert.match(good.stdout,/days: 51/);
   const limited=spawnSync(process.execPath,[resolve('dist/apps/server/src/cli.js'),'verify-history',world.id,'1'],{cwd:root,encoding:'utf8'});assert.notEqual(limited.status,0);assert.match(limited.stderr,/day limit/);assert.equal(await readFile(path,'utf8'),before);

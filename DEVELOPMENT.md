@@ -6,6 +6,11 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
+Implementing reviewed branches from recorded history: committed-record membership,
+verified reconstruction, checkpoint acceleration, stale-review protection and an
+independent copied world. All 77 tests and historical-branch browser acceptance
+pass; deployed on the LAN server. Publication is in progress.
+
 Implementing the Phase 4 replay journal: immutable linked records, atomic saved
 head, compact step/proposal entries, snapshot boundaries, read-only verification
 and recent-history inspection. All 73 tests and checkpoint/history browser
@@ -441,7 +446,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
   clamps and neighbor extrema — complete. Property scale/offset conversions are
   implemented; general entity migrations remain pending. Immutable checkpoint snapshots/definitions are implemented;
   immutable replay records now cover future saves from explicit snapshot boundaries;
-  selective replay and portable journal bundles remain pending.
+  reviewed historical branching is now implemented. Editing/skipping recorded
+  interventions and portable journal bundles remain pending.
 - 4c: restricted JSON plugin runtime, deterministic budgets, saved state, staged
   proposals, immutable artifacts, execution and failure recovery — implemented;
   complete, verified, live, and published. Explicit saved-state mappings are now
@@ -453,8 +459,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
   Layering and external world-local image packs remain future work.
 - 4e: world checkpoints, branches, restore, and portable state import/export —
   complete, live, and published. Restricted plugin definitions/state already travel
-  with world exports; external artwork bundles and selective event replay remain
-  future work.
+  with world exports; historical branching is implemented. External artwork bundles
+  and editing/skipping replay events remain future work.
 - Pollution/disease transport remains future broader-simulation work; custom
   numeric fields alone do not implement those physical/population systems.
 
@@ -845,3 +851,29 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - All 73 tests and browser recovery/history checks passed; user world preserved.
 - Selective replay, portable journal bundles, general entities and external/layered
   artwork remain future Phase 4 work.
+
+### 2026-09-19 — Historical branching started
+
+- Extending replay history with reviewed independent branches at recorded save
+  boundaries, including moments without named checkpoints.
+- Reconstruction will use matching verified checkpoints when available, preserve
+  the source world, and enforce replay/search limits before creating a branch.
+
+### 2026-09-19 — Historical branch acceptance
+
+- All 77 tests passed, including exact state/memory/appearance reconstruction,
+  checkpoint acceleration, abandoned pre-restore paths, orphan/budget rejection,
+  stale/mismatched reviews and independent branch creation.
+- Browser passed paging beyond 50 saves, review/cancel, day-one branch creation,
+  unchanged day-51 source, independent ticking, reload/mobile and zero model calls.
+- Inspected the review screenshot. Documentation states save-boundary selection,
+  1,000-day reconstruction and 10,000-record search limits.
+
+### 2026-09-19 — Historical branch deployment
+
+- Final typecheck/build, all 77 tests, historical-branch browser and checkpoint
+  browser regressions passed. No model calls were needed.
+- Restarted at `0.0.0.0:5180`; LAN checks preserved Aethra at day 792/revision 804.
+- History is still empty until this world’s next saved action/day; deployment did
+  not create a branch, apply a change or advance the user world.
+- Publishing paged history, verified reconstruction and reviewed independent branches.

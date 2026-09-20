@@ -2,14 +2,48 @@
 
 The engine now keeps an immutable replay journal for future saved steps and applied
 proposals. Open **Worlds → Recent world history** to see the latest 50 recorded
-saves, including steps, creator changes and snapshot boundaries. This is a read-only
-list; use checkpoints for restoration.
+saves, including steps, creator changes and snapshot boundaries. **Load earlier
+history** fetches the next 50. Use **Review branch** to explore a recorded moment
+in an independent world, or checkpoints to restore the current world.
 
 Existing worlds begin recording with an **adopted snapshot on their next save**.
 Their earlier proposal list is retained, but missing historical timing is not
 invented. New worlds start with an initial snapshot. Opening a world, previewing a
 proposal, discussing with the model or creating a checkpoint does not add a replay
 action. A saved multi-day advance is one record containing its day count.
+
+## Branch from a recorded moment
+
+1. Open **Worlds → Recent world history** and load earlier pages if needed.
+2. Set **Copy name**, then select **Review branch** on the desired recorded save.
+3. Review the reconstructed day, world summary, starting snapshot/checkpoint and
+   number of replayed days. Cancel leaves your current world untouched.
+4. Choose **Create branch** to open an independent world at that moment.
+
+The source world stays at its current day. The new world's state, definitions,
+plugin memory, appearance rules and accepted proposals come from the selected
+record. It gets its own ID, revision and initial journal snapshot. Advance or edit
+it independently. No model is called, and reconstruction never advances saved time.
+Records from a path abandoned by checkpoint restoration remain branchable.
+
+Only committed records in the selected world's chain can be used; orphan files
+are rejected. Reconstruction starts at the nearest preceding journal snapshot or
+available checkpoint whose exact world hash matches a record. It replays intervening
+steps/proposals and checks each resulting hash. A matching checkpoint verifies a
+starting state, not the earlier path leading to that checkpoint. Full-history
+verification remains a separate CLI operation.
+
+Browser reconstruction is capped at 1,000 replayed days and a search of 10,000
+records. Matching retained checkpoints often shorten replay. Missing, corrupt or
+incompatible inputs fail before creating a branch. Review binds the source world,
+current revision and reconstructed hash; a changed active world or stale revision
+requires reviewing again. Reconstruction runs again before creation. Existing world
+IDs cannot be overwritten.
+
+This branches at recorded **save boundaries**. A multi-day step has one boundary
+at its end; choosing an intermediate day, skipping/editing past interventions,
+portable journal bundles and overwriting the source from a journal record remain
+future work. The current UI searches/paginates within the newest 10,000 records.
 
 ## Verify a world
 
@@ -69,7 +103,7 @@ small records rather than full world snapshots; initialization/adoption, restore
 and explicit replacements store snapshots. This retention is independent of the
 100-day automatic checkpoint policy, which still keeps ten automatic checkpoints.
 Automatic checkpoint pruning never deletes journal artifacts. Journal compaction,
-portable journal bundles, selective replay/editing and arbitrary historical restore
+portable journal bundles, editing/skipping replay events and arbitrary historical restore
 remain future work.
 
 Older engine builds do not maintain `journalHead`; avoid using them as writers on

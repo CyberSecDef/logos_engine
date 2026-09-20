@@ -102,12 +102,25 @@ $('apply-world-review').onclick=()=>void action(async()=>{
  pending=null;$('proposal').hidden=true;setWorld(next);$('conversation').hidden=true;document.body.classList.remove('chat-open');promptState(null);
  finishWorldReview();$('worlds').hidden=true;
 });
+let historyCursor:string|null=null;
+async function loadHistory(before?:string) {
+ const history=await api<{entries:{id:string;kind:string;tick:number;revision:number;summary:string}[];hasMore:boolean}>(before?`history?before=${encodeURIComponent(before)}`:'history');if(!before)$('history-list').replaceChildren();
+ historyCursor=history.hasMore?history.entries.at(-1)?.id??null:null;$('history-more').hidden=!historyCursor;
+ for(const entry of history.entries){
+  const row=document.createElement('div'),label=document.createElement('p'),button=document.createElement('button');row.className='history-row checkpoint-row';label.className='muted';label.textContent=`Day ${entry.tick} · revision ${entry.revision} · ${entry.summary}`;
+  button.textContent='Review branch';button.onclick=()=>void action(async()=>{
+   const body={worldId:world.id,recordId:entry.id,id:`world-${requestId()}`,name:$<HTMLInputElement>('copy-name').value,expectedRevision:world.revision};
+   const result=await api<{summary:WorldSummary;hash:string;days:number;baseTick:number;baseKind:string}>('history/preview',body);
+   reviewWorld('Branch from recorded history?',result.summary,`Reconstructed from a verified ${result.baseKind==='checkpoint'?'checkpoint':'journal snapshot'} at day ${result.baseTick}, replaying ${result.days} day${result.days===1?'':'s'}. Creates an independent world using the copy name. Your source world stays at day ${world.tick}.`,'Create branch','history/branch',{...body,reviewedHash:result.hash});
+  });row.append(label,button);$('history-list').append(row);
+ }
+ text('history-status',$('history-list').children.length?`Showing ${$('history-list').children.length} recorded saves. Review a branch to explore a recorded moment in an independent world.`:'Replay recording begins on this world’s next save. Earlier day-by-day history is unavailable.');
+}
+$('history-more').onclick=()=>void action(async()=>{if(historyCursor)await loadHistory(historyCursor);});
 async function refreshWorlds() {
  const worlds=await api<{id:string;name:string;tick:number}[]>('worlds');$('world-list').replaceChildren();
  for(const w of worlds){const b=document.createElement('button');b.textContent=`${w.name} · day ${w.tick}${w.id===world.id?' · current':''}`;b.onclick=()=>void action(async()=>{setWorld(await api<World>('worlds/open',{id:w.id}));$('worlds').hidden=true;});$('world-list').append(b);}
- const history=await api<{entries:{id:string;kind:string;tick:number;revision:number;summary:string}[];hasMore:boolean}>('history');$('history-list').replaceChildren();
- text('history-status',history.entries.length?`${history.hasMore?'Latest 50 recorded saves.':'Recorded saves since history began.'} Checkpoints restore state; this list is read-only.`:'Replay recording begins on this world’s next save. Earlier day-by-day history is unavailable.');
- for(const entry of history.entries){const row=document.createElement('p');row.className='muted';row.textContent=`Day ${entry.tick} · revision ${entry.revision} · ${entry.summary}`;$('history-list').append(row);}
+ await loadHistory();
  const checkpoints=await api<Checkpoint[]>('checkpoints');$('checkpoint-list').replaceChildren();
  for(const checkpoint of checkpoints) {
   const row=document.createElement('div');row.className='checkpoint-row';const label=document.createElement('p');label.textContent=`${checkpoint.label} · day ${checkpoint.tick} · ${checkpoint.kind==='manual'?'named':checkpoint.kind==='automatic'?'automatic':'restore backup'}`;

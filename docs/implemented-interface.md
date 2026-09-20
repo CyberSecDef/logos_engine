@@ -179,6 +179,12 @@ Restricted plugin upgrades support [explicit saved-state mappings](world-plugins
 colors and installed artwork from bounded conditions, with versioned proposals,
 scope validation and unchanged physics/texture reveal.
 
-Read-only `GET /api/history` returns the latest 50 committed replay records; the
+Read-only `GET /api/history` returns 50 committed replay records; optional `before`
+is a validated committed-record cursor for earlier pages; the
 `verify-history` CLI re-executes recorded transitions within explicit budgets.
 Journal heads live in the save envelope, outside LLM-controlled world data.
+
+`POST /api/history/preview` reconstructs a committed record for an independent
+branch. `POST /api/history/branch` requires the reviewed hash, source identity and
+current revision before reconstruction and creation. Both enforce replay/search
+budgets; matching checkpoints can accelerate reconstruction.
