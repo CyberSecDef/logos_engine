@@ -1190,3 +1190,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   first-world remains day 826/revision 840. Preview did not mutate the world.
 - Publishing Phase 5a and the complete milestone plan. Phase 5b food/population
   is next, using the player's confirmed placement and demographic decisions.
+
+### 2026-09-20 — Phase 5a publication
+
+- Published `71464e9` to public `CyberSecDef/logos_engine` on `main`.
+- 118 tests and water/prompt/selective browser acceptance passed; exact live-world
+  state preserved. Phase 5a is complete, and Phase 5b food/population is next.
