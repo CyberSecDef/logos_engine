@@ -1,3 +1,4 @@
+import {pngInfo} from './artwork.js';
 import {ReplayJournal,type SaveAction} from './journal.js';
 import { mkdir, open, readFile, rename, realpath, lstat, readdir, unlink, link, rm } from 'node:fs/promises';
 import { resolve, join, dirname } from 'node:path';
@@ -77,25 +78,43 @@ export class WorldStore {
   async exists(id:string):Promise<boolean> {
     Id.parse(id);try{await lstat(join(this.root,id));return true;}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return false;throw error;}
   }
-  async createNew(input:World):Promise<void> {
+  async createNew(input:World,artworkSource?:string):Promise<void> {
     const world=validateWorld(input),dir=await this.directory(world.id,true);
-    try{await this.save(world);}catch(error){await rm(dir,{recursive:true,force:true});throw error;}
+    try{
+      if(artworkSource){
+        const hashes=new Set([...(world.artwork?.images??[]),...world.history.flatMap(p=>p.operations.flatMap(o=>o.kind==='artwork-activate'?o.pack.images:[]))].map(i=>i.hash));
+        for(const hash of hashes){try{await this.saveArtwork(world.id,[await this.readArtwork(artworkSource,hash)]);}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}}
+      }
+      await this.save(world);
+    }catch(error){await rm(dir,{recursive:true,force:true});throw error;}
   }
-  private async artifactDirectory(worldId:string,name:'snapshots'|'definitions'|'checkpoints'|'plugins'|'journal'):Promise<string> {
+  private async artifactDirectory(worldId:string,name:'snapshots'|'definitions'|'checkpoints'|'plugins'|'journal'|'assets'):Promise<string> {
     const dir=join(await this.directory(worldId),name);await mkdir(dir,{recursive:true});
     if((await lstat(dir)).isSymbolicLink())throw Error('Artifact directory cannot be a symlink');return dir;
   }
   private async immutable(dir:string,name:string,value:unknown):Promise<void> {
-    const target=join(dir,name),tmp=join(dir,`.${randomUUID()}.tmp`),serialized=JSON.stringify(value);
+    return this.immutableBytes(dir,name,Buffer.from(JSON.stringify(value)));
+  }
+  private async immutableBytes(dir:string,name:string,serialized:Buffer):Promise<void> {
+    const target=join(dir,name),tmp=join(dir,`.${randomUUID()}.tmp`);
     const handle=await open(tmp,'wx',0o600);
     try{await handle.writeFile(serialized);await handle.sync();}finally{await handle.close();}
     try {
       try{await link(tmp,target);}catch(error){
         if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;
-        if((await lstat(target)).isSymbolicLink()||await readFile(target,'utf8')!==serialized)throw Error('Immutable artifact differs from existing content');
+        if((await lstat(target)).isSymbolicLink()||!(await readFile(target)).equals(serialized))throw Error('Immutable artifact differs from existing content');
       }
       const directory=await open(dir,'r');try{await directory.sync();}finally{await directory.close();}
     }finally{await unlink(tmp).catch(()=>{});}
+  }
+  async saveArtwork(id:string,images:Buffer[]):Promise<void> {
+    const dir=await this.artifactDirectory(id,'assets');
+    for(const image of images){const info=pngInfo(image);await this.immutableBytes(dir,`${info.hash}.png`,image);}
+  }
+  async readArtwork(id:string,hash:string):Promise<Buffer> {
+    Digest.parse(hash);const path=join(await this.artifactDirectory(id,'assets'),`${hash}.png`),stat=await lstat(path);
+    if(!stat.isFile()||stat.isSymbolicLink()||stat.size>8*1024*1024)throw Error('Invalid artwork file');
+    const data=await readFile(path);if(pngInfo(data).hash!==hash)throw Error('Artwork image integrity check failed');return data;
   }
   private async journal(id:string):Promise<ReplayJournal> {
     const dir=await this.artifactDirectory(id,'journal');

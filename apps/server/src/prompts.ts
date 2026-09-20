@@ -70,6 +70,13 @@ export class PromptService {
   const ids=job.request.scope==='world'?world.tiles.map(t=>t.id):job.request.scope==='neighbors'?[job.request.tileId,...world.cells[job.request.tileId].neighbors]:[job.request.tileId];
   if(reply.operations.some(op=>!ids.includes(op.tileId)))throw Error('Model attempted to edit outside the selected scope');
   for(const op of reply.operations) {
+   if(op.kind==='artwork-activate'||op.kind==='artwork-reset'){
+    if(job.request.scope!=='world')throw Error('Artwork changes require Entire world scope');
+    if(op.kind==='artwork-activate'){
+     const packs=[...(world.artwork?[world.artwork]:[]),...world.history.flatMap(p=>p.operations.flatMap(o=>o.kind==='artwork-activate'?[o.pack]:[]))];
+     if(!packs.some(pack=>JSON.stringify(pack)===JSON.stringify(op.pack)))throw Error('Import and review artwork before selecting it through a prompt');
+    }
+   }
    if((op.kind==='plugin-define'||op.kind==='plugin-toggle'||op.kind==='plugin-remove')&&job.request.scope!=='world')throw Error('Plugin changes require Entire world scope');
    if(op.kind==='field-transfer'&&!ids.includes(op.toTileId))throw Error('Transfer destination is outside the selected scope');
    if((op.kind==='field-define'||op.kind==='field-remove')&&job.request.scope!=='world')throw Error('Property definitions require Entire world scope');
@@ -129,6 +136,7 @@ export function forecast(world:World,proposal:Proposal) {
  for(const op of proposal.operations) {
   if(op.kind==='plugin-define')for(const id of pluginTargets(candidate,op.definition))ids.add(id);
   if(op.kind==='plugin-define'||op.kind==='plugin-toggle'||op.kind==='plugin-remove'){const old=world.plugins.find(p=>p.definition.id===(op.kind==='plugin-define'?op.definition.id:op.pluginId));if(old)for(const id of pluginTargets(world,old.definition))ids.add(id);}
+  if(op.kind==='artwork-activate'||op.kind==='artwork-reset')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='field-define'||op.kind==='field-remove')for(const tile of world.tiles)ids.add(tile.id);
   if(op.kind==='appearance-define')for(const id of ruleTargets(world,op.rule))ids.add(id);
   if(op.kind==='appearance-define'||op.kind==='appearance-remove'){const old=world.definitions.appearance?.find(r=>r.id===(op.kind==='appearance-define'?op.rule.id:op.ruleId));if(old)for(const id of ruleTargets(world,old))ids.add(id);}

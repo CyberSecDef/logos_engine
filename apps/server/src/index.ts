@@ -1,3 +1,4 @@
+import {parseArtwork,MAX_ARTWORK_BYTES} from './artwork.js';
 import type {SaveAction} from './journal.js';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFile, mkdtemp, rm } from 'node:fs/promises';
@@ -72,6 +73,10 @@ export async function startServer(options:{port?:number; host?:string; root?:str
     if(pathname.startsWith('/api/')) {
       if(req.method==='GET' && pathname==='/api/session') return json(res,200,{token});
       if(req.headers.authorization!==`Bearer ${token}`) return json(res,401,{error:'Session required'});
+      if(req.method==='GET'&&pathname.startsWith('/api/artwork/image/')){
+        const parts=pathname.slice('/api/artwork/image/'.length).split('/');if(parts.length!==2||parts[0]!==world.id||!world.artwork?.images.some(i=>i.hash===parts[1]))throw Error('Artwork is not active in this world');
+        const data=await store.readArtwork(world.id,parts[1]);res.writeHead(200,{'Content-Type':'image/png','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(data);return;
+      }
       if(req.method==='GET' && pathname==='/api/world') return json(res,200,world);
       if(req.method==='GET' && pathname==='/api/history') return json(res,200,await store.history(world.id,new URL(req.url??'/',`http://${host}`).searchParams.get('before')??undefined));
       if(req.method==='GET' && pathname==='/api/checkpoints') return json(res,200,await store.checkpoints(world.id));
@@ -81,12 +86,19 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(req.method==='GET' && pathname==='/api/prompts/history')return json(res,200,await prompts.history(world));
       if(req.method==='GET' && pathname.startsWith('/api/prompts/jobs/'))return json(res,200,await prompts.get(world,pathname.slice('/api/prompts/jobs/'.length)));
       if(req.method!=='POST') return json(res,404,{error:'Unknown route'});
-      const input=await body(req,['/api/worlds/import','/api/worlds/import/preview'].includes(pathname)?MAX_ARCHIVE_BYTES:64000);
+      const input=await body(req,['/api/worlds/import','/api/worlds/import/preview','/api/artwork/preview','/api/artwork/apply'].includes(pathname)?Math.max(MAX_ARCHIVE_BYTES,MAX_ARTWORK_BYTES):64000);
       if(pathname==='/api/prompts')return json(res,202,await prompts.start(world,input));
       if(pathname==='/api/prompts/export')return json(res,200,await prompts.export(world,input));
       if(pathname==='/api/prompts/import')return json(res,200,await prompts.import(world,input));
       if(pathname==='/api/prompts/cancel'){const p=z.object({id:z.string()}).strict().parse(input);prompts.cancel(world,p.id);return json(res,200,{cancelled:true});}
       if(prompts.busy)throw Error('World is paused while the model responds; wait or cancel the request');
+      if(pathname==='/api/artwork/preview'||pathname==='/api/artwork/apply'){
+        const p=z.object({worldId:Id,expectedRevision:z.number().int(),bundle:z.unknown()}).strict().parse(input);if(p.worldId!==world.id)throw Error('Artwork belongs to another world');revision(p.expectedRevision);
+        const parsed=parseArtwork(p.bundle),proposal:ReturnType<typeof ProposalSchema.parse>={id:`artwork-${randomUUID()}`,worldId:world.id,expectedRevision:world.revision,summary:`Activate artwork: ${parsed.pack.label} v${parsed.pack.version}`,operations:[{kind:'artwork-activate',tileId:0,pack:parsed.pack}]};
+        const next=applyProposal(world,proposal);
+        if(pathname.endsWith('/preview'))return json(res,200,{summary:worldSummary(next),pack:parsed.pack,images:parsed.images.map(({data,...info})=>info)});
+        await store.saveArtwork(world.id,parsed.images.map(i=>i.data));await commit(next,{kind:'proposal',proposal});return json(res,200,world);
+      }
       if(pathname==='/api/step') {
         const p=z.object({expectedRevision:z.number().int(),days:z.number().int().min(1).max(10).default(1)}).strict().parse(input);
         if(p.expectedRevision!==world.revision) throw Error('Stale revision; refresh first');
@@ -96,7 +108,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
         const p=ProposalSchema.parse(input);
         return json(res,200,forecast(world,p));
       }
-      if(pathname==='/api/proposals/apply') {const proposal=ProposalSchema.parse(input);await commit(applyProposal(world,proposal),{kind:'proposal',proposal});return json(res,200,world);}
+      if(pathname==='/api/proposals/apply') {const proposal=ProposalSchema.parse(input);for(const op of proposal.operations)if(op.kind==='artwork-activate')for(const image of op.pack.images)await store.readArtwork(world.id,image.hash);await commit(applyProposal(world,proposal),{kind:'proposal',proposal});return json(res,200,world);}
       if(pathname==='/api/checkpoints') {
         const p=z.object({label:z.string().min(1).max(80),expectedRevision:z.number().int()}).strict().parse(input);revision(p.expectedRevision);
         return json(res,200,await store.checkpoint(world,p.label));
@@ -117,12 +129,12 @@ export async function startServer(options:{port?:number; host?:string; root?:str
         const reconstructed=await store.historicalState(world.id,p.recordId),next=copyWorld(reconstructed.world,p.id,p.name);
         if(pathname.endsWith('/preview'))return json(res,200,{summary:worldSummary(next),hash:reconstructed.hash,days:reconstructed.days,baseTick:reconstructed.baseTick,baseKind:reconstructed.baseKind});
         if(!('reviewedHash' in p)||p.reviewedHash!==reconstructed.hash)throw Error('Historical state differs from reviewed state');
-        await store.createNew(next);await activate(next);return json(res,200,world);
+        await store.createNew(next,world.id);await activate(next);return json(res,200,world);
       }
       if(pathname==='/api/worlds/branch') {
         const p=z.object({id:Id,name:z.string().min(1).max(80),expectedRevision:z.number().int(),checkpointId:Id.optional()}).strict().parse(input);revision(p.expectedRevision);
         const source=p.checkpointId?(await store.readCheckpoint(world.id,p.checkpointId)).world:world;
-        const next=copyWorld(source,p.id,p.name);await store.createNew(next);await activate(next);return json(res,200,world);
+        const next=copyWorld(source,p.id,p.name);await store.createNew(next,world.id);await activate(next);return json(res,200,world);
       }
       if(pathname==='/api/worlds/import/preview'||pathname==='/api/worlds/import') {
         const p=z.object({archive:z.unknown(),id:Id,name:z.string().min(1).max(80)}).strict().parse(input);

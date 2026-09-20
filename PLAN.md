@@ -488,3 +488,11 @@ or unrestricted new mechanics are already finished.
 
 No implementation or runtime verification has been performed yet. The reference
 findings above are based on source inspection, not a rendered visual comparison.
+
+## Agreed Phase 4 completion scope — 2026-09-19
+
+The player confirmed all five remaining areas: world-local/layered artwork,
+complete portable bundles, minimal generic entities, selective replay, and a final
+integration/compatibility acceptance pass. Complete them all before closing Phase 4.
+The concrete checklist and sequence are in [Phase 4 completion](docs/phase-4-completion.md).
+Earlier suggestions to defer layering or selective replay no longer apply.

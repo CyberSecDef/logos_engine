@@ -71,5 +71,6 @@ retain their data colors. Rendering never consumes simulation randomness or call
 an LLM. Definitions and accepted changes travel in checkpoints, branches and exports.
 Older builds without the appearance contract cannot load saves containing these rules.
 
-World-local external image bundles, layered artwork and richer terrain transitions
-remain future work.
+World-local [PNG replacement packs](world-artwork-packs.md) now customize the
+installed slot images. Portable asset bundles, layered artwork and richer terrain
+transitions remain in the agreed Phase 4 completion work.

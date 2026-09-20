@@ -15,13 +15,14 @@ export class WorldGlobe {
   texturesEnabled=true;
   textures:TerrainTextures;
   reveal:number[]=[];
+  private artworkKey='';
   private detail={value:1};
   spinning=!matchMedia('(prefers-reduced-motion: reduce)').matches;
   selected=-1;
   private marker=new THREE.LineLoop(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:'#d3f3d4',transparent:true,opacity:0.95,depthTest:false}));
   private pointer=new THREE.Vector2();
   private ray=new THREE.Raycaster();
-  constructor(canvas:HTMLCanvasElement,onSelect:(id:number)=>void,private onArtwork:(status:string)=>void=()=>{}) {
+  constructor(canvas:HTMLCanvasElement,onSelect:(id:number)=>void,private onArtwork:(status:string)=>void=()=>{},private assetHeaders:()=>HeadersInit=()=>({})) {
     this.scene=new GlobeScene(canvas);
     this.textures=new TerrainTextures(()=>{this.update();if(!this.world)this.onArtwork(this.textures.status);});
     this.scene.material.map=this.textures.texture;
@@ -29,11 +30,11 @@ export class WorldGlobe {
     this.scene.material.onBeforeCompile=(shader,renderer)=>{
       lighting(shader,renderer);shader.uniforms.uTextureDetail=this.detail;
       shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute float aTexture;\nvarying float vTexture;').replace('#include <begin_vertex>','#include <begin_vertex>\nvTexture=aTexture;');
-      shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying float vTexture;\nuniform float uTextureDetail;').replace('#include <map_fragment>','').replace('#include <color_fragment>','#include <color_fragment>\n#ifdef USE_MAP\ndiffuseColor.rgb=mix(diffuseColor.rgb,texture2D(map,vMapUv).rgb,vTexture*uTextureDetail);\n#endif');
+      shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying float vTexture;\nuniform float uTextureDetail;').replace('#include <map_fragment>','').replace('#include <color_fragment>','#include <color_fragment>\n#ifdef USE_MAP\nvec4 artwork=texture2D(map,vMapUv);diffuseColor.rgb=mix(diffuseColor.rgb,artwork.rgb,vTexture*uTextureDetail*artwork.a);\n#endif');
     };
-    this.scene.material.customProgramCacheKey=()=> 'logos-terrain-atlas-v1';
+    this.scene.material.customProgramCacheKey=()=> 'logos-terrain-atlas-v2';
     this.textures.texture.anisotropy=Math.min(4,this.scene.renderer.capabilities.getMaxAnisotropy());
-    void this.textures.load(terrainPack.entries);
+
 
     this.scene.setAxialTilt(15);this.scene.setSun({azimuth:30,elevation:35});
     this.scene.camera.position.set(2.6,1.2,2.8);
@@ -64,6 +65,8 @@ export class WorldGlobe {
   setWorld(world:World) {
     const rebuild=this.world?.id!==world.id || this.world.cells.length!==world.cells.length;
     this.world=world;this.reveal=textureReveals(world);
+    const artworkKey=JSON.stringify([world.id,world.artwork]);
+    if(artworkKey!==this.artworkKey){this.artworkKey=artworkKey;void this.textures.load(terrainPack.entries.map(entry=>{const local=world.artwork?.images.find(i=>i.slot===entry.id);return {...entry,image:local?`/api/artwork/image/${world.id}/${local.hash}`:entry.image};}),this.assetHeaders());}
     if(rebuild) {
       const triangles=world.cells.reduce((n,c)=>n+c.corners.length*3,0);
       this.geometry=new THREE.BufferGeometry();

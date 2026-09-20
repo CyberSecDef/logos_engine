@@ -68,7 +68,13 @@ home network; this milestone has no user login.
   immediate reveal on applied tile actions and a Colors only option. See
   [terrain artwork](docs/terrain-artwork.md).
 
-**Still planned:** automatic Cursor CLI launching, world-local/layered artwork packs, JavaScript/native plugins, richer erosion, trade,
+- Reviewed [world-local PNG artwork packs](docs/world-artwork-packs.md), with pinned
+  versions, local image storage and checkpoint/branch preservation.
+
+The agreed [Phase 4 finish line](docs/phase-4-completion.md) includes all five
+remaining areas; the artwork item is in progress.
+
+**Still planned:** automatic Cursor CLI launching, layered artwork and complete portable bundles, optional JavaScript/native plugins, richer erosion, trade,
 population, conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 

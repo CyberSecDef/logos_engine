@@ -1,3 +1,4 @@
+import {artworkOperations} from './artwork.js';
 import { z } from 'zod';
 import { pluginOperations } from './plugins.js';
 import { extensionOperations } from './extensions.js';
@@ -30,6 +31,7 @@ export const modelReplyJsonSchema={
   assumptions:{type:'array',items:{type:'string'}},
   operations:{type:'array',items:{anyOf:[
    ...extensionOperations.map(modelSchema),
+   ...artworkOperations.map(modelSchema),
    ...pluginOperations.map(modelSchema),
    {type:'object',additionalProperties:false,required:['kind','tileId','deltaM'],properties:{kind:{const:'elevation'},tileId:{type:'integer'},deltaM:{type:'integer',minimum:-2000,maximum:2000}}},
    {type:'object',additionalProperties:false,required:['kind','tileId','mmPerDay'],properties:{kind:{const:'rainfall'},tileId:{type:'integer'},mmPerDay:{type:'integer',minimum:0,maximum:500}}},

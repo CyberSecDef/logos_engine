@@ -12,7 +12,7 @@ function requestId():string {
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 let token='',world:World,selected=-1,busy=false,playing=false,pending:Proposal|null=null,timer:ReturnType<typeof setTimeout>|undefined;
 let promptJobId:string|null=null,chatPoll:ReturnType<typeof setTimeout>|undefined;
-const globe=new WorldGlobe($<HTMLCanvasElement>('globe'),selectTile,status=>text('art-status',status));
+const globe=new WorldGlobe($<HTMLCanvasElement>('globe'),selectTile,status=>text('art-status',status),()=>({Authorization:`Bearer ${token}`}));
 try{globe.texturesEnabled=localStorage.getItem('logos-terrain-style')!=='colors';}catch{}
 $<HTMLSelectElement>('texture-mode').value=globe.texturesEnabled?'artwork':'colors';
 $('texture-mode').onchange=()=>{globe.texturesEnabled=$<HTMLSelectElement>('texture-mode').value==='artwork';try{localStorage.setItem('logos-terrain-style',globe.texturesEnabled?'artwork':'colors');}catch{}globe.update();};
@@ -29,9 +29,9 @@ function setPlaying(value:boolean) {
  if(value)timer=setTimeout(tick,Number($<HTMLSelectElement>('speed').value));
 }
 async function action(fn:()=>Promise<void>) {
- if(busy)return;busy=true;document.body.classList.add('busy');$<HTMLInputElement>('chat-import').disabled=true;$<HTMLInputElement>('import-world').disabled=true;
+ if(busy)return;busy=true;document.body.classList.add('busy');$<HTMLInputElement>('chat-import').disabled=true;$<HTMLInputElement>('import-world').disabled=true;$<HTMLInputElement>('import-artwork').disabled=true;
  try {await fn();}catch(e){setPlaying(false);error(e);try{setWorld(await api<World>('world'));}catch{}}
- finally{busy=false;document.body.classList.remove('busy');$<HTMLInputElement>('chat-import').disabled=!!promptJobId;$<HTMLInputElement>('import-world').disabled=!!promptJobId;}
+ finally{busy=false;document.body.classList.remove('busy');$<HTMLInputElement>('chat-import').disabled=!!promptJobId;$<HTMLInputElement>('import-world').disabled=!!promptJobId;$<HTMLInputElement>('import-artwork').disabled=!!promptJobId;}
 }
 function setWorld(value:World) {const changed=world?.id!==value.id;world=value;if(changed){pending=null;$('proposal').hidden=true;selected=-1;$('conversation').hidden=true;document.body.classList.remove('chat-open');$('chat-history').replaceChildren();promptState(promptJobId);}updateCustomLayers();globe.setWorld(world);selectTile(selected);text('world-name',world.name);text('day',`DAY ${world.tick}`);text('save-status',`Saved locally · ${fmt(world.tiles.length)} places`);}
 function selectTile(id:number) {
@@ -84,12 +84,12 @@ for(const l of layers){const b=document.createElement('button');b.textContent=l.
 type WorldSummary={name:string;tick:number;tiles:number;fields:number;plugins:number;rules:number;interventions:number};
 let worldReview:{path:string;body:unknown}|null=null;
 function finishWorldReview() {
- worldReview=null;$('world-review').hidden=true;
+ worldReview=null;$('world-review').hidden=true;$('world-review-artwork').replaceChildren();
  for(const child of Array.from(document.body.children))if(child instanceof HTMLElement)child.inert=false;
  document.body.classList.remove('world-review-open');$('worlds-toggle').focus();
 }
 function reviewWorld(title:string,summary:WorldSummary,note:string,label:string,path:string,body:unknown) {
- setPlaying(false);worldReview={path,body};text('world-review-title',title);
+ $('world-review-artwork').replaceChildren();setPlaying(false);worldReview={path,body};text('world-review-title',title);
  text('world-review-summary',`${summary.name} · day ${summary.tick} · ${summary.tiles} zones · ${summary.fields} custom properties · ${summary.rules} custom rules · ${summary.plugins} plugins · ${summary.interventions} recorded changes.`);
  text('world-review-note',note);text('apply-world-review',label);$('world-review').hidden=false;
  for(const child of Array.from(document.body.children))if(child instanceof HTMLElement&&child.id!=='world-review'&&child.id!=='toast')child.inert=true;
@@ -118,6 +118,7 @@ async function loadHistory(before?:string) {
 }
 $('history-more').onclick=()=>void action(async()=>{if(historyCursor)await loadHistory(historyCursor);});
 async function refreshWorlds() {
+ text('world-artwork-status',world.artwork?`${world.artwork.label} · v${world.artwork.version} · ${world.artwork.images.length} replacements`:'Built-in painterly artwork');$<HTMLButtonElement>('reset-artwork').disabled=!world.artwork;
  const worlds=await api<{id:string;name:string;tick:number}[]>('worlds');$('world-list').replaceChildren();
  for(const w of worlds){const b=document.createElement('button');b.textContent=`${w.name} · day ${w.tick}${w.id===world.id?' · current':''}`;b.onclick=()=>void action(async()=>{setWorld(await api<World>('worlds/open',{id:w.id}));$('worlds').hidden=true;});$('world-list').append(b);}
  await loadHistory();
@@ -147,6 +148,19 @@ $('export-world').onclick=()=>void action(async()=>{
  const archive=await api('worlds/export'),href=URL.createObjectURL(new Blob([JSON.stringify(archive)],{type:'application/json'})),link=document.createElement('a');
  link.href=href;link.download=`logos-${world.id}-day-${world.tick}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(href),1000);
 });
+$('import-artwork').onchange=()=>void action(async()=>{
+ const input=$<HTMLInputElement>('import-artwork'),file=input.files?.[0];input.value='';if(!file)return;
+ if(file.size>32*1024*1024)throw Error('Artwork packs must be under 32 MiB');
+ const bundle=JSON.parse(await file.text()),body={worldId:world.id,expectedRevision:world.revision,bundle};
+ const result=await api<{summary:WorldSummary;pack:{label:string;version:number;credit:string;images:{slot:string;hash:string}[]};images:{hash:string;width:number;height:number}[]}>('artwork/preview',body);
+ reviewWorld('Activate world artwork?',result.summary,`${result.pack.label} v${result.pack.version}. ${result.pack.credit} Replaces ${result.pack.images.map(i=>i.slot).join(', ')}. Other slots retain built-in artwork. Reveal timing and simulation stay unchanged.`,'Activate artwork','artwork/apply',body);
+ for(const item of result.pack.images){const figure=document.createElement('figure'),image=document.createElement('img'),caption=document.createElement('figcaption');image.src=`data:image/png;base64,${bundle.images.find((i:{hash:string})=>i.hash===item.hash).data}`;image.alt=item.slot;caption.textContent=item.slot;figure.append(image,caption);$('world-review-artwork').append(figure);}
+});
+$('reset-artwork').onclick=()=>void action(async()=>{
+ const proposal:Proposal={id:`artwork-${requestId()}`,worldId:world.id,expectedRevision:world.revision,summary:'Return to built-in painterly artwork',operations:[{kind:'artwork-reset',tileId:0}]};
+ await api('proposals/preview',proposal);
+ reviewWorld('Return to built-in artwork?',{name:world.name,tick:world.tick,tiles:world.tiles.length,fields:world.definitions.fields.length,plugins:world.plugins.length,rules:world.definitions.rules.length,interventions:world.history.length+1},'Imported images remain stored for checkpoints and history. Reveal timing is unchanged.','Use built-in artwork','proposals/apply',proposal);
+});
 $('import-world').onchange=()=>void action(async()=>{
  const input=$<HTMLInputElement>('import-world'),file=input.files?.[0];input.value='';if(!file)return;
  if(file.size>32*1024*1024)throw Error('World archives must be under 32 MiB');
@@ -163,6 +177,8 @@ function describeRule(rule:CustomRule):string {
 }
 function describeOperation(o:Operation):string {
  switch(o.kind){
+  case 'artwork-activate':return `Activate artwork pack ${o.pack.label} v${o.pack.version}: ${o.pack.images.map(i=>i.slot).join(', ')}. ${o.pack.credit} Reveal timing is unchanged.`;
+  case 'artwork-reset':return 'Return this world to the built-in painterly artwork; imported images remain available in its history.';
   case 'appearance-define':return `Appearance rule: ${o.rule.label} v${o.rule.version} · ${o.rule.scope} · priority ${o.rule.priority}${o.rule.enabled?'':' · paused'}. When ${o.rule.conditions.map(c=>`${describeRead(c.read)} ${c.comparison} ${c.value}`).join(' AND ')||'always'}: ${o.rule.style.label}, color ${o.rule.style.color}, artwork ${o.rule.style.asset}. Cosmetic only; existing reveal timing applies.`;
   case 'appearance-remove':return `Remove appearance rule ${o.ruleId}; remaining appearance rules or base terrain determine its look.`;
   case 'plugin-define':return `World plugin: ${o.definition.label} v${o.definition.version} · ${o.definition.scope} · ${o.definition.program.length} instructions · ${o.definition.stateFields.length} saved state values per tile. ${o.definition.description} State migration: ${o.migration}.${o.migration==='map'?` ${(o.stateMap??[]).map(m=>'initial' in m?`${m.key}: new initial value`:`${m.key}: old ${m.from} × ${m.scale} + ${m.offset} (${m.precision==='exact'?'reject precision loss':'round to 0.001'})`).join('; ')}. Discard old keys: ${(o.discardStateKeys??[]).join(', ')||'none'}.`:''}`;

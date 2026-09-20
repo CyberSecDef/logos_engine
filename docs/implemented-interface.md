@@ -188,3 +188,8 @@ Journal heads live in the save envelope, outside LLM-controlled world data.
 branch. `POST /api/history/branch` requires the reviewed hash, source identity and
 current revision before reconstruction and creation. Both enforce replay/search
 budgets; matching checkpoints can accelerate reconstruction.
+
+[World-local artwork packs](world-artwork-packs.md) use reviewed PNG import, pinned
+`world.artwork` manifests and immutable world assets. `artwork-activate/reset`
+require global model authority; model activation selects a previously imported
+manifest. PNG bytes remain outside model context and deterministic simulation.

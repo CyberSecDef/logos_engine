@@ -16,6 +16,7 @@
     "test": "tsc && node --test dist/tests/*.test.js",
     "dev": "tsc && node dist/apps/server/src/index.js --dev",
     "start": "node dist/apps/server/src/index.js",
+    "artwork:pack": "tsc && node dist/apps/server/src/artwork-cli.js",
     "world": "tsc && node dist/apps/server/src/cli.js",
     "check": "npm run typecheck && npm test && npm run build",
     "test:browser": "npm run build && node tests/browser.mjs",
@@ -26,6 +27,7 @@
     "test:checkpoints": "npm run build && node tests/checkpoints-browser.mjs",
     "test:plugins": "npm run build && node tests/plugins-browser.mjs",
     "test:textures": "npm run build && node tests/textures-browser.mjs",
+    "test:artwork": "npm run build && node tests/artwork-browser.mjs",
     "test:history": "npm run build && node tests/history-branch-browser.mjs",
     "test:appearance": "npm run build && node tests/appearance-rules-browser.mjs"
   },

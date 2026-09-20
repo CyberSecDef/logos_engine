@@ -1,0 +1,62 @@
+# Agreed Phase 4 finish line
+
+Confirmed by the player on 2026-09-19: complete all five areas below, then close
+Phase 4 and move to broader simulation. This checklist supersedes suggestions to
+defer selective replay or layered artwork. No additional feature categories are
+required to finish this phase without a new agreement.
+
+## 1. World-local artwork and composition — in progress
+
+- Import validated world-specific artwork, store it under the world's assets,
+  and pin image content/version references in world data.
+- Review activation before Apply; retain color fallback and birth/reveal rules.
+- Combine base terrain with settlement/condition layers using bounded rendering.
+- Verify missing assets, world switching, save/reload, checkpoint/branch behavior,
+  overlays, deterministic appearance and unchanged simulation outcomes.
+
+First milestone implemented and verified: reviewed, versioned PNG replacement packs for the six installed
+terrain slots. Layered composition follows within this same agreed item.
+
+## 2. Complete portable world bundles — pending
+
+- Export/import required artwork and replay history alongside world state,
+  definitions, plugins and accepted proposals.
+- Validate sizes, references, hashes, compatibility and incomplete/corrupt bundles.
+- Preserve source history clearly when importing into an independent world.
+- Prove an exported world can be opened from an isolated world directory with its
+  artwork and required history intact; exclude credentials and conversations by default.
+
+## 3. Minimal generic entities — pending
+
+- Add world-defined entity types and stable instances within tiles, with bounded
+  properties, creation/update/removal, migrations and generic inspection.
+- Let existing rules/plugins address supported entity state through a documented
+  fixed interface. Keep counts, queries and execution bounded.
+- Demonstrate a tangible building-like entity introduced through a prompt,
+  participating in deterministic simulation without application edits during play.
+- Verify persistence, recovery and invalid/dependent migration rejection.
+
+## 4. Selective replay — pending
+
+- Start from recorded history, omit or replace a selected intervention, then replay
+  subsequent inputs into an independent candidate world.
+- Detect and explain later inputs whose revisions, definitions or dependencies no
+  longer fit. Do not silently skip failures or overwrite the source.
+- Review the resulting state before creating a branch; enforce explicit work limits.
+- Verify reproducibility, source preservation, failure handling and branch recovery.
+
+## 5. Integration, compatibility and final acceptance — pending
+
+- Run the shared change-contract acceptance cases across native Claude Code,
+  Cursor workflows and the configured direct API adapter.
+- Complete automatic local Cursor CLI integration, checking the installed CLI and
+  its supported interfaces first; request missing installation/login details as needed.
+- Review save/engine compatibility, interruption recovery, import/export, world
+  isolation and no-autonomous-model/no-offline-time behavior.
+- Reconcile PLAN, README, implemented-interface documentation and DEVELOPMENT;
+  publish a final acceptance matrix with evidence and any explicitly agreed limits.
+
+JavaScript/native plugin execution is not required: the restricted runtime remains
+the selected approach. Trade/population/warfare/technology, wind-driven pollution,
+water contamination and disease transport belong to Phase 5. Art alone does not
+create those mechanics.

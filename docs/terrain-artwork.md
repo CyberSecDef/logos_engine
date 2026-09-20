@@ -100,3 +100,7 @@ hashes. Unit tests cover the reveal schedule, copies, assets and padded UVs.
 World-specific [conditional appearance rules](world-appearance.md) can now select
 existing artwork, labels and colors from physical or custom values. External
 artwork bundles and layered composition remain future work.
+
+[World-local PNG replacement packs](world-artwork-packs.md) can now be imported,
+reviewed and pinned per world. Layered composition remains in the agreed Phase 4
+completion scope.

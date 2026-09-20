@@ -22,6 +22,7 @@ export function validateWorld(input:unknown):World {
     if(p.worldId!==w.id || commands.has(p.id) || p.operations.some(o=>!w.tiles[o.tileId]||(o.kind==='field-transfer'&&!w.tiles[o.toTileId]))) throw Error('Invalid command history');
     commands.add(p.id);
   }
+  if(w.artwork&&new Set(w.artwork.images.map(i=>i.slot)).size!==w.artwork.images.length)throw Error('Duplicate artwork slot');
   validateExtensions(w);validatePlugins(w);
   return w;
 }
@@ -36,6 +37,12 @@ export function applyProposal(world:World,input:unknown):World {
   for(const op of p.operations) {
     const tile=next.tiles[op.tileId];
     if(!tile) throw Error('Unknown tile');
+    if(op.kind==='artwork-activate'){
+      const packs=[...(next.artwork?[next.artwork]:[]),...next.history.flatMap(p=>p.operations.flatMap(o=>o.kind==='artwork-activate'?[o.pack]:[]))];
+      if(packs.some(pack=>pack.id===op.pack.id&&pack.version===op.pack.version&&JSON.stringify(pack)!==JSON.stringify(op.pack)))throw Error('Artwork pack version is immutable; use a new version');
+      next.artwork=op.pack;
+    }
+    if(op.kind==='artwork-reset')delete next.artwork;
     applyExtension(next,op);applyPlugin(next,op);
     if(op.kind==='elevation') tile.elevationM+=op.deltaM;
     if(op.kind==='communication') tile.communication=op.enabled;

@@ -6,6 +6,12 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
+The player approved all five remaining areas as the Phase 4 finish line. Track
+acceptance in [phase-4-completion.md](docs/phase-4-completion.md): world-local/layered
+artwork, complete portable bundles, minimal entities, selective replay, and final
+integration/compatibility acceptance. Reviewed world-local PNG packs are implemented and live; layered composition
+will follow before this item is marked complete.
+
 Implementing reviewed branches from recorded history: committed-record membership,
 verified reconstruction, checkpoint acceleration, stale-review protection and an
 independent copied world. All 77 tests and historical-branch browser acceptance
@@ -456,7 +462,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - 4d: shared painterly terrain pack, actual atlas rendering, 1,000-day staggered
   reveal and applied-action reveal — complete, verified, live, and published.
   World-specific conditional appearance rules are now implemented and verified.
-  Layering and external world-local image packs remain future work.
+  World-local replacement packs are now implemented. Layered composition and
+  complete portable artwork bundles remain required to finish the agreed scope.
 - 4e: world checkpoints, branches, restore, and portable state import/export —
   complete, live, and published. Restricted plugin definitions/state already travel
   with world exports; historical branching is implemented. External artwork bundles
@@ -886,3 +893,43 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - All 77 tests and both browser recovery/branching suites passed.
 - Portable journal bundles, editing/skipping recorded interventions, general
   entities and external/layered artwork remain future Phase 4 work.
+
+### 2026-09-19 — Phase 4 completion scope agreed
+
+- Documented all five remaining areas with concrete acceptance criteria and order.
+- All five are required; prior suggestions to defer layering/selective replay are
+  superseded. Restricted plugins remain the selected runtime.
+- Beginning validated world-local artwork import, pinned references and reviewed
+  activation. No new requirements are needed from the player for this foundation.
+
+### 2026-09-19 — World-local pack implementation checks
+
+- All 83 tests pass with typecheck/build: PNG validation and bounds, pinned versions,
+  no reveal/time/physics changes, preview isolation, authenticated image serving,
+  checkpoint/branch copies, journal replay, model scope and pack-generation CLI.
+- Renderer now reloads a bounded atlas per world/manifest and ignores stale async
+  image results; transparent pixels retain the tile color.
+- Browser acceptance checks image review, GPU replacement, reload, switching and
+  reset. Comparing globe pixels avoids randomized background stars.
+- Layered composition and the other four agreed areas remain outstanding.
+
+### 2026-09-19 — World-local pack browser acceptance
+
+- Artwork browser passed thumbnail review/cancel, unchanged preview state,
+  authenticated activation, GPU pixel change, reload, delayed old-world image
+  isolation, built-in reset and mobile review.
+- Existing texture/reveal and historical-branch browser regressions passed.
+- Inspected the image review. Final checks also release preview image memory on
+  close and verify selecting a previously imported manifest through the model contract.
+- Documentation includes a source manifest and `artwork:pack` helper. No user
+  worlds have received artwork changes during development.
+
+### 2026-09-19 — World-local pack deployment
+
+- Final 83-test suite, typecheck/build and artwork browser acceptance passed.
+  Texture and historical-branch browser regressions also passed.
+- Deployed at `0.0.0.0:5180`; LAN checks preserved Aethra at day 792/revision 804
+  with its existing built-in artwork. No user-world changes were applied.
+- Publishing the agreed five-item checklist and first artwork milestone. Layering,
+  portable bundles, entities, selective replay and final integration acceptance
+  remain required; Phase 4 is not marked complete.
