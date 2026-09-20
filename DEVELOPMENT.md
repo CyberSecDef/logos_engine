@@ -16,8 +16,8 @@ passed and published (`120f23a`). 5h2b resident garrisons are implemented; 242
 tests/typecheck/build, browser and native Claude acceptance passed. Deployment
 verified with exact saved-world preservation; published milestone `cc7b237`.
 5h3a supplied troop movements are implemented; 251 tests/typecheck/build passed.
-Browser/native acceptance and unchanged-world LAN deployment passed; publication
-is in progress. Automatic battles and
+Browser/native acceptance and unchanged-world LAN deployment passed; milestone
+`eb0dda6` is published. Automatic battles and
 capture (5h3b), integration (5h4) and tuning (5i) remain.
 
 ## Completed
@@ -2072,3 +2072,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - 5h3a supplied friendly troop movement complete. Next:5h3b automatic battles and
   capture with bounded combatant losses and civilian/building preservation, then
   5h4 integration and5i tuning. Existing ~741 kB bundle warning remains Phase6.
+
+
+### 2026-09-20 — Phase 5h3a publication
+
+- Published milestone `eb0dda6` to public `CyberSecDef/logos_engine` main.
+- Next:5h3b automatic battles/capture. Supplied friendly movements do not fight yet.
