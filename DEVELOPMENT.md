@@ -10,7 +10,7 @@ Phase 5h factions and conflict is underway. [The plan](docs/factions.md) separat
 identities/territory (5h1), borders/mobilization (5h2), conflict (5h3) and integrated
 acceptance (5h4). Confirmed creator-established factions/territory and automatic
 conflict under explicit rules. 5h1 registry, territory/relationships and review UI
-are implemented and deployed; publication is underway. Next: border policy and
+are implemented, deployed and published. Next: border policy and
 mobilization. Relationship records do not yet affect borders or initiate combat.
 
 ## Completed
@@ -1894,3 +1894,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Documented implementation/limits and four substeps in [factions](docs/factions.md).
   Phase 5h remains open: borders/mobilization, automatic conflict and integrated
   acceptance follow. Existing ~734 kB bundle warning remains Phase6 performance.
+
+### 2026-09-20 — Phase 5h1 publication
+
+- Published milestone `2005452` to public `CyberSecDef/logos_engine` main.
+- Next: Phase 5h2 borders/mobilization, then automatic conflict under explicit rules.
