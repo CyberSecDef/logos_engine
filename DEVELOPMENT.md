@@ -13,7 +13,7 @@ water contamination/sanitation, disease, technology, conflict and final tuning.
 **5a is complete and deployed:** actual water transport and next-day explanations.
 It preserves existing physics and save hashes while exposing reusable edge flows
 and per-zone budgets. All 118 tests and water/prompt/selective browser checks pass.
-**5b is complete and deployed; publishing this milestone.**
+**5b is complete, deployed and published.**
 Creator-placed settlements now track inhabitants, food, weather-limited harvest,
 shortage losses and sustained-surplus growth. Reviewed prompts and direct controls,
 inspection, overlays and recovery are integrated. All 125 tests and the settlement
@@ -1253,3 +1253,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   No settlement was placed in the player's world during testing or deployment.
 - Phase 5b is complete. Phase 5c trade/movement remains next; pollution, disease,
   technology and conflict remain planned in their documented later milestones.
+
+### 2026-09-20 — Phase 5b publication
+
+- Published `1ae5d36` to public `CyberSecDef/logos_engine` on `main`.
+- Settlement/food/population milestone complete, with documented defaults, reviewed
+  creator operations and exact live-state preservation. Next milestone: 5c.
