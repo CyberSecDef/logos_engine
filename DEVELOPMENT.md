@@ -12,7 +12,7 @@ acceptance (5h4). Confirmed creator-established factions/territory and automatic
 conflict under explicit rules. 5h1 registry, territory/relationships and review UI
 are deployed and published. 5h2a independent hostile border rules are implemented
 and deployed; 233 tests, typecheck/build, browser and native Claude acceptance
-passed. Publishing the milestone. Next: 5h2b mobilization with real inhabitants
+passed. Published milestone `120f23a`. Next: 5h2b mobilization with real inhabitants
 and provisions; automatic conflict (5h3), integration (5h4) and tuning (5i) remain.
 
 ## Completed
@@ -1954,3 +1954,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   `/tmp/logos-borders-deploy.json`.
 - Updated README, PLAN, Phase5 plan, world interface and detailed faction/channel
   documentation. Phase5h2a complete; mobilization (5h2b) is the next development task.
+
+
+### 2026-09-20 — Phase 5h2a publication
+
+- Published milestone `120f23a` to public `CyberSecDef/logos_engine` main.
+- Next: 5h2b mobilization, then 5h3 automatic conflict under explicit rules.
