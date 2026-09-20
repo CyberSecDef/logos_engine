@@ -2176,3 +2176,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Phase 5h4 is complete; Phase 5i whole-world balance/performance tuning follows.
   Forced displacement/building damage remain future scope. The existing large
   frontend bundle warning remains deferred to Phase 6.
+
+### 2026-09-20 — Phase 5h4 publication
+
+- Published milestone `a4a2008` to public `CyberSecDef/logos_engine` main.
+- Phase 5h is complete within the documented adjacent-land conflict scope.
+  Next: Phase 5i whole-world balance and performance tuning.
