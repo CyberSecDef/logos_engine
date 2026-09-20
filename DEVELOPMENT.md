@@ -933,3 +933,12 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Publishing the agreed five-item checklist and first artwork milestone. Layering,
   portable bundles, entities, selective replay and final integration acceptance
   remain required; Phase 4 is not marked complete.
+
+### 2026-09-19 — Phase 4 checklist and artwork publication
+
+- Pushed `ef58bd7` to public `CyberSecDef/logos_engine` on `main`.
+- All five agreed completion areas are documented with acceptance criteria.
+- Reviewed, versioned world-local PNG replacements are live; all 83 tests and
+  artwork/texture/historical-branch browser checks passed. User world preserved.
+- Next: layered artwork within item 1, followed by complete portable bundles,
+  minimal entities, selective replay and final integration/compatibility acceptance.
