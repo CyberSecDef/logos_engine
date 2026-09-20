@@ -9,7 +9,7 @@ before each milestone commit. Never mark unverified functionality complete.
 Plugin saved-state mappings are implemented: rename/reorder counters, convert
 units, add initial values, and explicitly discard retired keys. All 61 tests and
 browser acceptance pass, native Claude acceptance passed, and the milestone is
-live on the LAN server. Publication is in progress.
+live on the LAN server and published as `0aa95a6`.
 
 Phase 4 property conversions are implemented and verified: explicit scale/offset
 migrations, dependent-rule/plugin review, precision policy, forecasts, and
@@ -738,3 +738,10 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Restarted at `0.0.0.0:5180` and verified Aethra remains day 792/revision 803.
 - Added the crystal-hours example and documented precision, discarded memory,
   same-scope limits, checkpoints and compatibility. Publishing the milestone.
+
+### 2026-09-19 — Plugin state mapping publication
+
+- Pushed `0aa95a6` to public `CyberSecDef/logos_engine` on `main`.
+- All 61 tests, browser migration acceptance and native Claude acceptance passed.
+- User world preserved. Full replay history, general entities and world-local/layered
+  artwork remain outstanding Phase 4 work.
