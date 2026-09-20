@@ -1,3 +1,4 @@
+import {garrisonAvailability} from './garrisons.js';
 import {factionBorderOpen} from './factions.js';
 import {takeHealth} from './disease.js';
 import type {World,Operation} from '../../contracts/src/index.js';
@@ -32,6 +33,7 @@ export function applyJourney(w:World,op:Operation):void {
   if(op.path.some((id,i)=>i>0&&!factionBorderOpen(w,op.path[i-1],id,'travel')))throw Error('Departure path crosses a closed faction border');
   if(op.cargo.some(c=>c.amount>0)&&op.path.some((id,i)=>i>0&&!factionBorderOpen(w,op.path[i-1],id,'trade')))throw Error('Cargo departure path crosses a closed faction trade border');
   const source=w.tiles[op.tileId],s=source.settlement;if(!s||!w.tiles[op.path.at(-1)!].settlement)throw Error('Journeys require existing source and destination settlements');
+  if(op.population<=source.population&&op.population>source.population-garrisonAvailability(w,source.id).reserved)throw Error('Demobilize reserved inhabitants before departure');
   if(op.population>source.population||op.foodRations>s.foodRations)throw Error('Insufficient departure population or food');
   const j:Journey={id:op.journeyId,label:op.label,path:op.path,daysPerHop:op.daysPerHop,index:0,remainingDays:op.daysPerHop,population:op.population,foodRations:op.foodRations,cargo:op.cargo,departedTick:w.tick,shortageDays:0,shortageIntervalDays:s.settings.shortageIntervalDays,lossPermille:s.settings.lossPermille};
   for(const c of op.cargo){const f=w.definitions.fields.find(f=>f.id===c.fieldId);if(!f||f.quantity!=='stock'||fieldValue(w,op.tileId,c.fieldId)<c.amount)throw Error('Insufficient or invalid departure cargo');source.properties[c.fieldId]=(units(fieldValue(w,op.tileId,c.fieldId))-units(c.amount))/1000;}

@@ -1,3 +1,4 @@
+import {validateGarrisons,applyGarrison,reserveGarrisons,staffGarrisons} from './garrisons.js';
 import {validateFactions,applyFaction} from './factions.js';
 import {validateTechnology,applyTechnology,advanceResearch} from './technology.js';
 import {validateDisease,applyDisease,advanceDisease,attachVisitHealth,advanceContacts} from './disease.js';
@@ -37,7 +38,7 @@ export function validateWorld(input:unknown):World {
     commands.add(p.id);
   }
   if(w.artwork&&new Set(w.artwork.images.map(i=>i.slot)).size!==w.artwork.images.length)throw Error('Duplicate artwork slot');
-  validateFactions(w);validateTechnology(w);validateDisease(w);validateWaterQuality(w);validateAir(w);validateMigration(w);validateNeighborVisits(w);validateJourneys(w);validateRoutes(w);validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
+  validateGarrisons(w);validateFactions(w);validateTechnology(w);validateDisease(w);validateWaterQuality(w);validateAir(w);validateMigration(w);validateNeighborVisits(w);validateJourneys(w);validateRoutes(w);validateFoodTrade(w);validateEcology(w);validateSettlements(w);validateEntities(w);validateExtensions(w);validatePlugins(w);
   return w;
 }
 function event(w:World,e:WorldEvent) { w.events.push(e); if(w.events.length>200) w.events.shift(); }
@@ -58,7 +59,7 @@ export function applyProposal(world:World,input:unknown):World {
       next.artwork=op.pack;
     }
     if(op.kind==='artwork-reset')delete next.artwork;
-    applyFaction(next,op);applyTechnology(next,op);applyDisease(next,op);applyWaterQuality(next,op);applyAir(next,op);applyMigration(next,op);applyNeighborVisits(next,op);applyJourney(next,op);applyRoute(next,op);applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
+    applyGarrison(next,op);applyFaction(next,op);applyTechnology(next,op);applyDisease(next,op);applyWaterQuality(next,op);applyAir(next,op);applyMigration(next,op);applyNeighborVisits(next,op);applyJourney(next,op);applyRoute(next,op);applyFoodTrade(next,op);applyEcology(next,op);applySettlement(next,op);applyEntity(next,op);invalidateEntityReads(next);applyExtension(next,op);applyPlugin(next,op);
     if(op.kind==='elevation') tile.elevationM+=op.deltaM;
     if(op.kind==='communication') tile.communication=op.enabled;
     if(op.kind==='rainfall') {
@@ -95,9 +96,11 @@ function advanceDay(world:World,report?:WaterTransportReport):World {
   advanceJourneys(next);
   advanceEcology(next);
   advanceFoodTrade(next);
+  reserveGarrisons(next);
   advanceNeighborVisits(next);
   attachVisitHealth(next);
   advanceContacts(next);
+  staffGarrisons(next);
   advanceResearch(next);
   advanceSettlements(next);
   advanceSanitation(next);

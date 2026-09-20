@@ -119,7 +119,8 @@ world-defined progression and custom rules.
 [Factions and territory](docs/factions.md) lets the creator establish named factions,
 assign land and record relationships, with a territory overlay. Optional hostile
 border rules independently restrict travel, trade and knowledge exchange.
-Mobilization and automatic conflict are the next milestones.
+Local resident garrisons reserve healthy labor while retaining normal meals and
+health accounting. Moving armies and automatic conflict are next.
 
 **Still planned:** richer erosion, broader trade and movement,
 conflict, and broader technology effects. This is an early playable foundation.

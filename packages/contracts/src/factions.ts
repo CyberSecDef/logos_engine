@@ -1,5 +1,6 @@
 import {z} from 'zod';
 const id=z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/),tile=z.number().int().min(0).max(6761),version=z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
+export const GarrisonSchema=z.object({model:z.literal('resident-garrison-v1'),version:version.positive(),target:z.number().int().min(0).max(1000000),reserveDays:z.number().int().min(0).max(3650),lastDay:z.object({tick:version,population:z.number().int().min(0).max(1000000),reserved:z.number().int().min(0).max(1000000),workers:z.number().int().min(0).max(1000000),reason:z.enum(['demobilized','empty','terrain','food','serving','illness'])}).strict().optional()}).strict();
 export const FactionSchema=z.object({id,label:z.string().trim().min(1).max(80),color:z.string().regex(/^#[0-9a-fA-F]{6}$/)}).strict();
 export const FactionBordersSchema=z.object({model:z.literal('hostile-borders-v1'),enabled:z.boolean(),travel:z.boolean(),trade:z.boolean(),knowledge:z.boolean()}).strict();
 export const FactionsSchema=z.object({model:z.literal('territory-v1'),version:version.positive(),borders:FactionBordersSchema.optional(),definitions:z.array(FactionSchema).max(32),relations:z.array(z.object({a:id,b:id,relationship:z.enum(['allied','hostile'])}).strict()).max(496)}).strict();
@@ -9,4 +10,5 @@ export const factionOperations=[
  z.object({kind:z.literal('faction-claim'),tileId:tile,factionId:id.nullable()}).strict(),
  z.object({kind:z.literal('faction-relation'),tileId:tile,expectedVersion:version.positive(),factionId:id,otherFactionId:id,relationship:z.enum(['neutral','allied','hostile'])}).strict(),
  z.object({kind:z.literal('faction-borders-configure'),tileId:tile,expectedVersion:version.positive(),enabled:z.boolean(),travel:z.boolean(),trade:z.boolean(),knowledge:z.boolean()}).strict(),
+ z.object({kind:z.literal('garrison-configure'),tileId:tile,expectedVersion:version,target:z.number().int().min(0).max(1000000),reserveDays:z.number().int().min(0).max(3650)}).strict(),
 ] as const;

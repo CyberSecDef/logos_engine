@@ -1,4 +1,4 @@
-import {FactionsSchema,factionOperations} from './factions.js';
+import {FactionsSchema,GarrisonSchema,factionOperations} from './factions.js';
 import {TechnologySchema,ResearchSchema,technologyOperations} from './technology.js';
 import {DiseaseSchema,HealthSchema,diseaseOperations} from './disease.js';
 import {WaterQualitySchema,WaterQualityTileSchema,waterQualityOperations} from './water-quality.js';
@@ -29,7 +29,7 @@ export const TileSchema = z.object({
   waterL: uint, sedimentKg: uint, rainMm: uint.max(1000),
   temperatureC: z.number().finite(), vegetation: z.number().min(0).max(1),
   temperatureAnomalyC: z.number().finite().optional(),
-  factionId:Id.optional(),research:ResearchSchema.optional(),health:HealthSchema.optional(),waterQuality:WaterQualityTileSchema.optional(),air:AirTileSchema.optional(),travelAllowed:z.boolean().optional(),foodTradeAllowed:z.boolean().optional(),soilDay:SoilDaySchema.optional(), population: uint, settlement:SettlementSchema.optional(), communication: z.boolean(),
+  garrison:GarrisonSchema.optional(),factionId:Id.optional(),research:ResearchSchema.optional(),health:HealthSchema.optional(),waterQuality:WaterQualityTileSchema.optional(),air:AirTileSchema.optional(),travelAllowed:z.boolean().optional(),foodTradeAllowed:z.boolean().optional(),soilDay:SoilDaySchema.optional(), population: uint, settlement:SettlementSchema.optional(), communication: z.boolean(),
   properties:z.record(Id,z.number().finite().min(-1e9).max(1e9)),
 }).strict();
 export const RainRuleSchema = z.object({

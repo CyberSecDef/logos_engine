@@ -8,7 +8,7 @@ export function validateFactions(w:World):void {
 }
 export function applyFaction(w:World,op:Operation):void {
  if(op.kind==='faction-claim'){
-  const t=w.tiles[op.tileId];if(op.factionId===null){delete t.factionId;return;}
+  const t=w.tiles[op.tileId];if(t.garrison?.target&&op.factionId!==t.factionId)throw Error('Demobilize the garrison before changing territory owner');if(op.factionId===null){delete t.factionId;return;}
   if(!w.factions?.definitions.some(f=>f.id===op.factionId))throw Error('Define the faction before claiming territory');
   if(t.elevationM<=0)throw Error('New territory claims require land above sea level');
   t.factionId=op.factionId;return;

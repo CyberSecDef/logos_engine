@@ -269,3 +269,12 @@ relationships affect only explicitly enabled border rules. World-scope
 uses `hostile-borders-v1`; blocked journeys/routes report `border-closed`.
 Referential integrity and existing prompt scope/review rules apply. Combat is
 not implemented yet. See the faction document for channel and stranded-party rules.
+
+
+Local `garrison-configure` adds optional tile `resident-garrison-v1` state using
+current local `expectedVersion` (0 initially), `target`, and `reserveDays`. Service
+allocates existing resident labor after food sharing, with healthy staffing after
+contact and before research/farming. Residents retain normal meals and health;
+reserved slots stay home. Food/terrain can pause service. Demobilize (`target:0`)
+before changing owner or removing the settlement. See [resident garrisons](factions.md#implemented-5h2b-local-resident-garrisons)
+for exact eligibility, daily order, reports, migration and supply limitations.

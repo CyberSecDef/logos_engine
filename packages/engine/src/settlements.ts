@@ -1,3 +1,4 @@
+import {garrisonWorkers} from './garrisons.js';
 import {farmTechnologyPermille,researchWorkers} from './technology.js';
 import {takeHealth,illnessLabor} from './disease.js';
 import {visitLabor} from './neighbor-visits.js';
@@ -28,6 +29,7 @@ export function applySettlement(world:World,op:Operation):void {
  if(op.kind==='settlement-food')s.foodRations+=op.deltaRations;
  if(op.kind==='settlement-population'){if(world.disease&&op.population<tile.population)takeHealth(tile.health!,tile.population,tile.population-op.population);tile.population=op.population;s.shortageDays=0;s.surplusDays=0;}
  if(op.kind==='settlement-remove'){
+  if(tile.garrison?.target)throw Error('Demobilize the garrison before removing its settlement');delete tile.garrison;
   if(op.discardPopulation!==tile.population||op.discardFoodRations!==s.foodRations)throw Error('Settlement removal must explicitly discard the exact current inhabitants and food');
   delete tile.settlement;tile.population=0;if(world.disease)tile.health={ill:0,immune:0};return;
  }
@@ -39,7 +41,7 @@ export function advanceSettlements(world:World):void {
  const visitors=visitLabor(world),illWorkers=illnessLabor(world);
  for(const tile of world.tiles){const s=tile.settlement;if(!s)continue;const r=s.settings,pop=tile.population,before=s.foodRations;
   const {land,flooded,temperaturePermille,moisturePermille,fertility,waterQualityPermille}=farmConditions(world,tile.id);
-  const labor=visitors.get(tile.id),workers=pop-(labor?.away??0)+(labor?.incoming??0)-(illWorkers.get(tile.id)??0)-researchWorkers(world,tile.id);
+  const labor=visitors.get(tile.id),workers=pop-(labor?.away??0)+(labor?.incoming??0)-(illWorkers.get(tile.id)??0)-researchWorkers(world,tile.id)-garrisonWorkers(world,tile.id);
   const technologyPermille=farmTechnologyPermille(world,tile.id);
   const potential=Math.min(10_000_000,Math.floor(r.farmRationsPerDay*technologyPermille/1000),Math.floor(workers*r.workerRationsPerDay*technologyPermille/1000));
   const produced=land&&!flooded?Math.floor((potential*temperaturePermille*moisturePermille/1_000_000)*(world.soilEcology?.enabled?fertility/1000:1)*(world.waterQuality?.enabled?waterQualityPermille/1000:1)):0;
@@ -56,7 +58,7 @@ export function advanceSettlements(world:World):void {
   }
   if(world.disease&&losses)takeHealth(tile.health!,pop,losses);
   tile.population=pop+births-losses;
-  s.lastDay={...(world.technology?.enabled?{researchWorkers:researchWorkers(world,tile.id),technologyPermille}:{}),...(world.disease?.enabled?{illWorkers:illWorkers.get(tile.id)??0}:{}),...(world.waterQuality?.enabled?{waterQualityPermille}:{}),...(world.neighborVisits?.enabled?{workers,visitorsAway:labor?.away??0,visitingWorkers:labor?.incoming??0}:{}),...(world.soilEcology?.enabled?{fertilityPermille:fertility}:{}),tick:world.tick,beforeFood:before,produced,overflow,consumed,unmet,afterFood:s.foodRations,beforePopulation:pop,births,losses,afterPopulation:tile.population,potential,temperaturePermille,moisturePermille,land,flooded};
+  s.lastDay={...(tile.garrison?{garrisonWorkers:garrisonWorkers(world,tile.id)}:{}),...(world.technology?.enabled?{researchWorkers:researchWorkers(world,tile.id),technologyPermille}:{}),...(world.disease?.enabled?{illWorkers:illWorkers.get(tile.id)??0}:{}),...(world.waterQuality?.enabled?{waterQualityPermille}:{}),...(world.neighborVisits?.enabled?{workers,visitorsAway:labor?.away??0,visitingWorkers:labor?.incoming??0}:{}),...(world.soilEcology?.enabled?{fertilityPermille:fertility}:{}),tick:world.tick,beforeFood:before,produced,overflow,consumed,unmet,afterFood:s.foodRations,beforePopulation:pop,births,losses,afterPopulation:tile.population,potential,temperaturePermille,moisturePermille,land,flooded};
   if(births||losses){world.events.push({tick:world.tick,kind:'population',tileId:tile.id,amount:births||losses,message:births?`${s.label}: ${births} inhabitants added after sustained food reserves.`:`${s.label}: ${losses} inhabitants lost after sustained food shortage.`});if(world.events.length>200)world.events.shift();}
  }
 }

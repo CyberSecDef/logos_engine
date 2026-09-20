@@ -634,3 +634,12 @@ Neutral/allied/unclaimed edges remain open under local permissions. Journey
 closures preserve parties and leg progress while food consumption continues.
 Physical transport and custom generic flows remain independent. Mobilization
 (5h2b), automatic conflict (5h3), combined acceptance (5h4) and tuning (5i) remain.
+
+
+### Phase 5h2b implementation update
+
+[Resident garrisons](docs/factions.md#implemented-5h2b-local-resident-garrisons)
+reserve local population slots, staff healthy home workers before research/farms,
+and retain ordinary meals/health. Food/terrain can pause service; demobilization
+releases slots. No second population ledger or military stockpile exists. Moving
+armies, automatic conflict and associated supplies/losses remain Phase5h3.

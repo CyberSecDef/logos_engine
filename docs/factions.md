@@ -5,7 +5,7 @@ Phase 5h is split into four deliveries:
 1. **5h1 — identities and territory:** named/color-coded factions, stable IDs,
    tile ownership, explicit symmetric relationships, a territory overlay and
    reviewed world/local edits. Ownership does not create or move inhabitants.
-2. **5h2 — borders and mobilization:** 5h2a border policy is implemented; 5h2b mobilization remains next. connect explicit faction policy to defined
+2. **5h2 — borders and mobilization:** 5h2a border policy and 5h2b local resident garrisons are implemented; moving armies follow with conflict. connect explicit faction policy to defined
    travel/trade/knowledge channels, reserve existing inhabitants and provisions,
    and explain why movement or preparation stops. Avoid a second population ledger.
 3. **5h3 — conflict resolution:** automatic initiation under explicit world rules,
@@ -21,7 +21,8 @@ mechanics are implemented in the following milestones.
 
 Identity and territory are implemented, together with separately enabled border
 rules. A hostile label alone does not close a border or cause casualties or war.
-Mobilization and conflict consequences remain future milestones. Existing worlds
+Local resident garrisons prepare a labor/supply foundation; moving armies and
+conflict consequences remain future milestones. Existing worlds
 remain factionless until reviewed setup. Save schema extensions must remain
 optional so existing replay remains unchanged.
 
@@ -96,7 +97,7 @@ read-only forecasts, replay, checkpoints and portable archives. The model respon
 schema explicitly supports required nullable ownership for releases.
 `npm run test:factions` covers browser review/cancel, claims/releases, relations,
 territory overlay, unchanged population, save/replay/reload and responsive layouts.
-Full Phase 5h remains open; border policy is described below, mobilization is next.
+Full Phase 5h remains open; border policy and local garrisons are described below.
 
 
 ## Implemented: 5h2a hostile border policies
@@ -169,5 +170,88 @@ generic transfers, local versus assisted research, scope/version checks, pure
 forecasts, checkpoint/export/replay and unchanged physical simulation.
 `npm run test:faction-borders` covers review/cancel/apply, settings, stranded
 travelers, pause/reopen, saved reload/replay, responsive layouts and no autonomous
-model calls. Phase **5h2b mobilization**, **5h3 automatic conflict**, **5h4 combined
-acceptance**, and **5i whole-world tuning** remain to be implemented.
+model calls. Phase **5h3 moving armies/automatic conflict**, **5h4 combined acceptance**, and
+**5i whole-world tuning** remain to be implemented.
+
+
+## Implemented: 5h2b local resident garrisons
+
+Confirmed player choice: local resident garrisons first. Designated service slots
+stay within the settlement population and normal meal/health accounting. Healthy
+home residents fill service slots before research and farming. This implements
+mobilization preparation; it does not add movement orders, attacks or casualties.
+
+Select a claimed land settlement, open **Garrison service**, set **Resident service
+slots** and **Food reserve days required**, then review and Apply. **Review
+demobilizing** sets the target to zero and releases the allocation. A paused game
+does not spend food or labor. Example local advisor prompt:
+
+> Assign 40 resident service slots here, requiring seven days of food reserves.
+> Explain the farming impact before I apply it.
+
+### Interface and invariants
+
+Optional tile `garrison` has model `resident-garrison-v1`, a local `version`,
+`target` (integer0–1,000,000), `reserveDays` (integer0–3,650), and optional `lastDay`.
+`garrison-configure` accepts `tileId`, current `expectedVersion` (0 initially),
+`target` and `reserveDays`. It is a local operation, obeys tile/neighbor/world
+prompt scope, and increments its own version rather than the faction registry.
+A positive target requires a claimed land settlement and cannot initially exceed
+its existing population. Subsequent population losses do not erase the target:
+actual reservation is capped by remaining residents. Target zero demobilizes even
+if terrain has submerged. Removing a demobilized settlement removes its configuration.
+
+This is a **resident labor allocation**, with no second population, health or food
+ledger. Service slots are fungible daily allocations, not named soldiers or a
+permanent separate health cohort. Ill residents cannot serve while the disease
+model is active. Reserved slots stay home even when some are unfilled by healthy
+workers. Demobilization frees those slots for ordinary visits or migration.
+
+Ownership changes and settlement removal require target zero first, even if service
+is temporarily paused. A proposal may demobilize and then change ownership in
+sequence. No silent transfer of a garrison to a new faction occurs. Population
+creator edits, births and starvation still work through existing settlement rules.
+
+### Daily order, costs and permissions
+
+1. After journey arrivals, ecology and food sharing, take a snapshot of service
+   eligibility. Require population, land above sea, standing water at most100mm,
+   and food at least `population * (reserveDays + 1)`. The extra day covers today's
+   meals. Otherwise report empty, terrain or food and reserve zero slots.
+2. Reserve `min(target, population)` home slots. Routine visits can use only the
+   remaining residents. Neighbor farm job availability includes vacancies created
+   by service. Food-sharing policy operates before this reservation.
+3. After visit health and contact infection, staff at most the reserved slots from
+   healthy residents physically at home. Remaining healthy workers can research,
+   then farm. Illness is subtracted once; visitors cannot serve in the host garrison.
+4. All residents consume their usual settlement meal exactly once. No extra military
+   rations, stockpile, training currency or equipment is created or charged.
+5. Automatic migration can use only unreserved residents. Creator journey departures
+   also check current eligibility and reject requests consuming reserved slots;
+   demobilize first to release them. Incoming residents do not duplicate population.
+
+The food threshold is a **service eligibility condition**, not an earmarked stock
+reserve. It does not lock food against trade, provisions or creator edits. Eligibility
+is sampled once for that day's service; later transfers can affect tomorrow's service.
+A food pause permits residents to work and migrate again. Service automatically
+resumes when conditions recover. Ordinary borders/permissions still govern movement.
+There is no personal military allegiance, combat power, training, equipment, separate
+army supply system or mobile army in this delivery.
+
+### Reports and validation
+
+`lastDay` records tick, starting population, reserved slots, healthy workers and
+reason (`demobilized`, `empty`, `terrain`, `food`, `serving`, `illness`). Partial
+healthy staffing still reports serving with the actual count. Settlement daily
+reports add `garrisonWorkers`; garrison inspector shows both current eligibility
+and the last completed day's service. Preview shows day+5 staffing and existing
+farm/research/food consequences without advancing the save.
+
+`npm run check` covers exactly-once meals and population totals, farm/research
+competition, visits/migration, health/contact, food/terrain pauses and recovery,
+manual departure limits, safe ownership/removal, attrition, versions, malformed
+reports, scope, pure forecasts, deterministic replay, checkpoints and portable saves.
+`npm run test:garrisons` covers review/cancel/apply, staffing costs, food pause,
+demobilization, save/reload/replay, responsive layouts and zero autonomous model calls.
+Moving armies and automatic conflict are next (5h3); they must explicitly account
+for departures, supplies, injury/losses, capture and recovery before any battle runs.

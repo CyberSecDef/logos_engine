@@ -1,3 +1,4 @@
+import {garrisonReserved} from './garrisons.js';
 import {factionBorderOpen} from './factions.js';
 import {takeHealth} from './disease.js';
 import type {World,Operation} from '../../contracts/src/index.js';
@@ -21,7 +22,7 @@ export function advanceMigration(w:World):void {
  for(const t of w.tiles){if((w.journeys?.active.length??0)>=64)break;const a=snap[t.id];if(!a.eligible||!a.population||receiving.has(t.id)||incoming[t.id]>0||w.tick-(cooldown.get(t.id)??-r.cooldownDays)<r.cooldownDays)continue;
   const pressure=a.shortage>=r.shortageDays||a.food<a.population,crowded=a.population*1000>=a.capacity*r.crowdingPermille;
   const candidates=w.cells[t.id].neighbors.filter(id=>{const b=snap[id];return b.eligible&&factionBorderOpen(w,t.id,id,'travel')&&!departing.has(id)&&b.capacity>b.population+incoming[id]&&b.food>=(b.population+incoming[id]+1)*r.destinationReserveDays;}).sort((x,y)=>{const a=snap[x],b=snap[y];return b.food/Math.max(1,b.population+incoming[y])-a.food/Math.max(1,a.population+incoming[x])||x-y;});
-  for(const to of candidates){const b=snap[to],budget=Math.min(a.population,Math.max(1,Math.floor(a.population*r.departurePermille/1000))),housing=b.capacity-b.population-incoming[to],foodSpace=Math.floor(b.food/r.destinationReserveDays)-b.population-incoming[to];const population=Math.min(budget,housing,foodSpace);if(population<=0)continue;
+  for(const to of candidates){const b=snap[to],budget=Math.min(Math.max(0,a.population-garrisonReserved(w,t.id)),Math.max(1,Math.floor(a.population*r.departurePermille/1000))),housing=b.capacity-b.population-incoming[to],foodSpace=Math.floor(b.food/r.destinationReserveDays)-b.population-incoming[to];const population=Math.min(budget,housing,foodSpace);if(population<=0)continue;
    const destinationPopulation=b.population+incoming[to]+population;
    const betterFood=b.food/destinationPopulation>=a.food/a.population+r.reserveImprovementDays;
    const lessCrowded=destinationPopulation*1000<b.capacity*r.crowdingPermille&&destinationPopulation/b.capacity<a.population/a.capacity;

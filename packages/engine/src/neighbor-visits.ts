@@ -1,3 +1,4 @@
+import {garrisonReserved} from './garrisons.js';
 import {factionBorderOpen} from './factions.js';
 import type {World,Operation} from '../../contracts/src/index.js';
 import {farmConditions} from './farm-conditions.js';
@@ -19,10 +20,10 @@ export function advanceNeighborVisits(w:World):void {
  const stock=w.tiles.map(t=>t.settlement?.foodRations??0),balance=[...stock];
  const supply=w.tiles.map((t,i)=>open[i]&&t.settlement&&t.foodTradeAllowed!==false?Math.max(0,stock[i]-t.population*(r.foodReserveDays+1)):0);
  const demand=w.tiles.map((t,i)=>open[i]&&t.settlement&&t.foodTradeAllowed!==false?Math.min(1e9-stock[i],Math.max(0,t.population*(r.foodTargetDays+1)-stock[i])):0);
- const jobs=w.tiles.map(t=>{const s=t.settlement,c=farmConditions(w,t.id);return s&&open[t.id]&&c.land&&!c.flooded&&c.temperaturePermille>0&&c.moisturePermille>0&&c.fertility>0&&c.waterQualityPermille>0&&s.settings.workerRationsPerDay>0?Math.max(0,Math.ceil(s.settings.farmRationsPerDay/s.settings.workerRationsPerDay)-t.population):0;});
+ const jobs=w.tiles.map(t=>{const s=t.settlement,c=farmConditions(w,t.id);return s&&open[t.id]&&c.land&&!c.flooded&&c.temperaturePermille>0&&c.moisturePermille>0&&c.fertility>0&&c.waterQualityPermille>0&&s.settings.workerRationsPerDay>0?Math.max(0,Math.ceil(s.settings.farmRationsPerDay/s.settings.workerRationsPerDay)-t.population+garrisonReserved(w,t.id)):0;});
  const entries:NonNullable<NonNullable<World['neighborVisits']>['lastDay']>['entries']=[];
  for(const t of w.tiles){if(!open[t.id]||!t.population||!r.dailyPermille)continue;
-  let left=Math.min(t.population,Math.max(1,Math.floor(t.population*r.dailyPermille/1000)));
+  let left=Math.min(t.population-garrisonReserved(w,t.id),Math.max(1,Math.floor(t.population*r.dailyPermille/1000)));
   const sorted=[...w.cells[t.id].neighbors].filter(id=>open[id]&&factionBorderOpen(w,t.id,id,'travel')).sort((a,b)=>a-b),offset=sorted.length?(w.tick+t.id)%sorted.length:0;
   const neighbors=[...sorted.slice(offset),...sorted.slice(0,offset)];
   for(const to of neighbors){if(!factionBorderOpen(w,t.id,to,'trade')||!left||!demand[t.id]||!supply[to]||!r.carryRationsPerVisitor)continue;

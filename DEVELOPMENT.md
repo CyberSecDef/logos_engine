@@ -12,8 +12,10 @@ acceptance (5h4). Confirmed creator-established factions/territory and automatic
 conflict under explicit rules. 5h1 registry, territory/relationships and review UI
 are deployed and published. 5h2a independent hostile border rules are implemented
 and deployed; 233 tests, typecheck/build, browser and native Claude acceptance
-passed. Published milestone `120f23a`. Next: 5h2b mobilization with real inhabitants
-and provisions; automatic conflict (5h3), integration (5h4) and tuning (5i) remain.
+passed and published (`120f23a`). 5h2b resident garrisons are implemented; 242
+tests/typecheck/build, browser and native Claude acceptance passed. Deployment
+verified with exact saved-world preservation; publication follows. Moving armies/automatic conflict (5h3), integration
+(5h4) and tuning (5i) remain.
 
 ## Completed
 
@@ -1960,3 +1962,51 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `120f23a` to public `CyberSecDef/logos_engine` main.
 - Next: 5h2b mobilization, then 5h3 automatic conflict under explicit rules.
+
+### 2026-09-20 — Phase 5h2b mobilization started
+
+- Designing local resident garrisons before moving armies/conflict. Asked creator
+  whether service should reserve existing resident labor, with normal settlement
+  meals and a food-reserve threshold. No new population or food is created.
+- Reviewing interactions with illness/contact, visits, research, migration,
+  creator departures and territory changes. Implementation/acceptance pending.
+
+
+### 2026-09-20 — Phase 5h2b resident garrisons implemented
+
+- Creator confirmed local resident garrisons before moving armies. Added optional
+  per-tile versioned staffing/reserve settings, reviewed local operations, service
+  inspector, forecast reports and native provider capabilities27.
+- Service reserves existing resident slots after food sharing; visitors/migrants
+  and creator departures cannot consume those slots. Healthy home workers staff
+  them after contact and before research/farms. Neighbor workers can fill farm
+  vacancies. Population/health/meals remain in existing ledgers with no duplication.
+- Food threshold covers all resident meals plus configured reserve days; it is an
+  eligibility threshold rather than an earmarked stockpile. Terrain/food pauses
+  retain the target. Demobilization is required before owner changes or removal.
+- `npm run check`: **242 tests passed**, typecheck/build passed. Nine new tests
+  cover work/meal accounting, visits/migration, illness/contact, shortages/terrain,
+  manual departures, safe ownership/removal, attrition, versions, scope/forecast,
+  saved replay/checkpoint/export, and neighboring farm-worker substitution.
+- Browser/native Claude acceptance running. Documentation updated in faction
+  interface, Phase5 plan, README and PLAN. No combat or moving armies implemented.
+
+
+### 2026-09-20 — Phase 5h2b acceptance and deployment
+
+- Garrison browser acceptance passed reviewed/cancelled/applied staffing, labor and
+  meal accounting, food pause, demobilization, save/replay/reload and responsive
+  layouts; desktop/mobile screenshots inspected. Existing faction-border,
+  neighbor-visit and contact-disease browser suites passed. No autonomous model calls.
+- Native authenticated Claude produced the requested local 40-slot/7-reserve-day
+  configuration. Schema/scope/read-only forecast passed; temporary save unchanged.
+- Deployed `0.0.0.0:5180`; garrison controls verified through LAN. Preserved
+  first-world day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete save envelope
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  No garrisons, factions or test ticks introduced. Evidence:
+  `/tmp/logos-garrisons-deploy.json`.
+- Phase5h2b local mobilization complete. Next: 5h3 moving armies and automatic
+  conflict under explicit rules, then 5h4 integrated acceptance and 5i tuning.
+  Existing ~739 kB bundle warning remains Phase6 performance work.
