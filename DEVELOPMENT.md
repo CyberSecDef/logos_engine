@@ -942,3 +942,35 @@ runoff with sediment conservation, and checksummed storage/path validation.
   artwork/texture/historical-branch browser checks passed. User world preserved.
 - Next: layered artwork within item 1, followed by complete portable bundles,
   minimal entities, selective replay and final integration/compatibility acceptance.
+
+### 2026-09-19 — Layered artwork in progress
+
+- Implementing two ordered, alpha-composited appearance layers above base terrain.
+- Extending the bounded eight-slot atlas with optional settlement/condition images.
+- Preserving legacy styles, birth/reveal behavior, data overlays and simulation.
+- Next: contract/persistence tests, GPU acceptance, documentation and publication.
+
+### 2026-09-19 — Layer contract and composition verification
+
+- Added optional two-layer styles, automatic terrain base selection, and optional
+  settlement/condition image slots within the existing eight-slot atlas.
+- Model capabilities v10, review diffs and tile inspector expose layer order/opacity.
+- All 85 engine/API tests and typecheck/build pass, including invalid-layer
+  rejection, reveal/overlay behavior, unchanged physics, persistence and replay.
+- GPU checks exercise actual composition/order, alpha, missing/zero layers,
+  reload/switching, birth/colors/overlays and mobile. Test hashes use validated
+  saved fixtures, since schema parsing canonicalizes property order.
+- Existing painterly assets can be layered; no new production images were generated.
+
+### 2026-09-19 — Layered artwork milestone complete
+
+- All 86 engine/API tests, typecheck and production build passed.
+- Layer GPU browser, artwork import/delayed-switch regression and prompt-driven
+  appearance browser passed; inspected the composition screenshot.
+- Layer styles survive saved state, checkpoints, portable state and replay; image
+  copying for branches continues through the existing world artwork manifest.
+- Deployed to 0.0.0.0:5180. Live world was day 792/revision 804 before restart;
+  no active prompt and no user-world changes made by development tests.
+- Completion item 1 (world-local artwork and composition) is complete.
+- Next: item 2, complete portable bundles including image assets and replay journal.
+  Entities, selective replay and final acceptance also remain required.

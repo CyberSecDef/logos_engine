@@ -158,7 +158,7 @@ export function forecast(world:World,proposal:Proposal) {
   const values=(instance:typeof old,tileId:number)=>Object.fromEntries(instance.definition.stateFields.map((f,i)=>[f.id,instance.state.find(s=>s.tileId===tileId)?.values[i]??f.initial]));
   return [{id:op.definition.id,label:op.definition.label,totalTiles:targets.length,tiles:targets.slice(0,6).map(tileId=>({tileId,before:values(old,tileId),after:values(next,tileId)}))}];
  });
- const describeAppearance=(w:World,id:number)=>{const a=appearance(w,w.tiles[id],'terrain',1);return {label:a.label,color:a.color,asset:a.assetId??'none'};};
+ const describeAppearance=(w:World,id:number)=>{const a=appearance(w,w.tiles[id],'terrain',1);return {label:a.label,color:a.color,asset:a.assetId??'none',layers:a.layers};};
  const visualChanges=[...ids].map(tileId=>({tileId,before:describeAppearance(world,tileId),after:describeAppearance(applied,tileId)})).filter(t=>JSON.stringify(t.before)!==JSON.stringify(t.after));
  return {appearanceChanges:{total:visualChanges.length,tiles:visualChanges.slice(0,24)},pluginMigrations,tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,baselineUnit:baseline.definitions.fields.find(b=>b.id===f.id)?.unit??null,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
 }

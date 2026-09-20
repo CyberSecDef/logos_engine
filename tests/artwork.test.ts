@@ -51,3 +51,10 @@ test('artwork packing CLI produces a validated import without changing image byt
  try{const source=join(root,'manifest.json'),output=join(root,'pack.json');await writeFile(source,JSON.stringify({...pack,images:[{slot:'forest',file:resolve('packages/tile-packs/public/painterly-v1/alpine.png')}]}));const result=spawnSync(process.execPath,[resolve('dist/apps/server/src/artwork-cli.js'),source,output],{encoding:'utf8'});assert.equal(result.status,0,result.stderr);assert.equal(parseArtwork(JSON.parse(await readFile(output,'utf8'))).images[0].hash,info.hash);
  }finally{await rm(root,{recursive:true,force:true});}
 });
+
+test('packs support the bounded terrain plus settlement/condition slots',()=>{
+ const slots=['ocean','city','alpine','forest','meadow','dry','settlement','condition'];
+ const layered={...bundle,pack:{...pack,images:slots.map(slot=>({slot,hash:info.hash}))}};
+ assert.equal(parseArtwork(layered).pack.images.length,8);
+ assert.throws(()=>parseArtwork({...layered,pack:{...layered.pack,images:[...layered.pack.images,{slot:'forest',hash:info.hash}]}}));
+});

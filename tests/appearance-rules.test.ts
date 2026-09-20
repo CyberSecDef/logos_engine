@@ -67,3 +67,24 @@ test('appearance rules survive saves, snapshots and portable worlds; previews sh
  try{await store.save(changed);assert.equal(stateHash(await store.load(w.id)),stateHash(changed));const point=await store.checkpoint(changed,'Crystal terrain');assert.deepEqual((await store.readCheckpoint(w.id,point.id)).world.definitions,changed.definitions);const branch=copyWorld(unpackWorld(archiveWorld(changed)),'copy','Copy');assert.deepEqual(appearance(branch,branch.tiles[0]),appearance(changed,changed.tiles[0]));}finally{await rm(root,{recursive:true,force:true});}
  assert.deepEqual(terrainPack.entries.map(e=>e.id).sort(),['ocean','city','alpine','forest','meadow','dry'].sort());
 });
+
+test('layer composition preserves automatic terrain, ordering, reveals, overlays and physics',async()=>{
+ const w=make();for(const t of w.tiles){t.elevationM=500;t.vegetation=.8;}
+ const layered:AppearanceRule={...rule,conditions:[],style:{label:'Enchanted forest',color:'#778866',asset:'terrain',layers:[{asset:'settlement',opacity:.75},{asset:'condition',opacity:.25}]}};
+ const p=edit(w,[{kind:'appearance-define',tileId:0,rule:layered}]),next=applyProposal(w,p);
+ assert.deepEqual(appearance(next,next.tiles[0]).layers,layered.style.layers);assert.equal(appearance(next,next.tiles[0]).assetId,'forest');
+ assert.deepEqual(appearance(next,next.tiles[1]).layers,[]);assert.equal(textureReveals(next)[1],0);
+ assert.deepEqual(appearance(next,next.tiles[0],'rain').layers,[]);
+ const preview=forecast(w,p);assert.deepEqual(preview.appearanceChanges.tiles[0].after.layers,layered.style.layers);
+ const changed=applyProposal(next,edit(next,[{kind:'appearance-define',tileId:0,rule:{...layered,version:2,style:{...layered.style,layers:[{asset:'condition',opacity:.25},{asset:'settlement',opacity:.75}]}}}]));
+ assert.notDeepEqual(appearance(changed,changed.tiles[0]).layers,appearance(next,next.tiles[0]).layers);
+ assert.deepEqual(advance(next).tiles,advance(w).tiles);
+ const root=await mkdtemp(join(tmpdir(),'logos-layers-')),store=new WorldStore(root);
+ try{await store.save(w);await store.save(next,{kind:'proposal',proposal:p});assert.equal((await store.verifyHistory(w.id)).proposals,1);const checkpoint=await store.checkpoint(next,'Layers');assert.deepEqual((await store.readCheckpoint(w.id,checkpoint.id)).world.definitions,next.definitions);assert.deepEqual((await store.load(w.id)).definitions,next.definitions);assert.deepEqual(copyWorld(unpackWorld(archiveWorld(next)),'layers-copy','Layers').definitions,next.definitions);}finally{await rm(root,{recursive:true,force:true});}
+});
+
+test('layer contracts reject excessive layers, unbounded opacity and external asset references',()=>{
+ const w=make(),style={label:'Layers',color:'#778866',asset:'terrain',layers:[{asset:'settlement',opacity:.5}]};
+ for(const layers of [[...style.layers,...style.layers,...style.layers],[{asset:'condition',opacity:1.1}],[{asset:'condition',opacity:-.1}],[{asset:'https://example.com/a.png',opacity:1}]])assert.throws(()=>applyProposal(w,{...edit(w,[]),operations:[{kind:'appearance-define',tileId:0,rule:{...rule,conditions:[],style:{...style,layers}}}]}));
+ const reply={kind:'proposal',message:'Layers',assumptions:[],operations:[{kind:'appearance-define',tileId:0,rule:{...rule,conditions:[],style}}]};ModelReplySchema.parse(reply);assert.ok(JSON.stringify(modelReplyJsonSchema).includes('settlement'));
+});

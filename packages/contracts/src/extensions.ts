@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import {ArtworkSlot} from './artwork.js';
 
 const id=z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/);
 const scalar=z.number().finite().min(-1e9).max(1e9);
@@ -24,7 +25,7 @@ export const AppearanceRuleSchema=z.object({
  id,version:z.number().int().min(1),label:z.string().min(1).max(80),tileId:z.number().int().nonnegative(),
  scope:z.enum(['tile','neighbors','world']),enabled:z.boolean(),priority:z.number().int().min(0).max(100),
  conditions:z.array(ConditionSchema).max(8),
- style:z.object({label:z.string().min(1).max(60),color:z.string().regex(/^#[0-9a-fA-F]{6}$/),asset:z.enum(['none','ocean','city','alpine','forest','meadow','dry'])}).strict(),
+ style:z.object({label:z.string().min(1).max(60),color:z.string().regex(/^#[0-9a-fA-F]{6}$/),asset:z.enum(['none','terrain','ocean','city','alpine','forest','meadow','dry']),layers:z.array(z.object({asset:ArtworkSlot,opacity:z.number().finite().min(0).max(1)}).strict()).max(2).optional()}).strict(),
 }).strict();
 export type AppearanceRule=z.infer<typeof AppearanceRuleSchema>;
 export const DefinitionsSchema=z.object({fields:z.array(FieldDefinitionSchema).max(32),rules:z.array(CustomRuleSchema).max(64),appearance:z.array(AppearanceRuleSchema).max(32).optional()}).strict();

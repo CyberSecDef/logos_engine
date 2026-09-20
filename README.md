@@ -115,3 +115,7 @@ remaining milestones. See [PLAN.md](PLAN.md), the proposed
 The globe rendering and topology adapt MIT-licensed code from
 `globe.trackr.live`. No Earth
 imagery or live feeds are required. See [LICENSE](LICENSE).
+
+World artwork supports two ordered transparent layers above terrain, selected by
+reviewed appearance rules. For example, ask to keep forest terrain and overlay
+city artwork at 35% opacity. See [artwork packs and composition](docs/world-artwork-packs.md).

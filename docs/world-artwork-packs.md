@@ -3,11 +3,11 @@
 A world can now activate its own versioned PNG replacements for the six installed
 terrain slots: `ocean`, `city`, `alpine`, `forest`, `meadow`, and `dry`. Unspecified
 slots retain the built-in painterly images. Appearance rules keep choosing those
-slot IDs, so custom world properties can select imported artwork too.
+slot IDs, so custom world properties can select imported artwork too. Two optional
+slots, `settlement` and `condition`, supply transparent feature layers.
 
-This is the first part of the agreed world-local/layered artwork milestone.
-Settlement/condition composition is still in progress; a replacement image does
-not create settlement mechanics or a separate visual layer.
+Appearance rules can compose base terrain with up to two ordered image layers.
+Artwork remains cosmetic; it does not create settlement or weather mechanics.
 
 ## Create and import a pack
 
@@ -44,15 +44,15 @@ original pack while retaining imported images for history/checkpoints.
 
 ## Limits and behavior
 
-- At most six unique terrain slots per pack; a single image may fill multiple slots.
+- At most eight unique slots per pack; a single image may fill multiple slots.
 - Non-animated, non-interlaced 8-bit PNGs; dimensions 1–2048 in each axis.
 - Each image at most 8 MiB; import JSON at most 32 MiB, including base64 overhead.
 - Signatures, headers, chunk checksums, references, compressed output size and
   scanline filters are validated. SVGs, external image URLs and scripts are not accepted.
 - Pack ID/version contents are immutable within a world's retained proposal history.
   Change the version when changing its label, credit or image references.
-- Imported transparent pixels show the tile's fallback color. Multi-layer blending
-  is a later part of this same Phase 4 item.
+- Transparent base-image pixels show the tile color; transparent layer pixels show
+  the terrain/layers below. Missing feature images leave underlying artwork visible.
 
 Activation is cosmetic. It does not advance time, change terrain physics, or reveal
 all textures immediately. Birth stays color-only; the 1,000-day reveal schedule and
@@ -82,3 +82,43 @@ Current state-only world exports include manifest references but **do not yet
 bundle image bytes**. Back up the whole world directory to preserve its artwork.
 Complete portable bundles are the next agreed Phase 4 item. Older engine builds
 without the artwork contract cannot load worlds containing these manifests/operations.
+
+## Layered composition
+
+The winning appearance rule may include `style.layers` (zero to two entries).
+Layers blend bottom to top, respecting PNG alpha and opacity from 0 through 1.
+`asset: "terrain"` keeps automatic biome selection beneath the layers; `none`
+uses the rule's color beneath them. Existing explicit biome assets still work.
+
+```json
+{
+  "label": "Snowy village",
+  "color": "#789078",
+  "asset": "terrain",
+  "layers": [
+    {"asset": "settlement", "opacity": 1},
+    {"asset": "condition", "opacity": 0.6}
+  ]
+}
+```
+
+Include this style inside an `appearance-define` rule whose conditions describe
+when the village/snow should appear. Only that winning rule supplies layers;
+other matching rules do not add layers. Rule versions, scopes, review, state
+conditions and field migrations behave as before. Preview and tile inspection
+show layer order and opacity.
+
+All eight slot names are available for layers. The six original slots have built-in
+images; settlement/condition require an imported pack. Existing painterly images
+can be layered at partial opacity without importing anything, for example:
+“Keep the forest terrain here and overlay city artwork at 35% opacity.”
+Dedicated transparent overhead PNGs give better settlement/condition results.
+No new production feature images are bundled in this milestone.
+
+Layers share the base reveal schedule and deterministic tile rotation. They are
+hidden at birth, on Colors only and on data overlays; they fade at distant zoom.
+Tile sides stay colored. The atlas remains eight 512-pixel slots (2048×1024),
+with at most three texture samples per fragment, independent of rule count.
+Changing appearance does not alter simulation outcomes or call any model.
+Legacy worlds/styles without layers keep their previous rendering and serialized
+state; new optional fields require this version of the engine to load.

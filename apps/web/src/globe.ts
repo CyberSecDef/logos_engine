@@ -29,10 +29,10 @@ export class WorldGlobe {
     const lighting=this.scene.material.onBeforeCompile;
     this.scene.material.onBeforeCompile=(shader,renderer)=>{
       lighting(shader,renderer);shader.uniforms.uTextureDetail=this.detail;
-      shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute float aTexture;\nvarying float vTexture;').replace('#include <begin_vertex>','#include <begin_vertex>\nvTexture=aTexture;');
-      shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying float vTexture;\nuniform float uTextureDetail;').replace('#include <map_fragment>','').replace('#include <color_fragment>','#include <color_fragment>\n#ifdef USE_MAP\nvec4 artwork=texture2D(map,vMapUv);diffuseColor.rgb=mix(diffuseColor.rgb,artwork.rgb,vTexture*uTextureDetail*artwork.a);\n#endif');
+      shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute float aTexture;\nvarying float vTexture;\nattribute vec3 aLayer0;\nattribute vec3 aLayer1;\nvarying vec3 vLayer0;\nvarying vec3 vLayer1;').replace('#include <begin_vertex>','#include <begin_vertex>\nvTexture=aTexture;\nvLayer0=aLayer0;vLayer1=aLayer1;');
+      shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying float vTexture;\nvarying vec3 vLayer0;\nvarying vec3 vLayer1;\nuniform float uTextureDetail;').replace('#include <map_fragment>','').replace('#include <color_fragment>','#include <color_fragment>\n#ifdef USE_MAP\nvec4 artwork=texture2D(map,vMapUv);diffuseColor.rgb=mix(diffuseColor.rgb,artwork.rgb,vTexture*uTextureDetail*artwork.a);\nvec4 layer0=texture2D(map,vLayer0.xy);diffuseColor.rgb=mix(diffuseColor.rgb,layer0.rgb,layer0.a*vLayer0.z*uTextureDetail);\nvec4 layer1=texture2D(map,vLayer1.xy);diffuseColor.rgb=mix(diffuseColor.rgb,layer1.rgb,layer1.a*vLayer1.z*uTextureDetail);\n#endif');
     };
-    this.scene.material.customProgramCacheKey=()=> 'logos-terrain-atlas-v2';
+    this.scene.material.customProgramCacheKey=()=> 'logos-terrain-atlas-v3';
     this.textures.texture.anisotropy=Math.min(4,this.scene.renderer.capabilities.getMaxAnisotropy());
 
 
@@ -66,11 +66,12 @@ export class WorldGlobe {
     const rebuild=this.world?.id!==world.id || this.world.cells.length!==world.cells.length;
     this.world=world;this.reveal=textureReveals(world);
     const artworkKey=JSON.stringify([world.id,world.artwork]);
-    if(artworkKey!==this.artworkKey){this.artworkKey=artworkKey;void this.textures.load(terrainPack.entries.map(entry=>{const local=world.artwork?.images.find(i=>i.slot===entry.id);return {...entry,image:local?`/api/artwork/image/${world.id}/${local.hash}`:entry.image};}),this.assetHeaders());}
+    if(artworkKey!==this.artworkKey){this.artworkKey=artworkKey;void this.textures.load([...terrainPack.entries.map(entry=>{const local=world.artwork?.images.find(i=>i.slot===entry.id);return {...entry,image:local?`/api/artwork/image/${world.id}/${local.hash}`:entry.image};}),...(world.artwork?.images.filter(i=>i.slot==='settlement'||i.slot==='condition').map(i=>({id:i.slot,image:`/api/artwork/image/${world.id}/${i.hash}`}))??[])],this.assetHeaders());}
     if(rebuild) {
       const triangles=world.cells.reduce((n,c)=>n+c.corners.length*3,0);
       this.geometry=new THREE.BufferGeometry();
       for(const key of ['position','color'])this.geometry.setAttribute(key,new THREE.BufferAttribute(new Float32Array(triangles*9),3));
+      for(const key of ['aLayer0','aLayer1'])this.geometry.setAttribute(key,new THREE.BufferAttribute(new Float32Array(triangles*9),3));
       this.geometry.setAttribute('aTexture',new THREE.BufferAttribute(new Float32Array(triangles*3),1));
       this.geometry.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(triangles*6),2));
       this.ids=[];for(const c of world.cells)for(let i=0;i<c.corners.length*3;i++)this.ids.push(c.id);
@@ -85,11 +86,12 @@ export class WorldGlobe {
     const colors=this.geometry.getAttribute('color') as THREE.BufferAttribute;
     const weight=this.geometry.getAttribute('aTexture') as THREE.BufferAttribute;
     const uv=this.geometry.getAttribute('uv') as THREE.BufferAttribute;
+    const layers=[0,1].map(i=>this.geometry.getAttribute(`aLayer${i}`) as THREE.BufferAttribute);
     let vertex=0,textured=0;
     for(const cell of this.world.cells) {
       const tile=this.world.tiles[cell.id],art=appearance(this.world,tile,this.overlay,this.reveal[cell.id]),base=new THREE.Color(art.color);
       const slot=art.assetId?this.textures.slots.get(art.assetId):undefined;
-      const strength=this.texturesEnabled&&slot!==undefined?art.textureOpacity:0;if(strength>0)textured++;
+      const strength=this.texturesEnabled&&slot!==undefined?art.textureOpacity:0;const layerSlots=art.layers.map(l=>({slot:this.textures.slots.get(l.asset),opacity:l.opacity}));if(strength>0||this.texturesEnabled&&art.textureOpacity>0&&layerSlots.some(l=>l.slot!==undefined&&l.opacity>0))textured++;
       const center=new THREE.Vector3(...cell.center),radius=this.radius(cell.id),n=cell.corners.length;
       const top=cell.corners.map(c=>new THREE.Vector3(...c).lerp(center,0.065).normalize().multiplyScalar(radius));
       const bottom=top.map(v=>v.clone().normalize().multiplyScalar(0.993));
@@ -98,7 +100,9 @@ export class WorldGlobe {
       const scale=Math.max(...top.map(p=>p.clone().sub(center.clone().multiplyScalar(radius)).length()))*2;
       const add=(p:THREE.Vector3,shade:number)=>{
         pos.setXYZ(vertex,p.x,p.y,p.z); colors.setXYZ(vertex,base.r*shade,base.g*shade,base.b*shade);
-        const delta=p.clone().sub(center.clone().multiplyScalar(radius)),coords=atlasUV(slot??0,0.5+delta.dot(tangent)/scale,0.5+delta.dot(bitangent)/scale,art.variant%4);uv.setXY(vertex,...coords);weight.setX(vertex,shade===1?strength:0);vertex++;
+        const delta=p.clone().sub(center.clone().multiplyScalar(radius)),coords=atlasUV(slot??0,0.5+delta.dot(tangent)/scale,0.5+delta.dot(bitangent)/scale,art.variant%4);uv.setXY(vertex,...coords);weight.setX(vertex,shade===1?strength:0);
+        for(const [i,attribute] of layers.entries()){const layer=layerSlots[i],coords=atlasUV(layer?.slot??0,0.5+delta.dot(tangent)/scale,0.5+delta.dot(bitangent)/scale,art.variant%4);attribute.setXYZ(vertex,...coords,shade===1&&this.texturesEnabled&&layer?.slot!==undefined?art.textureOpacity*layer.opacity:0);}
+        vertex++;
       };
       for(let i=0;i<n;i++) {
         const j=(i+1)%n;
@@ -107,8 +111,9 @@ export class WorldGlobe {
         add(top[j],0.48);add(bottom[i],0.48);add(bottom[j],0.48);
       }
     }
+    for(const layer of layers)layer.needsUpdate=true;
     weight.needsUpdate=true;pos.needsUpdate=true;colors.needsUpdate=true;uv.needsUpdate=true;this.geometry.computeVertexNormals();this.geometry.computeBoundingSphere();this.select(this.selected);
-    this.onArtwork(!this.texturesEnabled?'Colors only':this.overlay!=='terrain'?'Overlay colors · artwork returns on Terrain':this.textures.status.includes('Loading')?this.textures.status:`${textured} / ${this.world.tiles.length} places illustrated · ${this.textures.slots.size===terrainPack.entries.length?'reveals through day 1,000':this.textures.status}`);
+    this.onArtwork(!this.texturesEnabled?'Colors only':this.overlay!=='terrain'?'Overlay colors · artwork returns on Terrain':this.textures.status.includes('Loading')?this.textures.status:`${textured} / ${this.world.tiles.length} places illustrated · ${this.textures.status==='Terrain artwork ready'?'reveals through day 1,000':this.textures.status}`);
   }
   select(id:number) {
     this.selected=id;this.marker.visible=id>=0&&!!this.world?.cells[id];

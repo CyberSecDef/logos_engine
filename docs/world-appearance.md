@@ -74,3 +74,12 @@ Older builds without the appearance contract cannot load saves containing these 
 World-local [PNG replacement packs](world-artwork-packs.md) now customize the
 installed slot images. Portable asset bundles, layered artwork and richer terrain
 transitions remain in the agreed Phase 4 completion work.
+
+## Layer composition
+
+Styles can now keep automatic biome artwork with `asset: "terrain"` and add up
+to two ordered `{asset, opacity}` entries in optional `layers`. Six built-in slots
+and imported `settlement`/`condition` slots are supported. PNG alpha blends over
+underlying images; missing layers are transparent. Only the winning rule supplies
+layers. See [artwork packs](world-artwork-packs.md#layered-composition) for an
+example, limits, reveal behavior and compatibility.

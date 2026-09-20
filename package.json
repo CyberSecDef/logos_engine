@@ -27,6 +27,7 @@
     "test:checkpoints": "npm run build && node tests/checkpoints-browser.mjs",
     "test:plugins": "npm run build && node tests/plugins-browser.mjs",
     "test:textures": "npm run build && node tests/textures-browser.mjs",
+    "test:layers": "npm run build && node tests/layers-browser.mjs",
     "test:artwork": "npm run build && node tests/artwork-browser.mjs",
     "test:history": "npm run build && node tests/history-branch-browser.mjs",
     "test:appearance": "npm run build && node tests/appearance-rules-browser.mjs"

@@ -193,3 +193,8 @@ budgets; matching checkpoints can accelerate reconstruction.
 `world.artwork` manifests and immutable world assets. `artwork-activate/reset`
 require global model authority; model activation selects a previously imported
 manifest. PNG bytes remain outside model context and deterministic simulation.
+
+Layered artwork: optional appearance `style.layers` composes at most two image
+layers in array order with opacity 0–1; base `asset: "terrain"` retains the biome.
+World packs now accept eight slots, including optional settlement and condition.
+See [artwork interface](world-artwork-packs.md#layered-composition).

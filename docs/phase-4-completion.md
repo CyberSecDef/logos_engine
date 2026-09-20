@@ -5,7 +5,7 @@ Phase 4 and move to broader simulation. This checklist supersedes suggestions to
 defer selective replay or layered artwork. No additional feature categories are
 required to finish this phase without a new agreement.
 
-## 1. World-local artwork and composition — in progress
+## 1. World-local artwork and composition — complete
 
 - Import validated world-specific artwork, store it under the world's assets,
   and pin image content/version references in world data.
@@ -14,8 +14,12 @@ required to finish this phase without a new agreement.
 - Verify missing assets, world switching, save/reload, checkpoint/branch behavior,
   overlays, deterministic appearance and unchanged simulation outcomes.
 
-First milestone implemented and verified: reviewed, versioned PNG replacement packs for the six installed
-terrain slots. Layered composition follows within this same agreed item.
+Verified: reviewed/versioned PNG packs; two ordered alpha layers; optional
+settlement/condition image slots; bounded rendering; missing-image fallback;
+world switching, checkpoint/branch persistence, replay and unchanged physics.
+86 engine/API tests pass, with artwork, layer and appearance browser acceptance.
+Dedicated new production overlay paintings can be added through packs; existing
+images already work as layers. The other four agreed areas remain required.
 
 ## 2. Complete portable world bundles — pending
 

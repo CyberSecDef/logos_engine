@@ -1,7 +1,7 @@
 import {readValue} from '../../engine/src/extensions.js';
 import type { Tile, World } from '../../contracts/src/index.js';
 export type Overlay='terrain'|'water'|'rain'|'temperature'|'communication'|`custom:${string}`;
-export type Appearance={label:string;color:string;assetId?:string;variant:number;textureOpacity:number};
+export type Appearance={label:string;color:string;assetId?:string;variant:number;textureOpacity:number;layers:{asset:string;opacity:number}[]};
 import manifest from '../../tile-packs/public/painterly-v1/manifest.json' with {type:'json'};
 export type TerrainEntry={id:string;label:string;color:string;image:string;conditions:{field:'elevationM'|'vegetation'|'population'|'temperatureC'|'rainMm';comparison:'lt'|'lte'|'gt'|'gte';value:number}[]};
 export const terrainPack=manifest as {id:string;version:number;revealDays:number;entries:TerrainEntry[]};
@@ -32,7 +32,7 @@ export function appearance(w:World,t:Tile,overlay:Overlay='terrain',reveal?:numb
  }
  if(overlay==='communication') color=t.communication?'#469783':'#d8956b';
  const textureOpacity=overlay==='terrain'?(reveal??textureReveals(w)[t.id]):0;
- return {label:custom?.style.label??entry.label,color,assetId:textureOpacity>0?(custom?(custom.style.asset==='none'?undefined:custom.style.asset):entry.id):undefined,variant:hash(`${terrainPack.id}:${t.id}`),textureOpacity};
+ return {label:custom?.style.label??entry.label,color,assetId:textureOpacity>0?(custom?(custom.style.asset==='none'?undefined:custom.style.asset==='terrain'?entry.id:custom.style.asset):entry.id):undefined,variant:hash(`${terrainPack.id}:${t.id}`),textureOpacity,layers:textureOpacity>0?(custom?.style.layers??[]):[]};
 }
 
 export function matchingAppearance(world:World,tile:Tile) {
