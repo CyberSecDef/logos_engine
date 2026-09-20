@@ -10,8 +10,8 @@ Phase 5g knowledge and technology is underway. The plan is split into local
 research (5g1), communication-based knowledge exchange (5g2), and broader unlocks
 plus integration (5g3). See [technology plan](docs/technology.md).
 Confirmed: settlements choose projects automatically; improved cultivation first.
-Phase 5g3 technology effects and integration is implemented and deployed;
-publication is underway. Filtration improves existing plants, as confirmed.
+Phase 5g3 technology effects and integration is implemented, deployed and
+published. Filtration improves existing plants, as confirmed.
 Phase 5g is complete: automatic research, knowledge exchange, treatment/farm
 improvements, prerequisites and read-only knowledge inputs. Next: Phase 5h
 factions and conflict, followed by Phase 5i full-world tuning.
@@ -1851,3 +1851,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
   recipes and definition migrations remain future extensions, not implied
   capabilities. Next5h factions/conflict; whole-world tuning remains5i. Existing
   large web-bundle warning remains Phase6 performance work.
+
+### 2026-09-20 — Phase 5g3 publication
+
+- Published milestone `10bb07d` to public `CyberSecDef/logos_engine` main.
+- Phase 5g complete; next: 5h factions/conflict, then 5i final integration/tuning.
