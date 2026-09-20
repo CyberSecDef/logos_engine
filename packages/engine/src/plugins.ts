@@ -1,5 +1,5 @@
 import type {World,Operation} from '../../contracts/src/index.js';
-import {PLUGIN_LIMITS,type PluginDefinition} from '../../contracts/src/plugins.js';
+import {PLUGIN_LIMITS,type PluginDefinition,type PluginInstance} from '../../contracts/src/plugins.js';
 import {executePlugin} from '../../plugin-host/src/index.js';
 import {readValue,ruleTargets} from './extensions.js';
 export type PluginChange={tileId:number;fieldId:string;value:number;kind:'add'|'set'};
@@ -28,6 +28,42 @@ export function validatePlugins(world:World):void {
  }
  if(worstFuel>PLUGIN_LIMITS.worldFuel)throw Error('World exceeds reserved plugin instruction budget; narrow plugin scope');
 }
+export function validateStateMappings(world:World,operations:Operation[]):void {
+ for(const op of operations)if(op.kind==='plugin-define'&&op.migration==='map') {
+  const id=op.definition.id;
+  if(!world.plugins.some(p=>p.definition.id===id))throw Error('State mapping requires an existing plugin');
+  if(operations.filter(o=>o.kind==='plugin-define'&&o.definition.id===id||o.kind==='plugin-remove'&&o.pluginId===id).length!==1)throw Error('A mapped plugin can only be defined once and cannot be removed in the same proposal');
+ }
+}
+function mappedState(world:World,old:PluginInstance|undefined,op:Extract<Operation,{kind:'plugin-define'}>):PluginInstance['state'] {
+ if(!old)throw Error('State mapping requires an existing plugin');
+ const p=op.definition;
+ if(p.scope!==old.definition.scope)throw Error('State mapping requires unchanged plugin scope; use reset for scope changes');
+ if(!op.stateMap)throw Error('State mapping requires stateMap');
+ const mappings=new Map(op.stateMap.map(m=>[m.key,m]));
+ if(mappings.size!==op.stateMap.length||mappings.size!==p.stateFields.length||p.stateFields.some(f=>!mappings.has(f.id)))throw Error('State mapping must name each destination key exactly once');
+ const oldKeys=old.definition.stateFields.map(f=>f.id),used=new Set<string>();
+ for(const mapping of mappings.values())if('from' in mapping) {
+  if(!oldKeys.includes(mapping.from))throw Error(`Unknown source state key: ${mapping.from}`);
+  used.add(mapping.from);
+ }
+ const discarded=op.discardStateKeys??[],unused=oldKeys.filter(key=>!used.has(key));
+ if(new Set(discarded).size!==discarded.length||discarded.length!==unused.length||unused.some(key=>!discarded.includes(key)))throw Error('Explicitly list every unused old key in discardStateKeys');
+ const states=new Map(old.state.map(s=>[s.tileId,s.values]));
+ return pluginTargets(world,p).sort((a,b)=>a-b).map(tileId=>{
+  const previous=states.get(tileId)??old.definition.stateFields.map(f=>f.initial);
+  return {tileId,values:p.stateFields.map(field=>{
+   const mapping=mappings.get(field.id)!;
+   if('initial' in mapping)return field.initial;
+   const value=previous[oldKeys.indexOf(mapping.from)]*mapping.scale+mapping.offset;
+   if(!Number.isFinite(value))throw Error('Non-finite state conversion');
+   if(mapping.precision==='exact'&&Math.abs(value*1000-Math.round(value*1000))>1e-7)throw Error(`State conversion loses precision for ${field.id}; choose round explicitly`);
+   const rounded=Math.round(value*1000)/1000;
+   if(rounded<field.min||rounded>field.max)throw Error(`Converted state outside bounds for ${field.id}`);
+   return rounded;
+  })};
+ });
+}
 export function applyPlugin(world:World,op:Operation):void {
  if(op.kind==='plugin-define') {
   const p=op.definition;if(p.tileId!==op.tileId)throw Error('Plugin origin must match operation');
@@ -35,9 +71,11 @@ export function applyPlugin(world:World,op:Operation):void {
   if(old&&old.definition.tileId!==p.tileId)throw Error('Plugin update cannot move its origin');
   const prior=world.history.flatMap(h=>h.operations).filter(o=>o.kind==='plugin-define'&&o.definition.id===p.id).reduce((max,o)=>o.kind==='plugin-define'?Math.max(max,o.definition.version):max,old?.definition.version??0);
   if(p.version!==prior+1)throw Error(`Plugin version must be ${prior+1}`);
+  if(op.migration!=='map'&&(op.stateMap!==undefined||op.discardStateKeys!==undefined))throw Error('stateMap/discardStateKeys require map migration');
   if(old&&op.migration==='preserve'&&(p.scope!==old.definition.scope||p.stateFields.length!==old.definition.stateFields.length||p.stateFields.some((f,i)=>f.id!==old.definition.stateFields[i].id)))throw Error('Plugin state shape/scope changed; choose reset explicitly');
+  const state=op.migration==='map'?mappedState(world,old,op):old&&op.migration==='preserve'?pluginTargets(world,old.definition).map(tileId=>({tileId,values:old.state.find(s=>s.tileId===tileId)?.values??old.definition.stateFields.map(f=>f.initial)})):[];
   world.plugins=world.plugins.filter(i=>i.definition.id!==p.id);
-  world.plugins.push({definition:p,state:old&&op.migration==='preserve'?pluginTargets(world,old.definition).map(tileId=>({tileId,values:old.state.find(s=>s.tileId===tileId)?.values??old.definition.stateFields.map(f=>f.initial)})):[]});world.plugins.sort((a,b)=>a.definition.id<b.definition.id?-1:1);
+  world.plugins.push({definition:p,state});world.plugins.sort((a,b)=>a.definition.id<b.definition.id?-1:1);
  }
  if(op.kind==='plugin-toggle'||op.kind==='plugin-remove') {
   const old=world.plugins.find(i=>i.definition.id===op.pluginId);if(!old||old.definition.tileId!==op.tileId)throw Error('Unknown plugin or mismatched origin');

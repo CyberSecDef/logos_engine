@@ -19,8 +19,12 @@ export const PluginDefinitionSchema=z.object({
  program:z.array(InstructionSchema).min(1).max(128),
 }).strict();
 export const PluginInstanceSchema=z.object({definition:PluginDefinitionSchema,state:z.array(z.object({tileId:z.number().int().nonnegative(),values:z.array(scalar).max(8)}).strict()).max(6762)}).strict();
+export const StateMappingSchema=z.union([
+ z.object({key:id,from:id,scale:scalar,offset:scalar,precision:z.enum(['exact','round'])}).strict(),
+ z.object({key:id,initial:z.literal(true)}).strict(),
+]);
 export const pluginOperations=[
- z.object({kind:z.literal('plugin-define'),tileId:z.number().int().nonnegative(),definition:PluginDefinitionSchema,migration:z.enum(['preserve','reset'])}).strict(),
+ z.object({kind:z.literal('plugin-define'),tileId:z.number().int().nonnegative(),definition:PluginDefinitionSchema,migration:z.enum(['preserve','reset','map']),stateMap:z.array(StateMappingSchema).max(8).optional(),discardStateKeys:z.array(id).max(8).optional()}).strict(),
  z.object({kind:z.literal('plugin-toggle'),tileId:z.number().int().nonnegative(),pluginId:id,enabled:z.boolean()}).strict(),
  z.object({kind:z.literal('plugin-remove'),tileId:z.number().int().nonnegative(),pluginId:id}).strict(),
 ] as const;

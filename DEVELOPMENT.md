@@ -6,6 +6,11 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
+Plugin saved-state mappings are implemented: rename/reorder counters, convert
+units, add initial values, and explicitly discard retired keys. All 61 tests and
+browser acceptance pass, native Claude acceptance passed, and the milestone is
+live on the LAN server. Publication is in progress.
+
 Phase 4 property conversions are implemented and verified: explicit scale/offset
 migrations, dependent-rule/plugin review, precision policy, forecasts, and
 persistence tests. Live on the LAN server and published as `6a56b58`.
@@ -422,17 +427,20 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - 4a: numeric definitions, conditional rules, explicit field migrations, generic
   inspector/overlays, model authority — complete.
 - 4b: conserved custom-resource transfers, daily accounting, bounded formula
-  clamps and neighbor extrema — complete. General definition/entity migrations
-  remain pending. Immutable checkpoint snapshots/definitions are implemented;
+  clamps and neighbor extrema — complete. Property scale/offset conversions are
+  implemented; general entity migrations remain pending. Immutable checkpoint snapshots/definitions are implemented;
   a complete append-only history remains pending.
 - 4c: restricted JSON plugin runtime, deterministic budgets, saved state, staged
   proposals, immutable artifacts, execution and failure recovery — implemented;
-  complete, verified, live, and published. JavaScript/native plugins are not enabled.
+  complete, verified, live, and published. Explicit saved-state mappings are now
+  implemented and verified; arbitrary migration code and JavaScript/native plugins
+  are not enabled.
 - 4d: shared painterly terrain pack, actual atlas rendering, 1,000-day staggered
   reveal and applied-action reveal — complete, verified, live, and published. Layering and world-local packs remain future work.
 - 4e: world checkpoints, branches, restore, and portable state import/export —
-  complete, live, and published. Plugin/texture bundles
-  and selective event replay remain future work.
+  complete, live, and published. Restricted plugin definitions/state already travel
+  with world exports; external artwork bundles and selective event replay remain
+  future work.
 - Pollution/disease transport remains future broader-simulation work; custom
   numeric fields alone do not implement those physical/population systems.
 
@@ -704,3 +712,29 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - The existing prompt workflow now supports explicit custom-property conversions
   with coordinated dependent definitions and precision/bounds review.
 - All 56 tests and conversion browser acceptance passed; live world preserved.
+
+### 2026-09-19 — Plugin saved-state migration started
+
+- Continuing Phase 4 with bounded declarative state mappings for existing plugins.
+- Preserve/reset behavior remains available. Mapping will require unchanged scope,
+  complete destination coverage and explicit acknowledgement of discarded keys.
+- No runtime capabilities or arbitrary migration code are being added.
+
+### 2026-09-19 — Plugin state mapping verification
+
+- All 61 tests, typecheck and production build passed.
+- Browser acceptance passed mapped-state review with actual before/after values,
+  unchanged live state during preview, Apply/reload and continued crystal production.
+- Tests cover defaults, simultaneous swaps, new/discarded keys, exact/round policy,
+  bounds/scope rejection, transaction consistency, snapshots and archive replay.
+- Extended shared model JSON Schema conversion to support strict mapping alternatives.
+- Native Claude acceptance and LAN deployment are in progress using isolated checks.
+
+### 2026-09-19 — Plugin state mapping deployment
+
+- Native Claude produced a valid map upgrade, retaining one warm day as 24 hours;
+  its five-day forecast produced the expected ten crystal shards in a temporary world.
+- Inspected the browser memory review; final 61-test suite and browser checks pass.
+- Restarted at `0.0.0.0:5180` and verified Aethra remains day 792/revision 803.
+- Added the crystal-hours example and documented precision, discarded memory,
+  same-scope limits, checkpoints and compatibility. Publishing the milestone.

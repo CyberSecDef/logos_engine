@@ -117,6 +117,7 @@ export class PromptService {
 }
 export function forecast(world:World,proposal:Proposal) {
  let baseline=structuredClone(world),candidate=applyProposal(world,proposal),baselineError:string|null=null;
+ const applied=candidate;
  for(let i=0;i<5;i++){if(!baselineError)try{baseline=advance(baseline);}catch(error){if(!(error instanceof PluginExecutionError))throw error;baselineError=error.message;}candidate=advance(candidate);}
  const ids=new Set(proposal.operations.flatMap(o=>[o.tileId,...world.cells[o.tileId].neighbors]));
  for(const op of proposal.operations) {
@@ -134,5 +135,12 @@ export function forecast(world:World,proposal:Proposal) {
  const totalTiles=ids.size,shown=[...ids].slice(0,24);
  const before=resourceTotals(world),base=resourceTotals(baseline);
  const resources=resourceTotals(candidate).map(r=>({...r,baselineUnit:base.find(b=>b.fieldId===r.fieldId)?.unit??null,beforeMilli:before.find(b=>b.fieldId===r.fieldId)?.totalMilli??null,baselineMilli:base.find(b=>b.fieldId===r.fieldId)?.totalMilli??null}));
- return {tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,baselineUnit:baseline.definitions.fields.find(b=>b.id===f.id)?.unit??null,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
+ const pluginMigrations=proposal.operations.flatMap(op=>{
+  if(op.kind!=='plugin-define'||op.migration!=='map')return [];
+  const old=world.plugins.find(p=>p.definition.id===op.definition.id)!,next=applied.plugins.find(p=>p.definition.id===op.definition.id)!;
+  const targets=pluginTargets(applied,next.definition);
+  const values=(instance:typeof old,tileId:number)=>Object.fromEntries(instance.definition.stateFields.map((f,i)=>[f.id,instance.state.find(s=>s.tileId===tileId)?.values[i]??f.initial]));
+  return [{id:op.definition.id,label:op.definition.label,totalTiles:targets.length,tiles:targets.slice(0,6).map(tileId=>({tileId,before:values(old,tileId),after:values(next,tileId)}))}];
+ });
+ return {pluginMigrations,tick:candidate.tick,baselineError,baselineTick:baseline.tick,totalTiles,resources,definitions:candidate.definitions,tiles:shown.map(id=>({id,before:world.tiles[id],after:candidate.tiles[id],baseline:baseline.tiles[id],waterMm:depthMm(candidate,id),baselineWaterMm:depthMm(baseline,id),properties:candidate.definitions.fields.map(f=>({id:f.id,label:f.label,unit:f.unit,baselineUnit:baseline.definitions.fields.find(b=>b.id===f.id)?.unit??null,after:fieldValue(candidate,id,f.id),baseline:baseline.definitions.fields.some(b=>b.id===f.id)?fieldValue(baseline,id,f.id):null}))})),events:candidate.events.slice(-12)};
 }

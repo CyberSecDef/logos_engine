@@ -88,8 +88,9 @@ scale and zero offset. Index conversions also permit offsets and negative scales
 Every existing rule or plugin reading or writing the property must be explicitly
 updated or removed in the same transaction, including disabled ones. Review its
 thresholds, constants, output amounts, and saved plugin counters. The engine does
-not infer their units or rewrite them. Plugin updates still explicitly choose
-state preserve/reset; arbitrary saved-state transformations remain future work.
+not infer their units or rewrite them. Plugin updates explicitly choose preserve/reset or a bounded
+[saved-state mapping](world-plugins.md#mapping-saved-memory-on-update); arbitrary
+migration code remains unsupported.
 A model reply allows 16 operations; if a conversion needs more coordinated edits,
 it should explain the limit rather than silently omit dependencies.
 

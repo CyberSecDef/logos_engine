@@ -1,0 +1,126 @@
+{
+  "id": "example-crystal-hours",
+  "worldId": "first-world",
+  "expectedRevision": 1,
+  "summary": "Convert crystal bloom memory from days to hours without changing its behavior.",
+  "operations": [
+    {
+      "kind": "plugin-define",
+      "tileId": 0,
+      "migration": "map",
+      "definition": {
+        "id": "crystal-bloom",
+        "version": 2,
+        "abi": "logos-stack-v1",
+        "label": "Crystal bloom",
+        "description": "After 72 consecutive warm hours, produce 5 crystal shards; each warm day adds 24 hours. Cold days reset memory.",
+        "tileId": 0,
+        "scope": "tile",
+        "enabled": true,
+        "everyDays": 1,
+        "stateFields": [
+          {
+            "id": "warm-hours",
+            "min": 0,
+            "max": 72,
+            "initial": 0
+          }
+        ],
+        "program": [
+          {
+            "op": "read",
+            "read": {
+              "source": "temperatureC",
+              "sample": "self"
+            }
+          },
+          {
+            "op": "constant",
+            "value": 10
+          },
+          {
+            "op": "greater"
+          },
+          {
+            "op": "jump-zero",
+            "target": 18
+          },
+          {
+            "op": "state-get",
+            "key": "warm-hours"
+          },
+          {
+            "op": "constant",
+            "value": 24
+          },
+          {
+            "op": "add"
+          },
+          {
+            "op": "state-set",
+            "key": "warm-hours"
+          },
+          {
+            "op": "state-get",
+            "key": "warm-hours"
+          },
+          {
+            "op": "constant",
+            "value": 72
+          },
+          {
+            "op": "less"
+          },
+          {
+            "op": "jump-zero",
+            "target": 13
+          },
+          {
+            "op": "stop"
+          },
+          {
+            "op": "constant",
+            "value": 5
+          },
+          {
+            "op": "emit",
+            "fieldId": "crystal",
+            "mode": "add"
+          },
+          {
+            "op": "constant",
+            "value": 0
+          },
+          {
+            "op": "state-set",
+            "key": "warm-hours"
+          },
+          {
+            "op": "stop"
+          },
+          {
+            "op": "constant",
+            "value": 0
+          },
+          {
+            "op": "state-set",
+            "key": "warm-hours"
+          },
+          {
+            "op": "stop"
+          }
+        ]
+      },
+      "stateMap": [
+        {
+          "key": "warm-hours",
+          "from": "warm-days",
+          "scale": 24,
+          "offset": 0,
+          "precision": "exact"
+        }
+      ],
+      "discardStateKeys": []
+    }
+  ]
+}

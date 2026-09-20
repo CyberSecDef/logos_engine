@@ -68,3 +68,62 @@ test('model plugins require world authority, and execute only through explicit p
   const next=applyProposal(w,job.proposal);forecast(w,job.proposal);advance(next);assert.equal(calls,2);
  }finally{await service.close();await rm(root,{recursive:true,force:true});}
 });
+
+const mappedUpdate=(w:World):Extract<Operation,{kind:'plugin-define'}>=>({
+ kind:'plugin-define',tileId:0,migration:'map',
+ definition:{...plugin(w),version:plugin(w).version+1,stateFields:[{id:'warm-hours',min:0,max:72,initial:0}],program:plugin(w).program.map(i=>i.op==='state-get'||i.op==='state-set'?{...i,key:'warm-hours'}:i.op==='constant'&&i.value===1?{...i,value:24}:i.op==='constant'&&i.value===3?{...i,value:72}:i)},
+ stateMap:[{key:'warm-hours',from:'warm-days',scale:24,offset:0,precision:'exact'}],discardStateKeys:[],
+});
+
+test('explicit plugin state mappings rename and convert memory without changing crystal production',()=>{
+ let original=advance(initialized()),converted=applyProposal(original,edit(original,[mappedUpdate(original)]));
+ assert.equal(converted.plugins[0].state[0].values[0],24);
+ const hash=stateHash(original),preview=forecast(original,edit(original,[mappedUpdate(original)]));
+ assert.deepEqual(preview.pluginMigrations[0].tiles[0],{tileId:0,before:{'warm-days':1},after:{'warm-hours':24}});assert.equal(stateHash(original),hash);
+ for(let i=0;i<12;i++){original=advance(original);converted=advance(converted);assert.deepEqual(converted.tiles,original.tiles);assert.equal(converted.plugins[0].state[0].values[0],original.plugins[0].state[0].values[0]*24);}
+});
+
+test('state mappings read old defaults simultaneously, cover new keys, and explicitly discard retired memory',()=>{
+ const w=initialized();plugin(w).scope='neighbors';plugin(w).enabled=false;plugin(w).stateFields.push({id:'retired',min:0,max:10,initial:7});w.plugins[0].state=[{tileId:0,values:[2,9]}];
+ const op=mappedUpdate(w);op.definition.stateFields.push({id:'new-counter',min:0,max:10,initial:5});op.stateMap!.push({key:'new-counter',initial:true});
+ assert.throws(()=>applyProposal(w,edit(w,[op])),/discardStateKeys/);op.discardStateKeys=['retired'];
+ const converted=applyProposal(w,edit(w,[op]));assert.deepEqual(converted.plugins[0].state.find(s=>s.tileId===0)!.values,[48,5]);assert.deepEqual(converted.plugins[0].state.find(s=>s.tileId!==0)!.values,[0,5]);
+ assert.deepEqual(advance(converted).plugins,converted.plugins);
+ const swap={...op,definition:{...op.definition,program:[{op:'stop' as const}],stateFields:[{id:'retired',min:0,max:10,initial:0},{id:'warm-days',min:0,max:10,initial:0}]},stateMap:[{key:'retired',from:'warm-days',scale:1,offset:0,precision:'exact' as const},{key:'warm-days',from:'retired',scale:1,offset:0,precision:'exact' as const}],discardStateKeys:[]};
+ assert.deepEqual(applyProposal(w,edit(w,[swap])).plugins[0].state.find(s=>s.tileId===0)!.values,[2,9]);
+});
+
+test('invalid state mappings reject the whole proposal without changing saved state',()=>{
+ const w=advance(initialized()),op=mappedUpdate(w),hash=stateHash(w);
+ assert.throws(()=>applyProposal(w,edit(w,[op,op])),/defined once/);
+ assert.throws(()=>forecast(w,edit(w,[op,{kind:'plugin-remove',tileId:0,pluginId:op.definition.id}])),/cannot be removed/);
+ const invalid:Operation[]=[
+  {...op,stateMap:undefined}, {...op,stateMap:[]}, {...op,stateMap:[op.stateMap![0],op.stateMap![0]]},
+  {...op,stateMap:[{key:'warm-hours',from:'missing',scale:1,offset:0,precision:'exact'}]},
+  {...op,discardStateKeys:['warm-days']}, {...op,definition:{...op.definition,scope:'world'}},
+  {...op,migration:'preserve'}, {...op,definition:{...op.definition,stateFields:[{id:'warm-hours',min:0,max:10,initial:0}]}},
+  {...op,stateMap:[{key:'warm-hours',from:'warm-days',scale:.0001,offset:0,precision:'exact'}]},
+ ];
+ for(const bad of invalid){assert.throws(()=>applyProposal(w,edit(w,[bad])));assert.equal(stateHash(w),hash);}
+ assert.throws(()=>applyProposal(make(),edit(make(),[{...op,definition:{...op.definition,version:1}}])),/existing plugin/);
+ const rounded=applyProposal(w,edit(w,[{...op,stateMap:[{key:'warm-hours',from:'warm-days',scale:.0015,offset:0,precision:'round'}]}]));assert.equal(rounded.plugins[0].state[0].values[0],.002);
+});
+
+test('mapped state and migration instructions survive checkpoints, archives and replay',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'logos-state-map-')),store=new WorldStore(root),w=advance(initialized());
+ const converted=applyProposal(w,edit(w,[mappedUpdate(w)]));
+ try{
+  await store.save(converted);assert.deepEqual(await store.load(w.id),converted);
+  const point=await store.checkpoint(converted,'Mapped state');assert.deepEqual((await store.readCheckpoint(w.id,point.id)).world,converted);
+  const restored=unpackWorld(archiveWorld(converted));assert.deepEqual(advance(restored),advance(converted));
+ }finally{await rm(root,{recursive:true,force:true});}
+});
+
+
+test('model contract exposes both strict state-mapping forms',async()=>{
+ const {ModelReplySchema,modelReplyJsonSchema}=await import('../packages/contracts/src/prompts.js');
+ const w=advance(initialized()),op=mappedUpdate(w);
+ ModelReplySchema.parse({kind:'proposal',message:'Retain warmth in hours',assumptions:[],operations:[op]});
+ const serialized=JSON.stringify(modelReplyJsonSchema);assert.ok(serialized.includes('stateMap'));assert.ok(serialized.includes('discardStateKeys'));
+ assert.throws(()=>ModelReplySchema.parse({kind:'proposal',message:'Invalid mixed mapping',assumptions:[],operations:[{...op,stateMap:[{...op.stateMap![0],initial:true}]}]}));
+});

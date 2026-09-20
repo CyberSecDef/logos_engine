@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Small converter for the finite schema vocabulary used by world extensions.
 // Runtime validation remains authoritative; unsupported schema types fail loudly.
 export function modelSchema(schema:z.ZodTypeAny):Record<string,unknown> {
- if(schema instanceof z.ZodDiscriminatedUnion)return {anyOf:schema.options.map((option:z.ZodTypeAny)=>modelSchema(option))};
+ if(schema instanceof z.ZodDiscriminatedUnion||schema instanceof z.ZodUnion)return {anyOf:schema.options.map((option:z.ZodTypeAny)=>modelSchema(option))};
  if(schema instanceof z.ZodOptional)return modelSchema(schema.unwrap());
  if(schema instanceof z.ZodObject) {
   const properties:Record<string,unknown>={},required:string[]=[];

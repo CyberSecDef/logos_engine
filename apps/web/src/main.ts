@@ -145,7 +145,7 @@ function describeRule(rule:CustomRule):string {
 }
 function describeOperation(o:Operation):string {
  switch(o.kind){
-  case 'plugin-define':return `World plugin: ${o.definition.label} v${o.definition.version} · ${o.definition.scope} · ${o.definition.program.length} instructions · ${o.definition.stateFields.length} saved state values per tile. ${o.definition.description} State migration: ${o.migration}.`;
+  case 'plugin-define':return `World plugin: ${o.definition.label} v${o.definition.version} · ${o.definition.scope} · ${o.definition.program.length} instructions · ${o.definition.stateFields.length} saved state values per tile. ${o.definition.description} State migration: ${o.migration}.${o.migration==='map'?` ${(o.stateMap??[]).map(m=>'initial' in m?`${m.key}: new initial value`:`${m.key}: old ${m.from} × ${m.scale} + ${m.offset} (${m.precision==='exact'?'reject precision loss':'round to 0.001'})`).join('; ')}. Discard old keys: ${(o.discardStateKeys??[]).join(', ')||'none'}.`:''}`;
   case 'plugin-toggle':return `${o.enabled?'Enable':'Disable'} plugin ${o.pluginId}; saved state is retained.`;
   case 'plugin-remove':return `Remove plugin ${o.pluginId} and its saved state; output properties remain.`;
   case 'rainfall':return `Zone ${o.tileId}: ${o.mmPerDay} mm rain/day`;
@@ -172,12 +172,17 @@ function updateCustomLayers() {
 }
 $('custom-layer').onchange=()=>{const value=$<HTMLSelectElement>('custom-layer').value;if(!value)return;globe.overlay=value as Overlay;globe.update();updateCustomLayers();for(const button of Array.from($('layer-buttons').children))button.classList.remove('active');};
 async function reviewProposal(proposal:Proposal) {
- const result=await api<{tick:number;baselineError:string|null;baselineTick:number;totalTiles:number;resources:{fieldId:string;label:string;unit:string;baselineUnit:string|null;totalMilli:number;beforeMilli:number|null;baselineMilli:number|null}[];tiles:{properties:{id:string;label:string;unit:string;baselineUnit:string|null;after:number;baseline:number|null}[];id:number;after:World['tiles'][number];baseline:World['tiles'][number];waterMm:number;baselineWaterMm:number}[]}>('proposals/preview',proposal);
+ const result=await api<{pluginMigrations:{id:string;label:string;totalTiles:number;tiles:{tileId:number;before:Record<string,number>;after:Record<string,number>}[]}[];tick:number;baselineError:string|null;baselineTick:number;totalTiles:number;resources:{fieldId:string;label:string;unit:string;baselineUnit:string|null;totalMilli:number;beforeMilli:number|null;baselineMilli:number|null}[];tiles:{properties:{id:string;label:string;unit:string;baselineUnit:string|null;after:number;baseline:number|null}[];id:number;after:World['tiles'][number];baseline:World['tiles'][number];waterMm:number;baselineWaterMm:number}[]}>('proposals/preview',proposal);
  pending=proposal;text('proposal-summary',proposal.summary);
  const container=$('preview-results');container.replaceChildren();
  if(result.baselineError){const note=document.createElement('p');note.className='baseline-error';note.textContent=`The unchanged world could not finish its forecast: ${result.baselineError} Baseline comparisons below use its last successful day (${result.baselineTick}); the proposed world reached day ${result.tick}.`;container.append(note);}
  for(const resource of result.resources??[]){const p=document.createElement('p');p.className='resource-preview';p.textContent=`World total · ${resource.label}: ${resource.totalMilli/1000} ${resource.unit} on day ${result.tick} (${resource.baselineMilli===null?'not previously a stock resource':`${resource.baselineMilli/1000} ${resource.baselineUnit??resource.unit} without this change`}).`;container.append(p);}
  for(const operation of proposal.operations){const p=document.createElement('p');p.textContent=describeOperation(operation);container.append(p);if(operation.kind==='plugin-define'){const details=document.createElement('details'),summary=document.createElement('summary'),code=document.createElement('pre');summary.textContent='Inspect plugin program';code.textContent=JSON.stringify(operation.definition,null,2);details.append(summary,code);container.append(details);}}
+ for(const migration of result.pluginMigrations??[]){
+  const block=document.createElement('details'),heading=document.createElement('summary');heading.textContent=`${migration.label}: saved memory on Apply · ${migration.tiles.length} of ${migration.totalTiles} zones`;block.className='state-migration-preview';block.append(heading);
+  const describe=(values:Record<string,number>)=>Object.entries(values).map(([key,value])=>`${key}: ${value}`).join(', ')||'no saved keys';
+  for(const tile of migration.tiles){const row=document.createElement('p');row.textContent=`Zone ${tile.tileId} · before: ${describe(tile.before)} → on Apply: ${describe(tile.after)}`;block.append(row);}container.append(block);
+ }
  if(result.totalTiles>result.tiles.length){const note=document.createElement('p');note.textContent=`Showing ${result.tiles.length} of ${result.totalTiles} potentially affected zones.`;container.append(note);}
  for(const tile of result.tiles){
   const customChanged=tile.properties.some(f=>f.baseline===null||f.after!==f.baseline);
