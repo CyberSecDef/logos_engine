@@ -15,7 +15,8 @@ portable world import/export, and persistent world selection. Published as
 `b4b38e0`. Phase 4c restricted plugins are implemented and live: deterministic
 instruction budgets, saved per-tile state, reviewed installation/update, and
 failure recovery. Verified, deployed, and published as `b10dbed`. General entity
-migrations, artwork, and a complete replay journal remain pending.
+migrations and a complete replay journal remain pending. Phase 4d terrain
+artwork is verified and live; milestone publication is in progress.
 
 ## Completed
 
@@ -423,7 +424,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - 4c: restricted JSON plugin runtime, deterministic budgets, saved state, staged
   proposals, immutable artifacts, execution and failure recovery — implemented;
   complete, verified, live, and published. JavaScript/native plugins are not enabled.
-- 4d: forest/city artwork packs and actual texture rendering.
+- 4d: shared painterly terrain pack, actual atlas rendering, 1,000-day staggered
+  reveal and applied-action reveal — verified and live; publication in progress. Layering and world-local packs remain future work.
 - 4e: world checkpoints, branches, restore, and portable state import/export —
   complete, live, and published. Plugin/texture bundles
   and selective event replay remain future work.
@@ -608,3 +610,46 @@ runoff with sediment conservation, and checksummed storage/path validation.
   workflow, with an explicit crystal-bloom walkthrough in `docs/world-plugins.md`.
 - All 49 tests, three browser suites, and a native Claude acceptance check passed.
 - User worlds were preserved; no automatic plugin installation or time advancement.
+
+### 2026-09-19 — Phase 4d started
+
+- Continuing with terrain image rendering while preserving color-only world birth.
+- Asked for artwork style and day-1 versus gradual texture appearance.
+- Using the imagegen skill for project raster assets. Building a shared atlas
+  loader with color fallbacks, readable overlays, and no simulation state changes.
+- Pending: artwork, rendering integration, acceptance tests, guide, deployment
+  and milestone publication.
+
+### 2026-09-19 — Terrain artwork and reveal policy
+
+- User chose painterly overhead artwork and a staggered reveal over 1,000 days.
+  Explicitly actioned tiles should reveal immediately on Apply.
+- Generated and inspected forest, meadow, dry grassland, alpine, water and city
+  PNG assets using the built-in image tool; copied all six into the repository.
+- Added a versioned data catalog and bounded atlas loader with gutter extrusion.
+- Implementing deterministic tile reveal order from seed/IDs, applied-action
+  reveal, top-face blending, overlay isolation, and a persistent Colors only option.
+- Generated images are cosmetic; no population/settlement mechanics are added.
+
+### 2026-09-19 — Texture acceptance checks
+
+- All 52 tests pass: staggered reveal through day 1,000, immediate action reveal,
+  clone/export consistency, atlas UV padding, and six local PNG assets.
+- Chromium GPU pixel checks passed: image textures change terrain rendering;
+  Colors only and thematic overlays retain their original colors.
+- Browser flow verified plain world birth, selection/preview without reveal,
+  immediate Apply reveal at day zero, reload, six biome textures, desktop/mobile
+  layouts, and missing-image color fallback. Simulation hashes stayed unchanged.
+- Inspected the rendered desktop/mobile screenshots. Completing documentation,
+  final regression/deployment and publication.
+
+### 2026-09-19 — Terrain milestone deployment
+
+- `npm run check` passed: typecheck, all 52 tests, and production build.
+- Texture and plugin browser regressions passed after the final loader change.
+- Restarted production at `0.0.0.0:5180`, preserving the user's current world
+  at day 407; no world edits or simulation steps were made by deployment.
+- Added the terrain guide, catalog/prompt provenance, initial-download size,
+  rendering limits, and remaining world-local/layered-pack scope.
+- Publishing six original generated PNGs with versioned immutable URLs, plus
+  the 1,000-day and action-triggered reveal implementation.

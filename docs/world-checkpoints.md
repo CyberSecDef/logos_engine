@@ -50,7 +50,9 @@ conversation records, checkpoint collections, credentials, or arbitrary executab
 state are included with the simulated state.
 The limit is 32 MiB including the request envelope. The SHA-256 checksum detects
 accidental modification; it is not a signature proving who authored an archive.
-Texture packs and external JavaScript/native plugin files are not bundled.
+The shared painterly-v1 texture pack ships with the application; its files and
+external JavaScript/native plugin files are not bundled into world exports.
+Terrain reveal progress derives from the tick/history already in the archive.
 Restricted plugin artifacts are recreated from the embedded definitions on save.
 
 ## Storage and guarantees

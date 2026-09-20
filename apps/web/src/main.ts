@@ -12,7 +12,10 @@ function requestId():string {
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 let token='',world:World,selected=-1,busy=false,playing=false,pending:Proposal|null=null,timer:ReturnType<typeof setTimeout>|undefined;
 let promptJobId:string|null=null,chatPoll:ReturnType<typeof setTimeout>|undefined;
-const globe=new WorldGlobe($<HTMLCanvasElement>('globe'),selectTile);
+const globe=new WorldGlobe($<HTMLCanvasElement>('globe'),selectTile,status=>text('art-status',status));
+try{globe.texturesEnabled=localStorage.getItem('logos-terrain-style')!=='colors';}catch{}
+$<HTMLSelectElement>('texture-mode').value=globe.texturesEnabled?'artwork':'colors';
+$('texture-mode').onchange=()=>{globe.texturesEnabled=$<HTMLSelectElement>('texture-mode').value==='artwork';try{localStorage.setItem('logos-terrain-style',globe.texturesEnabled?'artwork':'colors');}catch{}globe.update();};
 const fmt=(n:number)=>Math.round(n).toLocaleString();
 const text=(id:string,value:string)=>{$(id).textContent=value;};
 function error(e:unknown) {text('toast',e instanceof Error?e.message:String(e));$('toast').hidden=false;setTimeout(()=>{$('toast').hidden=true;},6500);}
@@ -38,7 +41,7 @@ function selectTile(id:number) {
  const t=world?.tiles[id];$('creator').hidden=!t;
  if(!t) {text('tile-title','Choose a place.');text('tile-subtitle','Select a tile to inspect its terrain, water, and possibilities.');$('tile-details').replaceChildren();return;}
  text('tile-title',appearance(world,t).label);text('tile-subtitle',`ZONE ${String(id).padStart(4,'0')} · ${world.cells[id].neighbors.length} neighbors`);
- const entries=[['Elevation',`${fmt(t.elevationM)} m`],['Standing water',`${(t.waterL/world.cells[id].areaM2).toFixed(1)} mm`],['Rainfall today',`${t.rainMm} mm`],['Temperature',`${t.temperatureC.toFixed(1)} °C`],['Heat / cold anomaly',`${(t.temperatureAnomalyC??0)>=0?'+':''}${(t.temperatureAnomalyC??0).toFixed(1)} °C`],['Vegetation',`${Math.round(t.vegetation*100)}%`],['Communication',t.communication?'Connected':'Isolated']];
+ const entries=[['Artwork',globe.reveal[id]>=1?'Revealed':globe.reveal[id]>0?'Appearing gradually':'Not revealed yet'],['Elevation',`${fmt(t.elevationM)} m`],['Standing water',`${(t.waterL/world.cells[id].areaM2).toFixed(1)} mm`],['Rainfall today',`${t.rainMm} mm`],['Temperature',`${t.temperatureC.toFixed(1)} °C`],['Heat / cold anomaly',`${(t.temperatureAnomalyC??0)>=0?'+':''}${(t.temperatureAnomalyC??0).toFixed(1)} °C`],['Vegetation',`${Math.round(t.vegetation*100)}%`],['Communication',t.communication?'Connected':'Isolated']];
  const container=$('tile-details');container.replaceChildren();
  for(const [label,value] of entries){const row=document.createElement('div');row.className='stat';const k=document.createElement('span');k.textContent=label;const v=document.createElement('strong');v.textContent=value;row.append(k,v);container.append(row);}
  for(const rule of world.rules.filter(r=>r.tileId===id)){const p=document.createElement('p');p.className='rule-note';p.textContent=rule.kind==='rainfall'?`Recurring rule: ${rule.mmPerDay} mm of rain / day`:`Sustained temperature: ${rule.celsius} °C`;container.append(p);}

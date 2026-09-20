@@ -133,7 +133,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
     const content=await readFile(target).catch(()=>null);
     if(!content) {res.statusCode=404;return res.end('Not found. Run npm run build.');}
     const types:Record<string,string>={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml'};
-    res.writeHead(200,{'Content-Type':types[extname(target)]??'application/octet-stream','X-Content-Type-Options':'nosniff'});res.end(content);
+    res.writeHead(200,{'Content-Type':types[extname(target)]??'application/octet-stream','X-Content-Type-Options':'nosniff',...(pathname.startsWith('/painterly-v1/')?{'Cache-Control':'public, max-age=31536000, immutable'}:{})});res.end(content);
   }
   try {
     await new Promise<void>((yes,no)=>{server.once('error',no);server.listen(options.port??Number(process.env.PORT??5180),bindHost,yes);});

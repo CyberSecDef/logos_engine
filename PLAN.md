@@ -363,10 +363,10 @@ Art depicts simulation state; a city image does not itself create a city.
 
 Use a data-driven appearance catalog, separate from simulation rules. Entries
 declare an asset ID, matching state conditions, priority, compatible layers,
-variants, fallback color, and pack version. Proposed initial presentation:
-birth is color-only, then textures become eligible after the first committed
-simulation tick when their state conditions match. Keep this reveal policy
-configurable rather than inventing a separate ecological maturation mechanic.
+variants, fallback color, and pack version. User-confirmed initial presentation: birth is color-only, then a few tiles at a
+time fade into textures over the first 1,000 simulated days. Tiles targeted by
+applied creator actions reveal immediately. This is visual presentation, not a
+separate ecological maturation mechanic; a Colors only option remains available.
 
 Support a base terrain image plus optional settlement and condition layers, so
 a forest settlement or flooded city does not require a unique full-tile image

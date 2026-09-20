@@ -150,9 +150,12 @@ journal. Restricted JSON programs are implemented in the
 [world-plugin interface](world-plugins.md); JavaScript/native execution remains unsupported. External agents receive scoped
 JSON packets and return responses for validation; they do not need repository access.
 
-Appearance has a catalog and tile-top UVs for hexagons and pentagons. Image IDs
-are reserved after birth but the renderer still uses colors for every tile.
-Actual image packs, texture loading/compositing, and settlements remain pending.
+Appearance now uses the versioned painterly-v1 pack and padded atlas UVs for
+hexagons and pentagons. Untouched worlds start colored; small groups reveal over
+1,000 simulated days, while applied action targets reveal immediately. Data
+overlays remain colored, with optional Colors only terrain rendering. See
+[terrain artwork](terrain-artwork.md). World-local/layered packs and settlement
+simulation remain pending.
 
 ## Restricted plugins
 

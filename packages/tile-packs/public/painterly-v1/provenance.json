@@ -1,0 +1,67 @@
+{
+  "pack": "painterly-v1",
+  "created": "2026-09-19",
+  "method": "Built-in image_gen tool, one generation per asset; original PNG files copied without editing.",
+  "prompts": [
+    {
+      "asset": "forest.png",
+      "prompt": "Use case: stylized-concept. Asset type: square terrain texture for a small hexagonal tile on a fantasy simulation globe. Strict orthographic straight-down overhead view, no horizon, no perspective tilt. Painterly hand-painted strategy-game terrain, readable large forms, restrained natural colors, softly lit with no directional shadows, no dramatic lighting. Entire square filled edge-to-edge with terrain; no hexagon outline, no borders, no labels, no text, no watermark. Detail must remain readable when reduced to a tiny game tile. Subject: a dense unbroken green forest canopy, clusters of rounded tree tops and occasional dark gaps. Leafy emerald and moss green crowns at varied sizes. No visible trunks, buildings, roads, people or sky.",
+      "sha256": "27b2d9671a55da6a9cdd76eb68682cbc0aa9d05a019d47f7d5a9a5be50851acf",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2638810
+    },
+    {
+      "asset": "city.png",
+      "prompt": "Use case: stylized-concept. Asset type: square terrain texture for a small hexagonal tile on a fantasy simulation globe. Strict orthographic straight-down overhead view, no horizon, no perspective tilt. Painterly hand-painted strategy-game terrain, readable large forms, restrained natural colors, softly lit with no directional shadows, no dramatic lighting. Entire square filled edge-to-edge with terrain; no hexagon outline, no borders, no labels, no text, no watermark. Detail must remain readable when reduced to a tiny game tile. Subject: a compact medieval fantasy town seen directly from above, clustered stone and timber houses with muted terracotta and slate roofs, winding narrow pale cobblestone lanes, a small open market square near the center. Buildings at small consistent aerial scale, filling the square. No tall towers, no people, no giant central building, no enclosing frame.",
+      "sha256": "26d275ea27b5e7c5ab70dce28dce349949403fa2e7eaac73007b4432ff9ef72e",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 3357045
+    },
+    {
+      "asset": "meadow.png",
+      "prompt": "Use case: stylized-concept. Asset type: square terrain texture for a small hexagonal tile on a fantasy simulation globe. Strict orthographic straight-down overhead view, no horizon, no perspective tilt. Painterly hand-painted strategy-game terrain, readable large forms, restrained natural colors, softly lit with no directional shadows, no dramatic lighting. Entire square filled edge-to-edge with terrain; no hexagon outline, no borders, no labels, no text, no watermark. Detail must remain readable when reduced to a tiny game tile. Subject: lush rolling meadow seen vertically from above, soft broad patches of sage and fresh grass green, subtle grasses and tiny scattered cream wildflowers, occasional low shrubs. No trees, no roads, no buildings, no water. Natural irregular patterns with low contrast.",
+      "sha256": "7fea2f71a38953c4766aab8bb6d1c7a8e63eb4301465cad4dd713974802e66bf",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 3008716
+    },
+    {
+      "asset": "dry.png",
+      "prompt": "Use case: stylized-concept. Asset type: square terrain texture for a small hexagonal tile on a fantasy simulation globe. Strict orthographic straight-down overhead view, no horizon, no perspective tilt. Painterly hand-painted strategy-game terrain, readable large forms, restrained natural colors, softly lit with no directional shadows, no dramatic lighting. Entire square filled edge-to-edge with terrain; no hexagon outline, no borders, no labels, no text, no watermark. Detail must remain readable when reduced to a tiny game tile. Subject: dry golden fantasy grassland seen vertically from above, broad ochre and muted olive grass patches, small tufts of straw-colored grass and sparse dusty earth, occasional tiny stones. No dunes, no trees, no buildings, no roads. Soft natural irregular patterns.",
+      "sha256": "f1dd9731a9c4b1ef1cdbdd5a67f132b66bbc635fe8b51db1b8c4918bec13d044",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 3207028
+    },
+    {
+      "asset": "alpine.png",
+      "prompt": "Use case: stylized-concept. Asset type: square terrain texture for a small hexagonal tile on a fantasy simulation globe. Strict orthographic straight-down overhead view, no horizon, no perspective tilt. Painterly hand-painted strategy-game terrain, readable large forms, restrained natural colors, softly lit with no directional shadows, no dramatic lighting. Entire square filled edge-to-edge with terrain; no hexagon outline, no borders, no labels, no text, no watermark. Detail must remain readable when reduced to a tiny game tile. Subject: rocky alpine ground seen vertically from above, broad interlocking grey stone outcrops, muted slate and warm grey rock slabs with subtle cracks, sparse pale lichens and small snow traces in crevices. No horizon, no mountain silhouettes, no buildings, no trees.",
+      "sha256": "c20e07817f9cfa5a5efe4d7f4cf3d784033301374848b6fedc830d7a66f95107",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 3350999
+    },
+    {
+      "asset": "ocean.png",
+      "prompt": "Use case: stylized-concept. Asset type: square terrain texture for a small hexagonal tile on a fantasy simulation globe. Strict orthographic straight-down overhead view, no horizon, no perspective tilt. Painterly hand-painted strategy-game terrain, readable large forms, restrained natural colors, softly lit with no directional shadows, no dramatic lighting. Entire square filled edge-to-edge with terrain; no hexagon outline, no borders, no labels, no text, no watermark. Detail must remain readable when reduced to a tiny game tile. Subject: deep ocean water seen vertically from above, rich muted teal and navy water, broad subtle painterly ripples and gentle wave patterns, low contrast with a few soft turquoise glints. No shore, no islands, no boats, no fish, no clouds, no white surf stripes.",
+      "sha256": "ef9a05518e56c74fa91cbecc66eac6189af78d1efc50a431ea7aedffcaae984e",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 1799809
+    }
+  ]
+}

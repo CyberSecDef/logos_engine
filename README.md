@@ -64,7 +64,11 @@ home network; this milestone has no user login.
   limits, reviewed installation, and failure recovery. Try
   [crystal bloom](docs/world-plugins.md).
 
-**Still planned:** automatic Cursor CLI launching, texture images, JavaScript/native plugins, richer erosion, trade,
+- Painterly terrain images, gradually revealed over 1,000 simulated days, with
+  immediate reveal on applied tile actions and a Colors only option. See
+  [terrain artwork](docs/terrain-artwork.md).
+
+**Still planned:** automatic Cursor CLI launching, world-local/layered artwork packs, JavaScript/native plugins, richer erosion, trade,
 population, conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 
@@ -85,6 +89,7 @@ npm run test:extensions # Custom properties/rules through the browser
 npm run test:resources  # Mana transfers, stock totals, and daily balance
 npm run test:checkpoints # Checkpoint/restore, branches, portable worlds
 npm run test:plugins    # Stateful plugin proposal, execution, pause/resume
+npm run test:textures   # GPU textures, reveal policy, overlays, fallbacks
 npm run world -- create my-world amber
 npm run world -- step my-world 10
 npm run world -- inspect my-world

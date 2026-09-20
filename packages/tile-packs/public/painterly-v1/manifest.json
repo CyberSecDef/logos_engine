@@ -1,0 +1,13 @@
+{
+  "id": "painterly-v1",
+  "version": 1,
+  "revealDays": 1000,
+  "entries": [
+    {"id":"ocean","label":"Deep water","color":"#174863","image":"/painterly-v1/ocean.png","conditions":[{"field":"elevationM","comparison":"lte","value":0}]},
+    {"id":"city","label":"Settlement","color":"#bda993","image":"/painterly-v1/city.png","conditions":[{"field":"population","comparison":"gte","value":100}]},
+    {"id":"alpine","label":"Alpine rock","color":"#b0b9b4","image":"/painterly-v1/alpine.png","conditions":[{"field":"elevationM","comparison":"gt","value":1200}]},
+    {"id":"forest","label":"Forest canopy","color":"#367c64","image":"/painterly-v1/forest.png","conditions":[{"field":"vegetation","comparison":"gt","value":0.6}]},
+    {"id":"meadow","label":"Meadow","color":"#89a96a","image":"/painterly-v1/meadow.png","conditions":[{"field":"vegetation","comparison":"gt","value":0.3}]},
+    {"id":"dry","label":"Dry grassland","color":"#b4a574","image":"/painterly-v1/dry.png","conditions":[]}
+  ]
+}

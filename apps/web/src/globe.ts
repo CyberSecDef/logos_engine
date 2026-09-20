@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { GlobeScene } from '../../../packages/globe/src/scene.js';
-import { appearance, type Overlay } from '../../../packages/globe/src/appearance.js';
+import { appearance,textureReveals,terrainPack, type Overlay } from '../../../packages/globe/src/appearance.js';
+import {TerrainTextures} from './terrain-textures.js';
+import {atlasUV} from '../../../packages/globe/src/texture-layout.js';
 import type { World } from '../../../packages/contracts/src/index.js';
 
 export class WorldGlobe {
@@ -10,13 +12,29 @@ export class WorldGlobe {
   ids:number[]=[];
   world:World|null=null;
   overlay:Overlay='terrain';
+  texturesEnabled=true;
+  textures:TerrainTextures;
+  reveal:number[]=[];
+  private detail={value:1};
   spinning=!matchMedia('(prefers-reduced-motion: reduce)').matches;
   selected=-1;
   private marker=new THREE.LineLoop(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:'#d3f3d4',transparent:true,opacity:0.95,depthTest:false}));
   private pointer=new THREE.Vector2();
   private ray=new THREE.Raycaster();
-  constructor(canvas:HTMLCanvasElement,onSelect:(id:number)=>void) {
+  constructor(canvas:HTMLCanvasElement,onSelect:(id:number)=>void,private onArtwork:(status:string)=>void=()=>{}) {
     this.scene=new GlobeScene(canvas);
+    this.textures=new TerrainTextures(()=>{this.update();if(!this.world)this.onArtwork(this.textures.status);});
+    this.scene.material.map=this.textures.texture;
+    const lighting=this.scene.material.onBeforeCompile;
+    this.scene.material.onBeforeCompile=(shader,renderer)=>{
+      lighting(shader,renderer);shader.uniforms.uTextureDetail=this.detail;
+      shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute float aTexture;\nvarying float vTexture;').replace('#include <begin_vertex>','#include <begin_vertex>\nvTexture=aTexture;');
+      shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying float vTexture;\nuniform float uTextureDetail;').replace('#include <map_fragment>','').replace('#include <color_fragment>','#include <color_fragment>\n#ifdef USE_MAP\ndiffuseColor.rgb=mix(diffuseColor.rgb,texture2D(map,vMapUv).rgb,vTexture*uTextureDetail);\n#endif');
+    };
+    this.scene.material.customProgramCacheKey=()=> 'logos-terrain-atlas-v1';
+    this.textures.texture.anisotropy=Math.min(4,this.scene.renderer.capabilities.getMaxAnisotropy());
+    void this.textures.load(terrainPack.entries);
+
     this.scene.setAxialTilt(15);this.scene.setSun({azimuth:30,elevation:35});
     this.scene.camera.position.set(2.6,1.2,2.8);
     const fit=()=>this.scene.camera.position.setLength(innerWidth<=760?6.2:4.7);
@@ -40,16 +58,17 @@ export class WorldGlobe {
     let previous=performance.now();
     const draw=(now:number)=>{
       if(this.spinning&&!document.hidden)this.scene.spin.rotation.y+=Math.min(now-previous,100)/1000*0.025;
-      previous=now;this.scene.resize();this.scene.render();requestAnimationFrame(draw);
+      previous=now;this.detail.value=Math.max(0,Math.min(1,(9-this.scene.camera.position.length())/2));this.scene.resize();this.scene.render();requestAnimationFrame(draw);
     };requestAnimationFrame(draw);
   }
   setWorld(world:World) {
     const rebuild=this.world?.id!==world.id || this.world.cells.length!==world.cells.length;
-    this.world=world;
+    this.world=world;this.reveal=textureReveals(world);
     if(rebuild) {
       const triangles=world.cells.reduce((n,c)=>n+c.corners.length*3,0);
       this.geometry=new THREE.BufferGeometry();
       for(const key of ['position','color'])this.geometry.setAttribute(key,new THREE.BufferAttribute(new Float32Array(triangles*9),3));
+      this.geometry.setAttribute('aTexture',new THREE.BufferAttribute(new Float32Array(triangles*3),1));
       this.geometry.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(triangles*6),2));
       this.ids=[];for(const c of world.cells)for(let i=0;i<c.corners.length*3;i++)this.ids.push(c.id);
       this.mesh=this.scene.setTiles({geometry:this.geometry},new Float32Array(triangles*3).fill(0.9),new Float32Array(triangles*3));
@@ -61,10 +80,13 @@ export class WorldGlobe {
     if(!this.world)return;
     const pos=this.geometry.getAttribute('position') as THREE.BufferAttribute;
     const colors=this.geometry.getAttribute('color') as THREE.BufferAttribute;
+    const weight=this.geometry.getAttribute('aTexture') as THREE.BufferAttribute;
     const uv=this.geometry.getAttribute('uv') as THREE.BufferAttribute;
-    let vertex=0;
+    let vertex=0,textured=0;
     for(const cell of this.world.cells) {
-      const tile=this.world.tiles[cell.id], base=new THREE.Color(appearance(this.world,tile,this.overlay).color);
+      const tile=this.world.tiles[cell.id],art=appearance(this.world,tile,this.overlay,this.reveal[cell.id]),base=new THREE.Color(art.color);
+      const slot=art.assetId?this.textures.slots.get(art.assetId):undefined;
+      const strength=this.texturesEnabled&&slot!==undefined?art.textureOpacity:0;if(strength>0)textured++;
       const center=new THREE.Vector3(...cell.center),radius=this.radius(cell.id),n=cell.corners.length;
       const top=cell.corners.map(c=>new THREE.Vector3(...c).lerp(center,0.065).normalize().multiplyScalar(radius));
       const bottom=top.map(v=>v.clone().normalize().multiplyScalar(0.993));
@@ -73,7 +95,7 @@ export class WorldGlobe {
       const scale=Math.max(...top.map(p=>p.clone().sub(center.clone().multiplyScalar(radius)).length()))*2;
       const add=(p:THREE.Vector3,shade:number)=>{
         pos.setXYZ(vertex,p.x,p.y,p.z); colors.setXYZ(vertex,base.r*shade,base.g*shade,base.b*shade);
-        const delta=p.clone().sub(center.clone().multiplyScalar(radius));uv.setXY(vertex,0.5+delta.dot(tangent)/scale,0.5+delta.dot(bitangent)/scale);vertex++;
+        const delta=p.clone().sub(center.clone().multiplyScalar(radius)),coords=atlasUV(slot??0,0.5+delta.dot(tangent)/scale,0.5+delta.dot(bitangent)/scale,art.variant%4);uv.setXY(vertex,...coords);weight.setX(vertex,shade===1?strength:0);vertex++;
       };
       for(let i=0;i<n;i++) {
         const j=(i+1)%n;
@@ -82,7 +104,8 @@ export class WorldGlobe {
         add(top[j],0.48);add(bottom[i],0.48);add(bottom[j],0.48);
       }
     }
-    pos.needsUpdate=true;colors.needsUpdate=true;uv.needsUpdate=true;this.geometry.computeVertexNormals();this.geometry.computeBoundingSphere();this.select(this.selected);
+    weight.needsUpdate=true;pos.needsUpdate=true;colors.needsUpdate=true;uv.needsUpdate=true;this.geometry.computeVertexNormals();this.geometry.computeBoundingSphere();this.select(this.selected);
+    this.onArtwork(!this.texturesEnabled?'Colors only':this.overlay!=='terrain'?'Overlay colors · artwork returns on Terrain':this.textures.status.includes('Loading')?this.textures.status:`${textured} / ${this.world.tiles.length} places illustrated · ${this.textures.slots.size===terrainPack.entries.length?'reveals through day 1,000':this.textures.status}`);
   }
   select(id:number) {
     this.selected=id;this.marker.visible=id>=0&&!!this.world?.cells[id];
