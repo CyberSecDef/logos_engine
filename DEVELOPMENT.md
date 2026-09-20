@@ -42,7 +42,7 @@ mechanics; scope and performance limits are documented in the acceptance matrix.
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
-| 5. Broader simulation | In progress: 5a–5g implemented | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
+| 5. Broader simulation | Complete: 5a–5i implemented and verified | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
@@ -2225,3 +2225,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Phase 5 is complete within its agreed scope. Live deployment preserves the
   player's exact save; repeatable acceptance commands and measured limits are
   recorded in `docs/phase-5-acceptance.md`.
+
+### 2026-09-20 — Phase 5 table status correction
+
+- Updated the phase overview table to mark Phase 5 complete (5a–5i verified).
+- Standardized all Phase 5 milestone table labels to complete, consistent with
+  the final acceptance record. Documentation only; no application or save changes.
