@@ -116,6 +116,10 @@ research through open communication channels. Filtration improves installed
 sanitation plants; prerequisite chains and read-only knowledge inputs support
 world-defined progression and custom rules.
 
+[Factions and territory](docs/factions.md) lets the creator establish named factions,
+assign land and record relationships, with a territory overlay. Border and
+automatic-conflict mechanics are the next milestones.
+
 **Still planned:** richer erosion, broader trade and movement,
 conflict, and broader technology effects. This is an early playable foundation.
 

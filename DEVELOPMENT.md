@@ -6,15 +6,12 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5g knowledge and technology is underway. The plan is split into local
-research (5g1), communication-based knowledge exchange (5g2), and broader unlocks
-plus integration (5g3). See [technology plan](docs/technology.md).
-Confirmed: settlements choose projects automatically; improved cultivation first.
-Phase 5g3 technology effects and integration is implemented, deployed and
-published. Filtration improves existing plants, as confirmed.
-Phase 5g is complete: automatic research, knowledge exchange, treatment/farm
-improvements, prerequisites and read-only knowledge inputs. Next: Phase 5h
-factions and conflict, followed by Phase 5i full-world tuning.
+Phase 5h factions and conflict is underway. [The plan](docs/factions.md) separates
+identities/territory (5h1), borders/mobilization (5h2), conflict (5h3) and integrated
+acceptance (5h4). Confirmed creator-established factions/territory and automatic
+conflict under explicit rules. 5h1 registry, territory/relationships and review UI
+are implemented and deployed; publication is underway. Next: border policy and
+mobilization. Relationship records do not yet affect borders or initiate combat.
 
 ## Completed
 
@@ -1856,3 +1853,44 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `10bb07d` to public `CyberSecDef/logos_engine` main.
 - Phase 5g complete; next: 5h factions/conflict, then 5i final integration/tuning.
+
+### 2026-09-20 — Phase 5h started
+
+- Documented four substeps and reviewed population, travel, food and ownership hooks.
+- Asked about creator versus automatic faction formation and conflict initiation.
+- Begin with identities/territory; later policy must explicitly define borders,
+  mobilization, supplies and conflict rather than infer effects from labels.
+
+### 2026-09-20 — Phase 5h1 faction identity, territory and relationships
+
+- Confirmed creator-established factions/territory and later automatic conflict
+  under explicit world rules. Added optional `territory-v1`, stable IDs, editable
+  names/colors, up to32 factions and symmetric neutral/allied/hostile records.
+- Added reviewed world-scope registry edits with shared versions, local land
+  claims/releases, persistent claims after depopulation/submergence, and removal
+  safeguards requiring no remaining territory. Claims preserve all zone contents;
+  relations do not close borders, change trade/knowledge or initiate combat yet.
+- Added faction inspector/forms, territory/resident counts (travelers excluded),
+  Territory overlay, forecast summaries and native provider capabilities v25.
+  Populations have no personal faction allegiance; ownership is territorial.
+- Fixed model-schema conversion for required nullable fields used by ownership
+  release, with a regression test. Runtime schema still requires explicit ID/null.
+- `npm run check`: **222 tests passed**, typecheck/build passed. Covers identity
+  updates, overlay colors, claims/releases, sea/depopulation, relation symmetry,
+  neutral reset, removal, limits, stale/dangling/duplicate/atomic rejection, prompt
+  scopes, pure previews, checkpoint/portable replay and 50-day unchanged simulation.
+- Faction, knowledge-exchange and journey browser workflows passed with zero
+  autonomous model calls. Reviewed definition/cancel, claim/release, relationships,
+  overlay, unchanged population, save/replay/reload and responsive layouts.
+  Inspected screenshots; styled faction selectors/color picker and reran UI.
+- Native authenticated Claude produced the requested faction ID/name/color in a
+  temporary world; schema/scope and read-only forecast passed, save unchanged.
+- Deployed `0.0.0.0:5180`; LAN faction controls verified. Preserved first-world
+  day1206/revision1235 and world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`;
+  full envelope `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  No factions or test ticks introduced into the user's world. Evidence:
+  `/tmp/logos-factions-deploy.json`.
+- Documented implementation/limits and four substeps in [factions](docs/factions.md).
+  Phase 5h remains open: borders/mobilization, automatic conflict and integrated
+  acceptance follow. Existing ~734 kB bundle warning remains Phase6 performance.

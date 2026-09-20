@@ -617,3 +617,10 @@ and read-only knowledge inputs for world rules/plugins. Combined 200-day simulat
 replay and conservation checks cover environment, population/travel, health, food
 and research. Phase 5g is complete; factions/conflict (5h) and final tuning (5i) follow.
 Construction/material recipes remain future scope; worker-time is the current cost.
+
+### Phase 5h1 implementation update
+
+[Faction identities and territory](docs/factions.md) now support reviewed registry
+edits, land claims/releases, symmetric relationships and a territory overlay.
+The player confirmed creator-established factions and rule-driven automatic
+conflict. Borders/mobilization/conflict follow; 5h1 labels have no combat effects.

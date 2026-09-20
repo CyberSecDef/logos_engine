@@ -259,3 +259,9 @@ Technology definitions also accept optional bounded `treatmentBonusPermille` and
 up to four `prerequisites`. Read-only `technologyKnown`/`technologyProgress` require
 a valid `technologyId` and work in rules, appearance conditions and restricted
 plugins. They cannot write built-in research/effects. See [technology effects](technology.md#implemented-5g3-treatment-efficiency-prerequisites-and-world-rule-reads).
+
+[Factions and territory](factions.md) adds optional `territory-v1`, versioned
+`faction-define`/`faction-remove`/`faction-relation` world operations and local
+`faction-claim` (existing ID or explicit null). Claims preserve zone contents;
+relationships currently have no combat/border effect. Referential integrity and
+existing prompt scope/review rules apply.

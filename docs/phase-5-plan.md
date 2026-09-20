@@ -10,7 +10,7 @@ Status: **5a–5e implemented and deployed**, including automatic visits and
 relocation follow-ups. Phase 5e passes engine, browser and native Claude source
 acceptance. Historical provider refusal for the earlier combined air/migration
 request is documented in DEVELOPMENT.md. Phase 5f1 health accounting and 5f2 contact transmission are implemented.
-Phase 5g [knowledge and technology](technology.md) is implemented. Next: 5h factions and conflict.
+Phase 5g [knowledge and technology](technology.md) is implemented. Current: [5h factions and conflict](factions.md), starting with identity and territory.
 
 ## Sequence and exit criteria
 
@@ -164,3 +164,11 @@ require reviewed health activation; no model calls occur during simulation.
   research cost; construction/material recipes remain future extensions. See [technology contracts](technology.md).
 
 Phase 5g is complete within the documented fixed effects. Phase 5h is next.
+
+### Phase 5h substeps and decisions
+
+See [factions and conflict](factions.md). Confirmed: creator-established factions
+and territory; automatic conflict under explicit world rules. **5h1 implemented:**
+identity, territory, symmetric relation records and visual inspection. **5h2 next:**
+border policies and mobilization. **5h3:** bounded automatic conflict. **5h4:**
+combined acceptance. Relationship labels alone do not initiate combat in 5h1.

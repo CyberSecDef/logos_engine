@@ -1,6 +1,6 @@
 import {readValue} from '../../engine/src/extensions.js';
 import type { Tile, World } from '../../contracts/src/index.js';
-export type Overlay='terrain'|'water'|'rain'|'temperature'|'population'|'food'|'communication'|'air'|'wind'|'water-quality'|'deposits'|'illness'|`custom:${string}`;
+export type Overlay='territory'|'terrain'|'water'|'rain'|'temperature'|'population'|'food'|'communication'|'air'|'wind'|'water-quality'|'deposits'|'illness'|`custom:${string}`;
 export type Appearance={label:string;color:string;assetId?:string;variant:number;textureOpacity:number;layers:{asset:string;opacity:number}[]};
 import manifest from '../../tile-packs/public/painterly-v1/manifest.json' with {type:'json'};
 export type TerrainEntry={id:string;label:string;color:string;image:string;conditions:{field:'elevationM'|'vegetation'|'population'|'temperatureC'|'rainMm';comparison:'lt'|'lte'|'gt'|'gte';value:number}[]};
@@ -30,6 +30,7 @@ export function appearance(w:World,t:Tile,overlay:Overlay='terrain',reveal?:numb
   const field=w.definitions.fields.find(f=>f.id===overlay.slice(7));
   if(field){const value=t.properties[field.id]??field.defaultValue;const ratio=(value-field.min)/(field.max-field.min);color=`hsl(${220-ratio*180}, 55%, ${30+ratio*35}%)`;}
  }
+ if(overlay==='territory')color=w.factions?.definitions.find(f=>f.id===t.factionId)?.color??'#53616a';
  if(overlay==='population')color=`hsl(45, 50%, ${18+Math.min(1,Math.log10(1+t.population)/6)*55}%)`;
  if(overlay==='food')color=!t.settlement||!t.population?'#53616a':`hsl(${Math.min(30,t.settlement.foodRations/t.population)*4}, 55%, 45%)`;
  if(overlay==='illness')color=t.health?`hsl(${120*(1-(t.population?t.health.ill/t.population:0))}, 50%, 42%)`:'#53616a';
