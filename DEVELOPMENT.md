@@ -6,6 +6,11 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
+Implementing the Phase 4 replay journal: immutable linked records, atomic saved
+head, compact step/proposal entries, snapshot boundaries, read-only verification
+and recent-history inspection. All 73 tests and checkpoint/history browser
+acceptance pass. Live on the LAN server; publication is in progress.
+
 Implementing world-specific appearance rules driven by built-in/custom properties.
 Rules select labels, colors and existing artwork through reviewed proposals.
 All 66 tests, appearance/texture browser checks, and native Claude acceptance
@@ -29,7 +34,8 @@ portable world import/export, and persistent world selection. Published as
 `b4b38e0`. Phase 4c restricted plugins are implemented and live: deterministic
 instruction budgets, saved per-tile state, reviewed installation/update, and
 failure recovery. Verified, deployed, and published as `b10dbed`. General entity
-migrations and a complete replay journal remain pending. Phase 4d terrain
+migrations remain pending. Future-save replay journaling is now implemented;
+selective replay remains pending. Phase 4d terrain
 artwork is verified, live, and published as `6099bd3`.
 
 ## Completed
@@ -434,7 +440,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - 4b: conserved custom-resource transfers, daily accounting, bounded formula
   clamps and neighbor extrema — complete. Property scale/offset conversions are
   implemented; general entity migrations remain pending. Immutable checkpoint snapshots/definitions are implemented;
-  a complete append-only history remains pending.
+  immutable replay records now cover future saves from explicit snapshot boundaries;
+  selective replay and portable journal bundles remain pending.
 - 4c: restricted JSON plugin runtime, deterministic budgets, saved state, staged
   proposals, immutable artifacts, execution and failure recovery — implemented;
   complete, verified, live, and published. Explicit saved-state mappings are now
@@ -793,3 +800,39 @@ runoff with sediment conservation, and checksummed storage/path validation.
   through reviewed prompts. All 66 tests and browser/native-provider checks passed.
 - Remaining Phase 4 work includes full replay history, general entities, external
   world-local artwork bundles and layered appearance.
+
+### 2026-09-19 — Replay journal started
+
+- Recording future simulation steps and accepted proposals without model calls.
+- Existing worlds will begin with an explicit adoption snapshot on their next save;
+  unavailable earlier day-by-day history will not be invented.
+- Restore/import/replacement boundaries use snapshots. Interrupted writes must not
+  publish partial history. UI, CLI and regression checks are in progress.
+
+### 2026-09-19 — Replay journal checks passed
+
+- All 72 tests, typecheck and production build passed.
+- Verified deterministic step/proposal replay, adoption without read-time rewriting,
+  restore boundaries/independent branches, unpublished orphan isolation, failed-save
+  atomicity, corrupt ancestors, symlink rejection and mismatched replay detection.
+- HTTP tests confirm preview/checkpoints do not add actions and accepted changes,
+  steps and restores do. Browser checkpoint/history regression is in progress.
+
+### 2026-09-19 — Replay journal acceptance
+
+- All 73 tests pass, including actual CLI success/budget-limit cases and the
+  50-entry recent-history bound. Verification leaves saved world bytes unchanged.
+- Browser regression passed recorded steps/restores, read-only replay verification,
+  checkpoint recovery, branching, export/import, reload and desktop/mobile layout.
+- Inspected the history panel. Documented adoption, snapshot boundaries, indefinite
+  journal retention, replay budgets and current portable-export limitations.
+- Final artifact-size consistency check, deployment and publication are underway.
+
+### 2026-09-19 — Replay journal deployment
+
+- Final 73-test suite, typecheck and build passed after matching artifact write/read
+  bounds. Checkpoint/history browser regression passed.
+- Restarted at `0.0.0.0:5180`; LAN checks preserved Aethra at day 792/revision 804.
+- Live history endpoint reports no records yet, as expected: adoption starts on
+  the next save. Deployment did not edit or advance the user world.
+- Publishing the journal, recent-history view and read-only verification CLI.

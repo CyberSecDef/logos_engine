@@ -90,3 +90,7 @@ JavaScript/native plugin execution, and texture packs remain separate work.
 Run `npm run test:checkpoints` for the browser acceptance flow. Integration tests
 also cover immutable artifacts, corruption rejection, retention, deterministic
 copies, revision safety, and persistent active-world selection.
+
+A separate [replay journal](world-replay.md) now records future saved steps and
+applied proposals. Restore appends a snapshot boundary while retaining the prior
+path. The journal is retained independently of automatic-checkpoint pruning.

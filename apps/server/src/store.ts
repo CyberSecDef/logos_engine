@@ -1,3 +1,4 @@
+import {ReplayJournal,type SaveAction} from './journal.js';
 import { mkdir, open, readFile, rename, realpath, lstat, readdir, unlink, link, rm } from 'node:fs/promises';
 import { resolve, join, dirname } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
@@ -24,13 +25,17 @@ export class WorldStore {
     if((await lstat(path)).isSymbolicLink() || dirname(await realpath(path))!==root) throw Error('World path escapes storage');
     return path;
   }
-  async save(input:World):Promise<void> {
+  async save(input:World,action?:SaveAction):Promise<void> {
     const world=validateWorld(input), dir=await this.directory(world.id);
+    let previous:World|undefined,journalHead:string|undefined;
     // Preserve the prior save format before the first schema-4 commit. Reads never rewrite it.
     try {
       const current=join(dir,'state.json');
       if((await lstat(current)).isSymbolicLink())throw Error('Save cannot be a symlink');
       const source=await readFile(current,'utf8'),old=JSON.parse(source);
+      if(stateHash(old.world)!==old.hash)throw Error('Save integrity check failed');
+      previous=validateWorld(migrateWorld(old.world));if(previous.id!==world.id)throw Error('Save belongs to another world');
+      if(old.journalHead!==undefined)journalHead=Digest.parse(old.journalHead);
       if(old.world?.schemaVersion===1||old.world?.schemaVersion===2||old.world?.schemaVersion===3) {
         if(stateHash(old.world)!==old.hash)throw Error('Legacy save integrity check failed');
         const backup=join(dir,`state.v${old.world.schemaVersion}.backup.json`);
@@ -49,7 +54,8 @@ export class WorldStore {
       }
     }catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
     await this.pluginArtifacts(world);
-    const serialized=JSON.stringify({hash:stateHash(world),world});
+    const head=await (await this.journal(world.id)).append(world,previous,journalHead,action);
+    const serialized=JSON.stringify({hash:stateHash(world),world,journalHead:head});
     const tmp=join(dir,`.state-${randomUUID()}.tmp`);
     const file=await open(tmp,'wx',0o600);
     try {await file.writeFile(serialized); await file.sync();} finally {await file.close();}
@@ -65,6 +71,7 @@ export class WorldStore {
     if(stateHash(envelope.world)!==envelope.hash) throw Error('Save integrity check failed');
     const world=validateWorld(migrateWorld(envelope.world));
     if(world.id!==id) throw Error('Save integrity check failed');
+    if(envelope.journalHead!==undefined)await (await this.journal(id)).head(Digest.parse(envelope.journalHead),world);
     return world;
   }
   async exists(id:string):Promise<boolean> {
@@ -74,7 +81,7 @@ export class WorldStore {
     const world=validateWorld(input),dir=await this.directory(world.id,true);
     try{await this.save(world);}catch(error){await rm(dir,{recursive:true,force:true});throw error;}
   }
-  private async artifactDirectory(worldId:string,name:'snapshots'|'definitions'|'checkpoints'|'plugins'):Promise<string> {
+  private async artifactDirectory(worldId:string,name:'snapshots'|'definitions'|'checkpoints'|'plugins'|'journal'):Promise<string> {
     const dir=join(await this.directory(worldId),name);await mkdir(dir,{recursive:true});
     if((await lstat(dir)).isSymbolicLink())throw Error('Artifact directory cannot be a symlink');return dir;
   }
@@ -90,6 +97,23 @@ export class WorldStore {
       const directory=await open(dir,'r');try{await directory.sync();}finally{await directory.close();}
     }finally{await unlink(tmp).catch(()=>{});}
   }
+  private async journal(id:string):Promise<ReplayJournal> {
+    const dir=await this.artifactDirectory(id,'journal');
+    return new ReplayJournal({write:async(hash,value)=>{
+      if(Buffer.byteLength(JSON.stringify(value))>64*1024*1024)throw Error('Journal artifact exceeds 64 MiB limit');
+      await this.immutable(dir,`${Digest.parse(hash)}.json`,value);
+    },read:async hash=>{
+      const path=join(dir,`${Digest.parse(hash)}.json`),stat=await lstat(path);
+      if(!stat.isFile()||stat.isSymbolicLink()||stat.size>64*1024*1024)throw Error('Invalid journal artifact');
+      return JSON.parse(await readFile(path,'utf8'));
+    }});
+  }
+  private async journalContext(id:string) {
+    const world=await this.load(id),dir=await this.directory(id),envelope=JSON.parse(await readFile(join(dir,'state.json'),'utf8'));
+    return {world,head:envelope.journalHead===undefined?undefined:Digest.parse(envelope.journalHead),journal:await this.journal(id)};
+  }
+  async history(id:string){const {world,head,journal}=await this.journalContext(id);return journal.recent(head,world);}
+  async verifyHistory(id:string,maxDays=10000){const {world,head,journal}=await this.journalContext(id);return journal.verify(head,world,maxDays);}
   private async pluginArtifacts(world:World):Promise<void> {
     const definitions=[...world.plugins.map(p=>p.definition),...world.history.flatMap(h=>h.operations).flatMap(op=>op.kind==='plugin-define'?[op.definition]:[])];
     if(!definitions.length)return;

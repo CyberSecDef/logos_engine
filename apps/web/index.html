@@ -22,6 +22,7 @@
 <aside id="worlds" hidden><div class="section-title">YOUR WORLDS</div><div id="world-list"></div><div class="section-title">PRESERVE THIS WORLD</div>
 <form id="save-checkpoint"><label>Checkpoint name<input id="checkpoint-label" required maxlength="80" placeholder="Before the next experiment"></label><button type="submit">Save checkpoint</button></form>
 <p class="muted">Automatic checkpoints: start of play and every 100 days; latest 10 retained. Named checkpoints and restore backups are kept.</p><div id="checkpoint-list"></div>
+<details id="world-history"><summary>Recent world history</summary><p id="history-status" class="muted"></p><div id="history-list"></div></details>
 <label>Copy name<input id="copy-name" maxlength="80" value="A new branch"></label><button id="branch-world">Branch current world</button>
 <button id="export-world">Export this world</button><label>Import a world (.json)<input id="import-world" type="file" accept=".json,application/json"></label>
 <div class="section-title">A FRESH BEGINNING</div><form id="new-world"><label>World name<input id="new-name" required maxlength="80" value="A new beginning"></label><label>Seed<input id="new-seed" required maxlength="120" value="wild-garden"></label><button type="submit">Create world</button></form></aside>

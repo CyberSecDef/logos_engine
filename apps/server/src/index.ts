@@ -1,3 +1,4 @@
+import type {SaveAction} from './journal.js';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFile, mkdtemp, rm } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
@@ -61,7 +62,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
   }
   function revision(expected:number) {if(expected!==world.revision)throw Error('Stale revision; refresh first');}
   async function activate(next:World) {await store.selectWorld(next.id);world=next;}
-  async function commit(next:World) {await store.save(next);world=next;}
+  async function commit(next:World,action?:SaveAction) {await store.save(next,action);world=next;}
   async function handle(req:IncomingMessage,res:ServerResponse) {
     const host=req.headers.host??'';
     const hostName=new URL(`http://${host}`).hostname.replace(/^\[|\]$/g,'');
@@ -72,6 +73,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(req.method==='GET' && pathname==='/api/session') return json(res,200,{token});
       if(req.headers.authorization!==`Bearer ${token}`) return json(res,401,{error:'Session required'});
       if(req.method==='GET' && pathname==='/api/world') return json(res,200,world);
+      if(req.method==='GET' && pathname==='/api/history') return json(res,200,await store.history(world.id));
       if(req.method==='GET' && pathname==='/api/checkpoints') return json(res,200,await store.checkpoints(world.id));
       if(req.method==='GET' && pathname==='/api/worlds/export') return json(res,200,archiveWorld(world));
       if(req.method==='GET' && pathname==='/api/worlds') return json(res,200,await store.list());
@@ -88,13 +90,13 @@ export async function startServer(options:{port?:number; host?:string; root?:str
       if(pathname==='/api/step') {
         const p=z.object({expectedRevision:z.number().int(),days:z.number().int().min(1).max(10).default(1)}).strict().parse(input);
         if(p.expectedRevision!==world.revision) throw Error('Stale revision; refresh first');
-        let next=world; for(let i=0;i<p.days;i++) next=advance(next); await store.automaticCheckpoint(world,next);await commit(next); return json(res,200,world);
+        let next=world; for(let i=0;i<p.days;i++) next=advance(next); await store.automaticCheckpoint(world,next);await commit(next,{kind:'step',days:p.days}); return json(res,200,world);
       }
       if(pathname==='/api/proposals/preview') {
         const p=ProposalSchema.parse(input);
         return json(res,200,forecast(world,p));
       }
-      if(pathname==='/api/proposals/apply') {await commit(applyProposal(world,input));return json(res,200,world);}
+      if(pathname==='/api/proposals/apply') {const proposal=ProposalSchema.parse(input);await commit(applyProposal(world,proposal),{kind:'proposal',proposal});return json(res,200,world);}
       if(pathname==='/api/checkpoints') {
         const p=z.object({label:z.string().min(1).max(80),expectedRevision:z.number().int()}).strict().parse(input);revision(p.expectedRevision);
         return json(res,200,await store.checkpoint(world,p.label));
@@ -105,7 +107,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
         if(pathname.endsWith('/preview'))return json(res,200,{checkpoint:saved.checkpoint,summary:worldSummary(saved.world)});
         const next=validateWorld({...saved.world,revision:world.revision+1});
         await store.checkpoint(world,`Before restore · day ${world.tick}`,'before-restore');
-        await commit(next);return json(res,200,world);
+        await commit(next,{kind:'snapshot',reason:'restore'});return json(res,200,world);
       }
       if(pathname==='/api/worlds/branch') {
         const p=z.object({id:Id,name:z.string().min(1).max(80),expectedRevision:z.number().int(),checkpointId:Id.optional()}).strict().parse(input);revision(p.expectedRevision);

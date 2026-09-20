@@ -139,7 +139,7 @@ with file/directory sync. It contains definitions currently represented by the
 schemas, state, rainfall/temperature rules, custom definitions/rules, and accepted transactions. Checkpoints now store immutable snapshot and definition artifacts; see
 [storage and restore behavior](world-checkpoints.md). Automatic server checkpoints
 run every 100 days and retain ten; manual checkpoints and restore backups persist.
-An append-only journal and general artifact migrations remain future milestones. Restricted plugin definitions/state are embedded in
+An immutable [replay journal](world-replay.md) now records future saves; selective replay and general artifact migrations remain future milestones. Restricted plugin definitions/state are embedded in
 schema-4 saves and recorded as immutable world artifacts. Run one server/writer against a world directory; do not
 run the CLI against a world being edited by the server.
 
@@ -178,3 +178,7 @@ Restricted plugin upgrades support [explicit saved-state mappings](world-plugins
 [World-specific appearance rules](world-appearance.md) now select cosmetic labels,
 colors and installed artwork from bounded conditions, with versioned proposals,
 scope validation and unchanged physics/texture reveal.
+
+Read-only `GET /api/history` returns the latest 50 committed replay records; the
+`verify-history` CLI re-executes recorded transitions within explicit budgets.
+Journal heads live in the save envelope, outside LLM-controlled world data.

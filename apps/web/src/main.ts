@@ -105,6 +105,9 @@ $('apply-world-review').onclick=()=>void action(async()=>{
 async function refreshWorlds() {
  const worlds=await api<{id:string;name:string;tick:number}[]>('worlds');$('world-list').replaceChildren();
  for(const w of worlds){const b=document.createElement('button');b.textContent=`${w.name} · day ${w.tick}${w.id===world.id?' · current':''}`;b.onclick=()=>void action(async()=>{setWorld(await api<World>('worlds/open',{id:w.id}));$('worlds').hidden=true;});$('world-list').append(b);}
+ const history=await api<{entries:{id:string;kind:string;tick:number;revision:number;summary:string}[];hasMore:boolean}>('history');$('history-list').replaceChildren();
+ text('history-status',history.entries.length?`${history.hasMore?'Latest 50 recorded saves.':'Recorded saves since history began.'} Checkpoints restore state; this list is read-only.`:'Replay recording begins on this world’s next save. Earlier day-by-day history is unavailable.');
+ for(const entry of history.entries){const row=document.createElement('p');row.className='muted';row.textContent=`Day ${entry.tick} · revision ${entry.revision} · ${entry.summary}`;$('history-list').append(row);}
  const checkpoints=await api<Checkpoint[]>('checkpoints');$('checkpoint-list').replaceChildren();
  for(const checkpoint of checkpoints) {
   const row=document.createElement('div');row.className='checkpoint-row';const label=document.createElement('p');label.textContent=`${checkpoint.label} · day ${checkpoint.tick} · ${checkpoint.kind==='manual'?'named':checkpoint.kind==='automatic'?'automatic':'restore backup'}`;

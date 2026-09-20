@@ -15,11 +15,13 @@ try {
  await page.locator('#worlds-toggle').click();await page.locator('#checkpoint-label').fill('Before the rain');await page.locator('#save-checkpoint button').click();await page.getByText('Before the rain · day 0 · named',{exact:true}).waitFor();
  await page.locator('#worlds-toggle').click();await page.locator('#step').click();await page.waitForFunction(()=>document.querySelector('#day').textContent==='DAY 1');
  await page.locator('#worlds-toggle').click();assert.match(await page.locator('#worlds').textContent(),/every 100 days/);
+ await page.locator('#world-history summary').click();assert.match(await page.locator('#history-list').textContent(),/Advanced 1 day/);assert.match(await page.locator('#history-list').textContent(),/initial snapshot/);await page.screenshot({path:'.local/screenshots/journal-history.png'});
  const named=page.locator('.checkpoint-row').filter({hasText:'Before the rain'});await named.getByRole('button',{name:'Review restore'}).click();await page.locator('#world-review').waitFor({state:'visible'});
  assert.match(await page.locator('#world-review-note').textContent(),/saved as a restore backup/);await page.screenshot({path:'.local/screenshots/checkpoint-restore.png'});
  await page.locator('#cancel-world-review').click();assert.equal(await page.locator('#day').textContent(),'DAY 1');
  await named.getByRole('button',{name:'Review restore'}).click();await page.locator('#apply-world-review').click();await page.locator('#world-review').waitFor({state:'hidden'});assert.equal(await page.locator('#day').textContent(),'DAY 0');
  await page.locator('#worlds-toggle').click();await page.getByText('Before restore · day 1 · day 1 · restore backup',{exact:true}).waitFor();
+ assert.match(await page.locator('#history-list').textContent(),/restore snapshot/);const verified=await new WorldStore(root).verifyHistory('first-world');assert.equal(verified.days,1);assert.equal(verified.snapshots,2);
  await page.locator('#copy-name').fill('A separate path');await page.locator('#branch-world').click();await page.waitForFunction(()=>document.querySelector('#world-name').textContent==='A separate path');
  await page.locator('#step').click();await page.waitForFunction(()=>document.querySelector('#day').textContent==='DAY 1');assert.equal((await new WorldStore(root).load('first-world')).tick,0);
  await page.locator('#worlds-toggle').click();const downloaded=page.waitForEvent('download');await page.locator('#export-world').click();const download=await downloaded,archive=JSON.parse(await readFile(await download.path(),'utf8'));assert.equal(archive.format,'logos-world');
@@ -27,5 +29,5 @@ try {
  await page.locator('#apply-world-review').click();await page.locator('#world-review').waitFor({state:'hidden'});await page.waitForFunction(()=>document.querySelector('#world-name').textContent==='Imported garden');
  await page.reload();await page.waitForFunction(()=>document.querySelector('#world-name').textContent==='Imported garden');await page.locator('#worlds-toggle').click();await page.waitForFunction(()=>document.querySelectorAll('#world-list button').length===3&&!document.body.classList.contains('busy'));await page.screenshot({path:'.local/screenshots/checkpoints-desktop.png'});
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'.local/screenshots/checkpoints-mobile.png'});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);assert.equal(calls,0);
- console.log('Checkpoint browser passed: named save, cancel/review/restore, backup, independent branch, export/import review, reload, desktop/mobile; no model calls.');
+ console.log('Checkpoint/replay browser passed: recorded steps and restore history, read-only replay verification; named save, cancel/review/restore, backup, independent branch, export/import review, reload, desktop/mobile; no model calls.');
 }finally{await browser.close();await app.close();await rm(root,{recursive:true,force:true});}
