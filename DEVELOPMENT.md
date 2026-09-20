@@ -6,8 +6,8 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5f2 local and travel-contact transmission is implemented and deployed;
-publication is underway. Phase 5f health/disease is complete. Next: Phase 5g
+Phase 5f2 local and travel-contact transmission is implemented, deployed and
+published. Phase 5f health/disease is complete. Next: Phase 5g
 knowledge and technology, with tangible research costs and bounded unlocks.
 Confirmed: workforce loss, recovery and temporary immunity, no direct disease
 deaths, and polluted water may introduce initial cases. See [health model](docs/disease.md).
@@ -1693,3 +1693,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
   `/tmp/logos-contact-deploy.json`. Existing ~663 kB bundle warning remains Phase 6.
 - Phase 5f complete. Next: 5g knowledge/technology, then 5h conflict and 5i integrated
   long-run tuning; broader Phase 5 is not complete yet.
+
+### 2026-09-20 — Phase 5f2 publication
+
+- Published milestone `70f5e14` to public `CyberSecDef/logos_engine` main.
+- Phase 5f is complete; next development milestone is 5g knowledge and technology.
