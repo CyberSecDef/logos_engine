@@ -6,8 +6,7 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 4 implementation and acceptance are complete; deploying and publishing the
-final milestone. All five agreed areas plus the requested Codex provider passed
+Phase 4 is complete, deployed on the LAN and published as `59842f0`. All five agreed areas plus the requested Codex provider passed
 verification. See [acceptance evidence](docs/phase-4-acceptance.md): 113 tests,
 15 browser/regression scripts, live Claude/Cursor/Codex Discuss and Propose, and
 mocked Anthropic API coverage. No paid direct API credentials are configured.
@@ -1150,3 +1149,10 @@ runoff with sediment conservation, and checksummed storage/path validation.
   survived shutdown/restart: first-world day 826, revision 840. Claude stays default.
 - Next: publish this milestone, then Phase 5 planning; no broader simulation
   mechanics were introduced during final acceptance.
+
+### 2026-09-19 — Phase 4 publication
+
+- Published `59842f0` to public `CyberSecDef/logos_engine` on `main`.
+- 113 tests, 15 browser/cache regressions and live Claude/Cursor/Codex acceptance
+  passed. LAN deployment preserved the exact day-826/revision-840 world hash.
+- All five agreed Phase 4 completion items are closed. Phase 5 planning is next.
