@@ -6,8 +6,8 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5f1 health accounting/recovery is implemented and deployed. Publication is
-underway. Next: 5f2 local and travel-contact transmission; no contagion exists yet.
+Phase 5f1 health accounting/recovery is implemented, deployed and published.
+Next: 5f2 local and travel-contact transmission; no contagion exists yet.
 Confirmed: workforce loss, recovery and temporary immunity, no direct disease
 deaths, and polluted water may introduce initial cases. See [health model](docs/disease.md).
 
@@ -1648,3 +1648,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Next **5f2**: local/travel-contact transmission with deterministic snapshots,
   attribution and no population duplication. Full Phase 5f is not yet complete.
 - Existing ~661 kB web bundle warning remains a Phase 6 performance task.
+
+### 2026-09-20 — Phase 5f1 publication
+
+- Published milestone `10a0316` to public `CyberSecDef/logos_engine` main.
+- Next work remains 5f2 contact transmission; health accounting and environmental
+  introduction are complete, with explicit activation required in existing worlds.
