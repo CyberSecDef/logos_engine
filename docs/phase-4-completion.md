@@ -71,7 +71,7 @@ and historical-branch browser checks cover reproducibility, source preservation,
 stale/tampered review rejection, dependencies, plugin failure and recovery.
 See [work limits and snapshot boundaries](selective-replay.md).
 
-## 5. Integration, compatibility and final acceptance — pending
+## 5. Integration, compatibility and final acceptance — complete
 
 - Run the shared change-contract acceptance cases across native Claude Code,
   Cursor workflows and the configured direct API adapter.
@@ -82,7 +82,14 @@ See [work limits and snapshot boundaries](selective-replay.md).
 - Reconcile PLAN, README, implemented-interface documentation and DEVELOPMENT;
   publish a final acceptance matrix with evidence and any explicitly agreed limits.
 
-JavaScript/native plugin execution is not required: the restricted runtime remains
+Verified: automatic native-login Claude, Cursor and Codex adapters passed live
+Discuss/Propose acceptance; all four automatic transports passed shared fixture
+validation. 113 tests and all 15 browser/regression scripts passed. Save migration,
+interruption recovery, portable data and time/model policies were audited.
+The optional paid API path remains mocked because credentials are not configured.
+See the [final matrix and explicit limits](phase-4-acceptance.md).
+
+All five agreed items are complete. JavaScript/native plugin execution is not required: the restricted runtime remains
 the selected approach. Trade/population/warfare/technology, wind-driven pollution,
 water contamination and disease transport belong to Phase 5. Art alone does not
 create those mechanics.

@@ -4,6 +4,8 @@ import { z } from 'zod';
 import type { World, Proposal } from '../../../packages/contracts/src/index.js';
 import { PromptRequestSchema, PromptJobSchema, ModelReplySchema, type PromptRequest, type PromptJob } from '../../../packages/contracts/src/prompts.js';
 import { buildContext, capabilities, systemPrompt, type ModelProvider } from '../../../packages/agent-bridge/src/context.js';
+import { CodexProvider } from '../../../packages/agent-bridge/src/codex.js';
+import { CursorProvider } from '../../../packages/agent-bridge/src/cursor.js';
 import { ClaudeCodeProvider } from '../../../packages/agent-bridge/src/claude.js';
 import { AnthropicProvider } from '../../../packages/agent-bridge/src/anthropic.js';
 import { advance, applyProposal, depthMm } from '../../../packages/engine/src/index.js';
@@ -15,11 +17,13 @@ import { ruleTargets, ruleAffectedTargets, fieldValue } from '../../../packages/
 export function configuredProvider():ModelProvider {
  const name=process.env.LLM_PROVIDER??'claude-code';
  if(name==='claude-code')return new ClaudeCodeProvider();
+ if(name==='cursor')return new CursorProvider();
+ if(name==='codex')return new CodexProvider();
  if(name==='anthropic') {
   if(!process.env.ANTHROPIC_API_KEY||!process.env.ANTHROPIC_MODEL)return {name:'Anthropic API (configuration needed)',async generate(){throw Error('Set ANTHROPIC_API_KEY and ANTHROPIC_MODEL in the server .env');}};
   return new AnthropicProvider(process.env.ANTHROPIC_API_KEY,process.env.ANTHROPIC_MODEL);
  }
- return {name:'Provider configuration needed',async generate(){throw Error('Unsupported LLM_PROVIDER. Choose claude-code or anthropic.');}};
+ return {name:'Provider configuration needed',async generate(){throw Error('Unsupported LLM_PROVIDER. Choose claude-code, cursor, codex, or anthropic.');}};
 }
 export class PromptService {
  private active?:{job:PromptJob;controller:AbortController;done:Promise<void>};

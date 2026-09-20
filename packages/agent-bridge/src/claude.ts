@@ -38,6 +38,16 @@ export function claudeArgs(model?:string):string[] {
  if(model)args.push('--model',model);
  return args;
 }
+export function decodeClaudeReply(output:string):unknown {
+ let envelope:{is_error?:boolean;structured_output?:unknown;result?:string};
+ try{envelope=JSON.parse(output);}catch{throw Error('Claude Code returned invalid JSON');}
+ if(!envelope||envelope.is_error)throw Error('Claude Code could not complete the request. Check login, availability, and usage limits.');
+ if(envelope.structured_output)return envelope.structured_output;
+ if(typeof envelope.result==='string'){
+  try{return JSON.parse(envelope.result);}catch{throw Error('Claude Code response did not contain world-change JSON. No changes were applied.');}
+ }
+ throw Error('Claude Code returned no structured response');
+}
 export class ClaudeCodeProvider implements ModelProvider {
  readonly name='Claude Code';
  constructor(private readonly model=process.env.CLAUDE_MODEL) {}
@@ -69,8 +79,8 @@ export class ClaudeCodeProvider implements ModelProvider {
     const abort=()=>terminate(new Error('Model request cancelled or timed out'));
     signal.addEventListener('abort',abort,{once:true});if(signal.aborted)abort();
     const cleanup=()=>{signal.removeEventListener('abort',abort);if(killTimer)clearTimeout(killTimer);};
-    child.stdout.on('data',chunk=>{output+=chunk;if(output.length>128000)terminate(new Error('Model response exceeded size limit'));});
-    child.stderr.on('data',chunk=>{errorOutput+=chunk;if(errorOutput.length>32000)terminate(new Error('Provider diagnostics exceeded size limit'));});
+    child.stdout.on('data',chunk=>{if(failure)return;output+=chunk;if(output.length>128000)terminate(new Error('Model response exceeded size limit'));});
+    child.stderr.on('data',chunk=>{if(failure)return;errorOutput+=chunk;if(errorOutput.length>32000)terminate(new Error('Provider diagnostics exceeded size limit'));});
     child.stdin.on('error',()=>{});
     child.once('error',()=>{cleanup();reject(new Error('Could not start isolated Claude Code. Install bubblewrap and verify sandbox support.'));});
     child.once('close',code=>{
@@ -84,11 +94,7 @@ export class ClaudeCodeProvider implements ModelProvider {
     });
     child.stdin.end(JSON.stringify(context));
    });
-   const envelope=JSON.parse(result);
-   if(envelope.is_error)throw Error('Claude Code could not complete the request. Check login, availability, and usage limits.');
-   if(envelope.structured_output)return envelope.structured_output;
-   if(typeof envelope.result==='string')return JSON.parse(envelope.result);
-   throw Error('Claude Code returned no structured response');
+   return decodeClaudeReply(result);
   } finally {await rm(root,{recursive:true,force:true});}
  }
 }

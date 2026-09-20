@@ -33,7 +33,8 @@
     "test:layers": "npm run build && node tests/layers-browser.mjs",
     "test:artwork": "npm run build && node tests/artwork-browser.mjs",
     "test:history": "npm run build && node tests/history-branch-browser.mjs",
-    "test:appearance": "npm run build && node tests/appearance-rules-browser.mjs"
+    "test:appearance": "npm run build && node tests/appearance-rules-browser.mjs",
+    "test:providers:live": "tsc && node tests/providers-live.mjs"
   },
   "dependencies": {
     "three": "0.186.0",

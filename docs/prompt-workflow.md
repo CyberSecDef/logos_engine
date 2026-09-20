@@ -13,8 +13,9 @@ communication flag. The flag does not yet simulate knowledge exchange. Custom
 numeric definitions and bounded conditional rules are available through
 [world extensibility](world-extensibility.md), with
 [conserved stock transfers](resource-transfers.md) for local resource sharing.
-New engine mechanics, arbitrary
-rule expressions, and executable world plugins remain future work.
+World-local [restricted plugins](world-plugins.md), [generic entities](world-entities.md),
+and [appearance rules](world-appearance.md) are also supported. Arbitrary host code
+and mechanics outside these fixed interfaces are unavailable.
 Models cannot extend application code through this interface.
 
 Example prompts:
@@ -55,6 +56,100 @@ available to the CLI for its service. The default engine location under `/home` 
 hidden; engine paths elsewhere remain read-only. This is a bounded text-provider
 integration, not the future sandbox for arbitrary world plugin execution.
 
+## Automatic local Cursor CLI
+
+Set `LLM_PROVIDER=cursor` in the server `.env` and restart. The default remains
+Claude Code. Cursor requires Linux, bubblewrap and the official Linux CLI package
+version **2026.09.18-9a7762b**, including its adjacent Node runtime. The adapter
+checks this exact version before sending a model request because its empty
+`--allowed-tools` restriction uses an internal CLI interface. Updates require
+adapter revalidation; an unverified version fails without calling a model.
+
+```dotenv
+LLM_PROVIDER=cursor
+CURSOR_BIN=/absolute/path/to/cursor-agent
+# CURSOR_MODEL=your-enabled-model-id
+# CURSOR_API_KEY=optional-server-only-key
+```
+
+It searches PATH for `cursor-agent`, then `.local/cursor/cursor-agent` relative
+to the server directory. `CURSOR_BIN` must be absolute when set. This server's
+installation is `.local/cursor/cursor-agent`; the downloaded binary is ignored by
+Git. Authenticate from the repository directory:
+
+```sh
+AGENT_CLI_CREDENTIAL_STORE=file .local/cursor/cursor-agent login
+```
+
+The browser login stores native credentials in `~/.config/cursor/auth.json`
+(or `$XDG_CONFIG_HOME/cursor/auth.json`). Only this credential directory is mounted
+writable into the disposable home, so native refresh updates the original login.
+The adapter never copies refresh tokens. With `CURSOR_API_KEY`, native credentials
+are not mounted. Neither option exposes keys in model context or process arguments.
+
+The trusted CLI runs in bubblewrap with a read-only host root and masked host
+homes, temporary directories and `/run`. The default repository under `/home` is
+unreadable. Installations elsewhere are read-only and should contain no secrets
+outside the masked locations. The official runtime is mounted read-only. The
+model has an empty tool allowlist, ask mode, and deny rules for file, shell, web
+and MCP tools. Its workspace and settings are created afresh for every request;
+host workspace rules, hooks, plugins, MCP configuration and chats are not mounted.
+Auto-update is disabled. A timeout/cancel terminates the process group, output is
+bounded, and temporary files are removed. Only decoded JSON reaches the same
+server validation and explicit review/Apply workflow as other providers.
+
+Cursor's own service transport may retry a connection within this single CLI
+invocation; Logos does not start another request automatically. Usage and exact
+model availability remain controlled by the logged-in Cursor account.
+
+The public [CLI options](https://cursor.com/docs/cli/reference/parameters) and
+[authentication documentation](https://cursor.com/docs/cli/reference/authentication)
+describe the supported headless/login interface. The internal tool restriction
+was checked against the installed version, not inferred from those public docs.
+
+## Local Codex for OpenAI models
+
+The Codex provider supports the native Linux CLI **0.154.0** and its existing
+ChatGPT login. Set `LLM_PROVIDER=codex`; optional `CODEX_MODEL` selects a model
+available to that account. Without it, the isolated CLI uses its own default,
+not the model configured in your personal Codex configuration.
+
+```dotenv
+LLM_PROVIDER=codex
+# CODEX_BIN=/absolute/path/to/native/codex
+# CODEX_MODEL=your-enabled-model-id
+# CODEX_API_KEY=optional-server-only-api-key
+```
+
+Authenticate with `codex login` as the server user. The adapter finds `codex` on
+PATH (resolving symlinks); `CODEX_BIN` can identify the native executable directly.
+Npm JavaScript launchers are not supported by this native-binary mount.
+
+Only the original `auth.json` file from the native Codex home is mounted into a
+scratch home, writable for in-place native credential refresh. It is never copied.
+No personal config, sessions, skills or plugin directories are mounted. Optional
+`CODEX_API_KEY` is passed only to the subprocess and avoids mounting native auth.
+The native CLI manages authentication, including its account and model limits.
+
+Codex runs noninteractively with ephemeral sessions and ignored user config/rules.
+Shell, apps, browsers, computer use, subagents, hooks, images and Code Mode host
+features are disabled. The tool permission profile permits only minimal runtime
+and read-only scratch access, explicitly denies its credential home, and disables
+tool network access. The outer bubblewrap boundary also hides the engine under
+`/home`. The CLI can contact its model service. No engine/world path is writable.
+Version checking, output caps, process cancellation and private diagnostics match
+Cursor's adapter. A recognized disabled-Code-Mode startup notice is allowed; other
+error items, tool activity or missing completion reject the reply.
+
+Codex's strict output schema wraps the reply JSON in one string. Logos decodes it
+and applies the identical inner world-change schema, scope and revision checks.
+This accommodates optional world fields and property dictionaries without
+loosening server validation. Use the manual exchange on unsupported platforms.
+
+See official [noninteractive execution](https://learn.chatgpt.com/docs/non-interactive-mode)
+and [configuration](https://learn.chatgpt.com/docs/config-file/config-reference).
+The pinned CLI and filesystem tests verify this adapter's narrower configuration.
+
 ## Optional direct API
 
 Set `LLM_PROVIDER=anthropic`, `ANTHROPIC_API_KEY`, and `ANTHROPIC_MODEL` in the
@@ -63,7 +158,7 @@ credentials stay server-side. This path has mocked HTTP coverage but has not bee
 verified with a paid API request. Missing provider configuration does not prevent
 ordinary simulation or manual controls.
 
-## Cursor and other local sessions
+## Manual exchange with other local sessions
 
 Open the external-exchange section, write a prompt, choose its mode and scope, and
 export the context JSON. Give that packet to your chosen local session and request

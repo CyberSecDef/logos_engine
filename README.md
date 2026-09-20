@@ -48,7 +48,7 @@ home network; this milestone has no user login.
   and vegetation effects, temperature overlay and inspector tracking.
 - Validated creator transactions, five-day previews, saved rules, and reload.
 - Responsive inspector, time controls, world creation, and appearance/UV foundation.
-- Local Claude Code conversations: Discuss, Propose, review, Apply; cancellation
+- Local Claude Code, Cursor and Codex conversations: Discuss, Propose, review, Apply; cancellation
   and saved history; scoped JSON exchange; optional Anthropic API adapter.
 - Versioned custom numeric properties and weather-driven declarative rules, with
   generic inspectors/overlays and safe migration of existing worlds. See the
@@ -71,10 +71,18 @@ home network; this milestone has no user login.
 - Reviewed [world-local PNG artwork packs](docs/world-artwork-packs.md), with pinned
   versions, local image storage and checkpoint/branch preservation.
 
-The agreed [Phase 4 finish line](docs/phase-4-completion.md) includes all five
-remaining areas; the artwork item is in progress.
+- Portable bundles include committed replay history and required artwork; imported
+  source histories remain inspectable in independent worlds.
+- World-defined entity types and instances participate in rules and restricted
+  plugins, with explicit migrations and generic inspection.
+- Selective replay can omit or replace an intervention, review consequences,
+  and create a separate branch with its own verified history.
 
-**Still planned:** automatic Cursor CLI launching, final compatibility acceptance, richer erosion, trade,
+All five [Phase 4 items](docs/phase-4-completion.md) are complete. See the
+[final acceptance matrix](docs/phase-4-acceptance.md) for live provider checks,
+compatibility evidence and limits.
+
+**Still planned:** richer erosion, trade,
 population, conflict, and technology. The communication flag is persisted but
 knowledge exchange is not simulated yet. This is an early playable foundation.
 

@@ -486,8 +486,9 @@ or unrestricted new mechanics are already finished.
   machine; target responsive interaction and a basic tick within 100 ms at the
   reference resolution, then adjust the budget based on measurements.
 
-No implementation or runtime verification has been performed yet. The reference
-findings above are based on source inspection, not a rendered visual comparison.
+At the original planning milestone, no implementation or runtime verification
+had been performed. Current completed behavior and verification are recorded in
+DEVELOPMENT.md and the implemented-interface documentation.
 
 ## Agreed Phase 4 completion scope — 2026-09-19
 
@@ -496,3 +497,17 @@ complete portable bundles, minimal generic entities, selective replay, and a fin
 integration/compatibility acceptance pass. Complete them all before closing Phase 4.
 The concrete checklist and sequence are in [Phase 4 completion](docs/phase-4-completion.md).
 Earlier suggestions to defer layering or selective replay no longer apply.
+
+
+### Final provider acceptance scope — 2026-09-19
+
+The player added local Codex support for OpenAI models. Claude Code, Cursor CLI,
+Codex CLI and the optional Anthropic API share the world-change validator. CLI
+providers use native login or supported server-only API credentials, disposable
+workspaces and bounded responses. No provider can change engine files during play.
+The final acceptance matrix records live versus mocked transport evidence; paid
+direct API acceptance requires credentials and is not implied by mock tests.
+
+Phase 4 is complete. The [final acceptance matrix](docs/phase-4-acceptance.md)
+records 113 passing tests, all browser regressions, live Claude/Cursor/Codex checks,
+and mocked direct API coverage. Phase 5 is the next development phase.

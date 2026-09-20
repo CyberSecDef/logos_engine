@@ -140,7 +140,8 @@ with file/directory sync. It contains definitions currently represented by the
 schemas, state, rainfall/temperature rules, custom definitions/rules, and accepted transactions. Checkpoints now store immutable snapshot and definition artifacts; see
 [storage and restore behavior](world-checkpoints.md). Automatic server checkpoints
 run every 100 days and retain ten; manual checkpoints and restore backups persist.
-An immutable [replay journal](world-replay.md) now records future saves; selective replay and general artifact migrations remain future milestones. Restricted plugin definitions/state are embedded in
+An immutable [replay journal](world-replay.md) records committed steps and interventions; [selective replay](selective-replay.md)
+can omit or replace one intervention into a reviewed independent branch. Restricted plugin definitions/state are embedded in
 schema-4 saves and recorded as immutable world artifacts. Run one server/writer against a world directory; do not
 run the CLI against a world being edited by the server.
 

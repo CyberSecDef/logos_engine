@@ -6,48 +6,16 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-The player approved all five remaining areas as the Phase 4 finish line. Track
-acceptance in [phase-4-completion.md](docs/phase-4-completion.md): world-local/layered
-artwork, complete portable bundles, minimal entities, selective replay, and final
-integration/compatibility acceptance. Reviewed world-local PNG packs are implemented and live; layered composition
-will follow before this item is marked complete.
+Phase 4 implementation and acceptance are complete; deploying and publishing the
+final milestone. All five agreed areas plus the requested Codex provider passed
+verification. See [acceptance evidence](docs/phase-4-acceptance.md): 113 tests,
+15 browser/regression scripts, live Claude/Cursor/Codex Discuss and Propose, and
+mocked Anthropic API coverage. No paid direct API credentials are configured.
 
-Implementing reviewed branches from recorded history: committed-record membership,
-verified reconstruction, checkpoint acceleration, stale-review protection and an
-independent copied world. All 77 tests and historical-branch browser acceptance
-pass; deployed on the LAN server and published as `151e338`.
-
-Implementing the Phase 4 replay journal: immutable linked records, atomic saved
-head, compact step/proposal entries, snapshot boundaries, read-only verification
-and recent-history inspection. All 73 tests and checkpoint/history browser
-acceptance pass. Live on the LAN server and published as `5da7446`.
-
-Implementing world-specific appearance rules driven by built-in/custom properties.
-Rules select labels, colors and existing artwork through reviewed proposals.
-All 66 tests, appearance/texture browser checks, and native Claude acceptance
-passed. The milestone is live on the LAN server and published as `79cd743`.
-
-Plugin saved-state mappings are implemented: rename/reorder counters, convert
-units, add initial values, and explicitly discard retired keys. All 61 tests and
-browser acceptance pass, native Claude acceptance passed, and the milestone is
-live on the LAN server and published as `0aa95a6`.
-
-Phase 4 property conversions are implemented and verified: explicit scale/offset
-migrations, dependent-rule/plugin review, precision policy, forecasts, and
-persistence tests. Live on the LAN server and published as `6a56b58`.
-
-Temperature interventions are complete, published, and live on the LAN server.
-The Phase 4b resource-transfer milestone is complete and running locally:
-conserved custom resources, daily accounting, formula clamps, and neighbor extrema.
-Phase 4e is complete and live: immutable checkpoints, 100-day automatic
-checkpoints (ten retained), reviewed restore with backup, independent branches,
-portable world import/export, and persistent world selection. Published as
-`b4b38e0`. Phase 4c restricted plugins are implemented and live: deterministic
-instruction budgets, saved per-tile state, reviewed installation/update, and
-failure recovery. Verified, deployed, and published as `b10dbed`. General entity
-migrations remain pending. Future-save replay journaling is now implemented;
-selective replay remains pending. Phase 4d terrain
-artwork is verified, live, and published as `6099bd3`.
+Next: Phase 5 planning for tangible food/population, movement/trade, knowledge,
+technology and conflict, followed by pollution and disease transport. No Phase 5
+mechanics are being implemented in this milestone. Detailed prior activity below
+is chronological; old test counts and pending lists describe their dated milestone.
 
 ## Completed
 
@@ -56,7 +24,10 @@ artwork is verified, live, and published as `6099bd3`.
   preview/apply, appearance foundation, and two additional integration tests.
 - Phase 3: validated prompt workflow, native-login Claude adapter, optional API
   adapter, manual agent exchange, saved conversations, and 18 passing tests.
-- Public GitHub repository created; Phases 1 and 2 pushed.
+- Phase 4: versioned definitions, conserved transfers, restricted plugins, artwork,
+  entities, complete portable bundles, checkpoints, replay/branches, and automatic
+  Claude/Cursor/Codex provider integration.
+- Public GitHub repository created; prior milestones published.
 
 - Reviewed the reference globe source and documented the product decisions.
 - Wrote the implementation plan and proposed engine–world interface.
@@ -71,7 +42,7 @@ artwork is verified, live, and published as `6099bd3`.
 | 1. Engine foundation | Complete | npm/TypeScript setup; stable spherical topology; seeded worlds; pure ticks; validated declarative interventions; persistence; deterministic/conservation tests; CLI. |
 | 2. First playable globe | Complete | Local server; colored globe; picking; inspector; pause/step/play; rain/elevation/channel controls; save/reload; appearance catalog/UV foundation. |
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
-| 4. World extensibility | In progress | Definition migrations; full rule expression language; sandbox feasibility and plugin execution; artwork packs; branches/import/export. |
+| 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
 | 5. Broader simulation | Pending | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
 | 6. Polish and scale | Pending | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
@@ -88,7 +59,7 @@ artwork is verified, live, and published as `6099bd3`.
 ## Decisions and remaining questions
 
 - Use installed Node.js 22 initially; retain a provider-neutral adapter contract.
-  Bun and the sandbox runtime remain subjects of compatibility testing.
+  Bun remains unverified; the restricted plugin runtime and Linux CLI sandboxes are implemented.
 - No blocking product questions. Provider credentials, application transports,
   and plugin runtime capabilities must be verified before those integrations.
 
@@ -444,7 +415,7 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Restarted production on `0.0.0.0:5180` with the same selected world; no user
   request was active. Completing docs and final regression/publication checks.
 
-## Phase 4 remaining work
+## Historical Phase 4 remaining work (superseded by final acceptance)
 
 - 4a: numeric definitions, conditional rules, explicit field migrations, generic
   inspector/overlays, model authority — complete.
@@ -1123,3 +1094,59 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - 103 tests, selective replay and historical-branch browser checks passed.
 - Exact live-world hash preserved across deployment at day 826/revision 840.
 - Phase 4 items 1–4 complete; final integration/compatibility acceptance is next.
+
+### 2026-09-19 — Final Phase 4 acceptance in progress
+
+- Checking automatic Cursor CLI integration against its installed interface and
+  isolation controls; downloaded official CLI into ignored local storage.
+- Cursor authentication is pending the player's preferred login method. Native
+  Claude remains the configured provider; direct API credentials are not configured.
+- Auditing shared provider validation, save compatibility and recovery evidence;
+  Phase 4 stays open until final acceptance is documented.
+
+### 2026-09-19 — Provider integration checks
+
+- Added automatic Cursor CLI selection, native browser credential refresh, pinned
+  CLI version checking, empty tool allowlist and disposable bubblewrap workspace.
+- Cursor browser login succeeded. First live request exposed an account-gated
+  context flag; removed it and retained empty workspace/settings plus tool denial.
+- 109 tests passed before that flag adjustment, including shared provider-envelope
+  conformance, mocked API transport, private diagnostic handling, process limits,
+  cancellation and actual filesystem isolation. Live provider retest is running.
+- Correcting stale README/interface statements about completed Phase 4 features.
+
+### 2026-09-19 — Codex scope addition
+
+- Player requested Codex support for OpenAI models; adding a local Codex provider
+  with existing ChatGPT login or CODEX_API_KEY, configurable model, isolated
+  scratch workspace and the same reviewed world-change contract.
+- Cursor's isolated full-context request succeeded. Adapter acceptance encountered
+  a transient upstream provider error; checking an explicitly available model.
+- Codex is installed and authenticated. Verifying its restricted configuration and
+  structured response transport before exposing it as a supported provider.
+
+### 2026-09-19 — Codex acceptance and browser regression
+
+- Native Codex passed live Discuss and Propose through disposable saved worlds;
+  no saved state changed until explicit in-memory Apply. Existing ChatGPT login
+  works; only its original auth file is mounted, with no copied refresh tokens.
+- Added shared bounded CLI runner and Codex JSONL decoding; the strict transport
+  envelope preserves the existing world-change validator for all operations.
+- Full typecheck/build and 111 tests passed. Running all browser acceptance paths.
+- Cursor returned a valid rainfall proposal; adding support for a single enclosing
+  JSON code fence while rejecting explanatory prose and malformed JSON.
+- Direct Anthropic requests remain mocked because no paid API credentials are set.
+
+### 2026-09-19 — Phase 4 final acceptance and deployment
+
+- All five agreed items are complete, plus requested local Codex/OpenAI support.
+- Final typecheck/build and 113 tests passed with zero skips; all 15 browser/cache
+  regression scripts passed against temporary worlds.
+- Live Discuss/Propose passed for Claude, Cursor (composer-2.5) and Codex. Codex's
+  actual inner sandbox also blocked dummy credential reads and workspace writes.
+- Published the acceptance matrix with compatibility/recovery evidence and the
+  explicit mocked-only direct API limit. Reconciled current README/PLAN/log state.
+- Deployed on 0.0.0.0:5180. No player prompt was active. Exact saved world hash
+  survived shutdown/restart: first-world day 826, revision 840. Claude stays default.
+- Next: publish this milestone, then Phase 5 planning; no broader simulation
+  mechanics were introduced during final acceptance.
