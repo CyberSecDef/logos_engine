@@ -157,7 +157,8 @@ require reviewed health activation; no model calls occur during simulation.
 - **5g1 implemented:** automatic local research, healthy resident worker-time
   costs, reserve checks, cultivation improvements and local archives. Confirmed
   settlements choose projects automatically; cultivation is the first example.
-- **5g2 next:** communication-gated knowledge exchange with one-hop snapshots.
+- **5g2 implemented:** communication-gated adjacent archive access accelerates
+  local research, with frozen prior-day completions and real learner labor.
 - **5g3 pending:** broader bounded unlocks, resource costs/custom reads as needed,
   and combined-world acceptance. See [technology contracts](technology.md).
 

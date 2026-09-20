@@ -248,3 +248,9 @@ technologies and tile archives. `technology-configure`/`technology-define` requi
 world prompt scope and current technology versions; `research-assign`,
 `research-pause` and `research-auto` act locally. Automatic worker allocation is
 deterministic, disjoint from farm labor, and completes effects on the next day.
+
+`knowledge-configure` separately enables `neighbor-knowledge-v1`, shares the
+technology version and requires world scope. Both adjacent endpoints must allow
+communication. Prior-day completed archives improve local research efficiency;
+reports attribute bonus work to one source. No same-day relay or teacher labor
+is modeled. See [knowledge exchange](technology.md#implemented-5g2-adjacent-knowledge-exchange).

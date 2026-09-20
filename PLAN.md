@@ -602,3 +602,10 @@ snapshots, attribution, rounding and compatibility. Phase 5g technology is next.
 cultivation improvements, healthy resident labor costs and food reserve gates.
 The player confirmed automatic project selection. Knowledge sharing and broader
 unlocks follow in 5g2/5g3; research runs without automatic model calls.
+
+### Phase 5g2 implementation update
+
+Separately activated neighbor knowledge exchange now accelerates local research
+through open communication channels. Learners supply workers/food; prior-day
+archives, stable source selection and no stacking prevent instant chain learning.
+Phase 5g3 broader unlocks/integration remains. See [technology](docs/technology.md).

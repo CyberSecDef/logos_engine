@@ -111,11 +111,11 @@ arrivals, with new cases attributed to their exposure location.
 
 [Automatic research](docs/technology.md) lets settlements spend healthy resident
 worker-days on local technologies. Improved cultivation boosts farming after
-completion; knowledge exchange remains the next milestone.
+completion. Separately enabled neighboring knowledge exchange accelerates local
+research through open communication channels.
 
 **Still planned:** richer erosion, broader trade and movement,
-conflict, and broader technology effects. The communication flag is persisted but
-knowledge exchange is not simulated yet. This is an early playable foundation.
+conflict, and broader technology effects. This is an early playable foundation.
 
 ## Verify and use the CLI
 

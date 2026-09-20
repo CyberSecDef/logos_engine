@@ -10,9 +10,9 @@ Phase 5g knowledge and technology is underway. The plan is split into local
 research (5g1), communication-based knowledge exchange (5g2), and broader unlocks
 plus integration (5g3). See [technology plan](docs/technology.md).
 Confirmed: settlements choose projects automatically; improved cultivation first.
-5g1 automatic local research is implemented, deployed and published.
-204 tests, three browser workflows and native Claude acceptance passed. Next:
-5g2 communication-gated knowledge exchange.
+5g2 communication-gated knowledge exchange is implemented and deployed;
+publication is underway. Confirmed: neighbor archives accelerate local research,
+with real learner workers and food reserves. Next: 5g3 broader unlocks/integration.
 
 ## Completed
 
@@ -1751,3 +1751,48 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `3c38f73` to public `CyberSecDef/logos_engine` main.
 - Next: 5g2 knowledge exchange; local research is complete, wider Phase 5g remains open.
+
+### 2026-09-20 — Phase 5g2 started
+
+- Reviewed local research, archived knowledge and the existing communication flag.
+- Proposed adjacent communicating settlements as the first knowledge channel,
+  independent from physical travel. Freeze eligible prior-day knowledge so new
+  discoveries cannot be retransmitted within the same tick.
+- Asked the player whether sharing accelerates learning or grants an instant copy.
+
+### 2026-09-20 — Phase 5g2 neighboring knowledge exchange
+
+- Player confirmed research acceleration rather than instant copying. Added
+  separately reviewed `neighbor-knowledge-v1`, world-only `knowledge-configure`,
+  current technology version checks and preserved exchange settings on global pause.
+- Default +100% progress per local researcher from one communicating adjacent
+  populated land settlement with prior-day completed knowledge. Both communication
+  gates apply; physical travel is separate. Stable lowest-ID source, no stacking,
+  no same-day relay or free completion. Existing research stays unchanged without
+  activation. Source archives are accessed without separate teacher labor costs.
+- Learner health, food, visit and terrain restrictions still apply. Final-day
+  labor is bounded to the remaining required work. Farm labor and meals charge
+  real workers once; efficiency bonus is separately attributed in daily reports.
+- Added exchange controls/status, source/work attribution in inspector/forecasts,
+  communication explanations and provider capabilities v23. Updated research,
+  interface, roadmap, README and phase documentation with exact semantics/limits.
+- `npm run check`: **210 tests passed**, typecheck/build passed. Tests cover closed
+  endpoints, travel independence, no two-hop relay, source eligibility, food/local/
+  global/exchange pause, rounding, no-stacking/tie-breaks, version/scope, forecast
+  purity, deterministic 50-day replay, checkpoints and portable archives.
+- Knowledge and research browser workflows passed with zero autonomous model
+  calls: activation/cancel, actual assistance, closure/reopening, completion and
+  next-day effects, reload/replay, desktop/mobile. Inspected screenshots; corrected
+  obsolete communication text found during visual review and reran knowledge UI.
+- Native authenticated Claude produced exactly the requested exchange operation
+  and +100% setting in an isolated world; schema/scope and read-only forecast
+  passed with its saved fixture unchanged.
+- Deployed at `0.0.0.0:5180` and verified LAN controls. Preserved first-world
+  day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and full save envelope
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Sharing remains inactive pending reviewed activation. Evidence:
+  `/tmp/logos-knowledge-deploy.json`. No user-world edits/test ticks performed.
+- Existing ~728 kB bundle warning remains a Phase 6 performance task. Next:
+  Phase 5g3 broader bounded unlocks and integrated acceptance; full 5g remains open.
