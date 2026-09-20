@@ -14,7 +14,7 @@ are deployed and published. 5h2a independent hostile border rules are implemente
 and deployed; 233 tests, typecheck/build, browser and native Claude acceptance
 passed and published (`120f23a`). 5h2b resident garrisons are implemented; 242
 tests/typecheck/build, browser and native Claude acceptance passed. Deployment
-verified with exact saved-world preservation; publication follows. Moving armies/automatic conflict (5h3), integration
+verified with exact saved-world preservation; published milestone `cc7b237`. Moving armies/automatic conflict (5h3), integration
 (5h4) and tuning (5i) remain.
 
 ## Completed
@@ -2010,3 +2010,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Phase5h2b local mobilization complete. Next: 5h3 moving armies and automatic
   conflict under explicit rules, then 5h4 integrated acceptance and 5i tuning.
   Existing ~739 kB bundle warning remains Phase6 performance work.
+
+
+### 2026-09-20 — Phase 5h2b publication
+
+- Published milestone `cc7b237` to public `CyberSecDef/logos_engine` main.
+- Next: moving armies and automatic conflict (5h3); local garrisons do not fight yet.
