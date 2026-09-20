@@ -2218,3 +2218,10 @@ runoff with sediment conservation, and checksummed storage/path validation.
   Evidence: `/tmp/logos-phase5-deploy.json`. No test activation or ticks on live save.
 - Phase 5 complete. Existing frontend bundle warning, denser profiling and broader
   UI/performance polish remain subsequent work; no new mechanics implied.
+
+### 2026-09-20 — Phase 5 completion publication
+
+- Published milestone `ccb796f` to public `CyberSecDef/logos_engine` main.
+- Phase 5 is complete within its agreed scope. Live deployment preserves the
+  player's exact save; repeatable acceptance commands and measured limits are
+  recorded in `docs/phase-5-acceptance.md`.
