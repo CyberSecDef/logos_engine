@@ -1,4 +1,4 @@
-import {unpackBundle,MAX_BUNDLE_BYTES} from './portable.js';
+import {unpackBundle,MAX_BUNDLE_BYTES,artworkHashes} from './portable.js';
 import {parseArtwork,MAX_ARTWORK_BYTES} from './artwork.js';
 import type {SaveAction} from './journal.js';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
@@ -13,7 +13,7 @@ import { createWorld } from '../../../packages/worldgen/src/index.js';
 import { advance, applyProposal, validateWorld } from '../../../packages/engine/src/index.js';
 import { CreateWorldSchema, ProposalSchema, Id, type World } from '../../../packages/contracts/src/index.js';
 import { Digest } from '../../../packages/contracts/src/checkpoints.js';
-import { copyWorld, worldSummary } from './world-management.js';
+import { copyWorld, worldSummary, digest } from './world-management.js';
 import { WorldStore } from './store.js';
 import { PromptService, configuredProvider, forecast } from './prompts.js';
 import type { ModelProvider } from '../../../packages/agent-bridge/src/context.js';
@@ -122,6 +122,26 @@ export async function startServer(options:{port?:number; host?:string; root?:str
         const next=validateWorld({...saved.world,revision:world.revision+1});
         await store.checkpoint(world,`Before restore · day ${world.tick}`,'before-restore');
         await commit(next,{kind:'snapshot',reason:'restore'});return json(res,200,world);
+      }
+      if(pathname==='/api/history/intervention'){
+        const p=z.object({worldId:Id,recordId:Digest,expectedRevision:z.number().int().nonnegative()}).strict().parse(input);if(p.worldId!==world.id)throw Error('Replay source is not the active world');revision(p.expectedRevision);return json(res,200,await store.intervention(world.id,p.recordId));
+      }
+      if(pathname==='/api/history/selective/preview'||pathname==='/api/history/selective/branch'){
+        const edit=z.discriminatedUnion('mode',[z.object({mode:z.literal('omit')}).strict(),z.object({mode:z.literal('replace'),summary:z.string().min(1).max(500),operations:ProposalSchema.shape.operations}).strict()]);
+        const schema=z.object({worldId:Id,recordId:Digest,id:Id,name:z.string().trim().min(1).max(80),expectedRevision:z.number().int().nonnegative(),edit}).strict();
+        const p=(pathname.endsWith('/branch')?schema.extend({reviewedHash:Digest}):schema).parse(input);
+        if(p.worldId!==world.id)throw Error('Replay source is not the active world');revision(p.expectedRevision);if(await store.exists(p.id))throw Error('World already exists');
+        const result=await store.selectiveState(world.id,p.recordId,p.edit,{id:p.id,name:p.name});if(result.sourceHash!==digest(world))throw Error('Replay source changed outside this server; reload before continuing');
+        // Replacement artwork must already exist in this source world. No paths or uploads.
+        const images=new Set([...(result.start.artwork?.images??[]),...(result.world.artwork?.images??[]),...result.world.history.flatMap(h=>h.operations.flatMap(o=>o.kind==='artwork-activate'?o.pack.images:[]))].map(i=>i.hash));for(const hash of artworkHashes(await store.readOrigins(world.id)))images.add(hash);if(images.size>1024)throw Error('Selective branch exceeds 1024 artwork images');let imageBytes=0;for(const hash of images){imageBytes+=(await store.readArtwork(world.id,hash)).length;if(imageBytes>MAX_BUNDLE_BYTES)throw Error('Selective branch artwork exceeds 128 MiB');}
+        if(pathname.endsWith('/preview')){
+          const changes=result.world.tiles.flatMap((tile,index)=>{const before=world.tiles[index];return JSON.stringify(tile)===JSON.stringify(before)?[]:[{tileId:tile.id,before,after:tile}];});
+          const describe=(w:typeof world,id:string)=>{const e=w.entities?.instances.find(e=>e.id===id);if(!e)return 'absent';const t=w.entities!.types.find(t=>t.id===e.typeId)!;return `${e.label} in zone ${e.tileId}: ${t.properties.map(f=>`${f.label} ${e.properties[f.id]??f.defaultValue} ${f.unit}`).join(', ')}`;};
+          const entityChanges=[...new Set([...(world.entities?.instances??[]),...(result.world.entities?.instances??[])].map(e=>e.id))].map(id=>({id,before:describe(world,id),after:describe(result.world,id)})).filter(e=>e.before!==e.after);
+          return json(res,200,{entityChanges:{total:entityChanges.length,rows:entityChanges.slice(0,12)},summary:worldSummary(result.world),hash:result.hash,days:result.days,workDays:result.workDays,proposals:result.proposals,rebased:result.rebased,baseTick:result.baseTick,original:result.original.summary,originalOperations:result.original.operations,changes:{total:changes.length,tiles:changes.slice(0,12)},entities:{before:world.entities?.instances.length??0,after:result.world.entities?.instances.length??0}});
+        }
+        if(!('reviewedHash' in p)||p.reviewedHash!==result.hash)throw Error('Selective replay differs from reviewed candidate');
+        await store.createSelective(world.id,result);await activate(result.world);return json(res,200,world);
       }
       if(pathname==='/api/history/preview'||pathname==='/api/history/branch') {
         const schema=z.object({worldId:Id,recordId:Digest,id:Id,name:z.string().trim().min(1).max(80),expectedRevision:z.number().int().nonnegative()}).strict();

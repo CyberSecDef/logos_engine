@@ -54,7 +54,7 @@ dependencies. Entity and portable browser acceptance pass. Native Claude Code
 generated a valid building-like type/instance/rule and its deterministic tick was
 verified in memory. See [entity interface and limits](world-entities.md).
 
-## 4. Selective replay — pending
+## 4. Selective replay — complete
 
 - Start from recorded history, omit or replace a selected intervention, then replay
   subsequent inputs into an independent candidate world.
@@ -62,6 +62,14 @@ verified in memory. See [entity interface and limits](world-entities.md).
   longer fit. Do not silently skip failures or overwrite the source.
 - Review the resulting state before creating a branch; enforce explicit work limits.
 - Verify reproducibility, source preservation, failure handling and branch recovery.
+
+Verified: omit/replace a committed intervention, verify the original timeline and
+replay subsequent inputs into a reviewed independent candidate. Failures identify
+the later action/day; revisions are explicitly rebased and no inputs are skipped.
+Branches retain verifiable replay journals. 103 engine/API tests plus selective
+and historical-branch browser checks cover reproducibility, source preservation,
+stale/tampered review rejection, dependencies, plugin failure and recovery.
+See [work limits and snapshot boundaries](selective-replay.md).
 
 ## 5. Integration, compatibility and final acceptance — pending
 

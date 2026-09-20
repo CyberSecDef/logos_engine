@@ -27,6 +27,7 @@
     "test:checkpoints": "npm run build && node tests/checkpoints-browser.mjs",
     "test:plugins": "npm run build && node tests/plugins-browser.mjs",
     "test:textures": "npm run build && node tests/textures-browser.mjs",
+    "test:selective": "npm run build && node tests/selective-browser.mjs",
     "test:entities": "npm run build && node tests/entities-browser.mjs",
     "test:portable": "npm run build && node tests/portable-browser.mjs",
     "test:layers": "npm run build && node tests/layers-browser.mjs",

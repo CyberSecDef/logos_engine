@@ -24,3 +24,5 @@ button:disabled{cursor:wait;opacity:.45;pointer-events:none}textarea{font:inheri
 #world-review-artwork{display:flex;flex-wrap:wrap;gap:10px;max-height:30vh;overflow:auto}#world-review-artwork figure{margin:0;width:100px}#world-review-artwork img{width:100px;height:100px;object-fit:cover;border-radius:5px}#world-review-artwork figcaption{font-size:10px;color:var(--muted);margin:4px 0}
 
 .entity-preview p{overflow-wrap:anywhere;font-size:12px;line-height:1.6}
+
+.replay-editor label{display:block;margin:10px 0;font-size:11px}.replay-editor input,.replay-editor textarea{width:100%;background:#101d23;color:inherit;border:1px solid var(--line);border-radius:5px;padding:8px}.replay-editor textarea{font:11px monospace;resize:vertical}.replay-diff{width:100%;font-size:12px;overflow-wrap:anywhere}.replay-diff p{margin:8px 0}

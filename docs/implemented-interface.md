@@ -209,3 +209,10 @@ IDs, create/update/move/remove operations and explicit type migrations. Rules,
 appearance and restricted plugins can read counts/sums; rule/plugin add/set outputs
 can write matching instances. See [world entities](world-entities.md) for the
 fixed contract, limits, model scopes, preview semantics and cistern example.
+
+## Selective replay
+
+Recorded interventions support omission or replacement followed by bounded replay
+into a reviewed independent world. Later input failures are reported, never skipped.
+The new branch retains its rewritten input journal. See [selective replay](selective-replay.md)
+for endpoint bodies, review guarantees, snapshot boundaries and recovery behavior.

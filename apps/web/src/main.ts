@@ -104,6 +104,16 @@ $('apply-world-review').onclick=()=>void action(async()=>{
  finishWorldReview();$('worlds').hidden=true;
 });
 let historyCursor:string|null=null;
+async function reviewSelective(recordId:string,edit:{mode:'omit'}|{mode:'replace';summary:string;operations:Operation[]}){
+ const body={worldId:world.id,recordId,id:`world-${requestId()}`,name:$<HTMLInputElement>('copy-name').value,expectedRevision:world.revision,edit};
+ const result=await api<{summary:WorldSummary;hash:string;days:number;workDays:number;proposals:number;rebased:number;baseTick:number;original:string;originalOperations:Operation[];changes:{total:number;tiles:{tileId:number;before:World['tiles'][number];after:World['tiles'][number]}[]};entityChanges:{total:number;rows:{id:string;before:string;after:string}[]}}>('history/selective/preview',body);
+ reviewWorld('Create an alternate history?',result.summary,`${edit.mode==='omit'?'Omit':'Replace'}: ${result.original}. Replay ${result.days} days and ${result.proposals} interventions from day ${result.baseTick}; ${result.rebased} later revision numbers adjusted. All later operations were validated without skipping failures. Your source world stays unchanged.`, 'Create alternate world','history/selective/branch',{...body,reviewedHash:result.hash});
+ const diff=document.createElement('div');diff.className='replay-diff';const heading=document.createElement('p');heading.textContent=`Compared with the current world: ${result.changes.total} changed zones and ${result.entityChanges.total} changed entities. Showing up to 12 of each. Rules may differ even when current values match.`;diff.append(heading);
+ for(const operation of result.originalOperations){const row=document.createElement('p');row.textContent=`Original: ${describeOperation(operation)}`;diff.append(row);}
+ if(edit.mode==='replace')for(const operation of edit.operations){const row=document.createElement('p');row.textContent=`Replacement: ${describeOperation(operation)}`;diff.append(row);}
+ for(const change of result.changes.tiles){const parts:string[]=[];for(const key of ['elevationM','rainMm','temperatureC','waterL','vegetation','population','communication'] as const)if(change.before[key]!==change.after[key])parts.push(`${{elevationM:'Elevation (m)',rainMm:'Rain (mm)',temperatureC:'Temperature (°C)',waterL:'Water (L)',vegetation:'Vegetation',population:'Population',communication:'Connected'}[key]}: ${typeof change.before[key]==='number'?fmt(change.before[key] as number):String(change.before[key])} → ${typeof change.after[key]==='number'?fmt(change.after[key] as number):String(change.after[key])}`);for(const field of new Set([...Object.keys(change.before.properties),...Object.keys(change.after.properties)]))if(change.before.properties[field]!==change.after.properties[field])parts.push(`${field}: ${change.before.properties[field]??'default'} → ${change.after.properties[field]??'default'}`);const row=document.createElement('p');row.textContent=`Zone ${change.tileId}: ${parts.join('; ')||'saved state changed'}`;diff.append(row);}
+ for(const e of result.entityChanges.rows){const row=document.createElement('p');row.textContent=`${e.before} → ${e.after}`;diff.append(row);}$('world-review-artwork').append(diff);
+}
 async function loadHistory(before?:string) {
  const history=await api<{entries:{id:string;kind:string;tick:number;revision:number;summary:string}[];hasMore:boolean}>(before?`history?before=${encodeURIComponent(before)}`:'history');if(!before)$('history-list').replaceChildren();
  historyCursor=history.hasMore?history.entries.at(-1)?.id??null:null;$('history-more').hidden=!historyCursor;
@@ -113,7 +123,15 @@ async function loadHistory(before?:string) {
    const body={worldId:world.id,recordId:entry.id,id:`world-${requestId()}`,name:$<HTMLInputElement>('copy-name').value,expectedRevision:world.revision};
    const result=await api<{summary:WorldSummary;hash:string;days:number;baseTick:number;baseKind:string}>('history/preview',body);
    reviewWorld('Branch from recorded history?',result.summary,`Reconstructed from a verified ${result.baseKind==='checkpoint'?'checkpoint':'journal snapshot'} at day ${result.baseTick}, replaying ${result.days} day${result.days===1?'':'s'}. Creates an independent world using the copy name. Your source world stays at day ${world.tick}.`,'Create branch','history/branch',{...body,reviewedHash:result.hash});
-  });row.append(label,button);$('history-list').append(row);
+  });row.append(label,button);
+  if(entry.kind==='proposal'){
+   const omit=document.createElement('button');omit.textContent='Review without this';omit.onclick=()=>void action(()=>reviewSelective(entry.id,{mode:'omit'}));
+   const replace=document.createElement('button');replace.textContent='Replace intervention';replace.onclick=()=>void action(async()=>{
+    const proposal=await api<Proposal>('history/intervention',{worldId:world.id,recordId:entry.id,expectedRevision:world.revision});
+    const editor=document.createElement('div'),nameLabel=document.createElement('label'),name=document.createElement('input'),label=document.createElement('label'),input=document.createElement('textarea'),review=document.createElement('button');editor.className='replay-editor';name.value=proposal.summary;name.maxLength=500;nameLabel.textContent='Replacement summary';nameLabel.append(name);label.textContent='Replacement operations (JSON)';input.value=JSON.stringify(proposal.operations,null,2);input.rows=8;input.maxLength=50000;label.append(input);review.textContent='Review replacement replay';review.onclick=()=>void action(()=>reviewSelective(entry.id,{mode:'replace',summary:name.value,operations:JSON.parse(input.value)}));editor.append(nameLabel,label,review);row.querySelector('.replay-editor')?.remove();row.append(editor);
+   });row.append(omit,replace);
+  }
+  $('history-list').append(row);
  }
  text('history-status',$('history-list').children.length?`Showing ${$('history-list').children.length} recorded saves. Review a branch to explore a recorded moment in an independent world.`:'Replay recording begins on this world’s next save. Earlier day-by-day history is unavailable.');
 }

@@ -1,13 +1,13 @@
 import {bundle,artworkHashes,SourcesSchema,MAX_BUNDLE_BYTES,validateSource,memoryJournal,type PortableSource} from './portable.js';
 import {pngInfo} from './artwork.js';
 import {ReplayJournal,type SaveAction} from './journal.js';
-import { mkdir, open, readFile, rename, realpath, lstat, readdir, unlink, link, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, open, readFile, rename, realpath, lstat, readdir, unlink, link, rm } from 'node:fs/promises';
 import { resolve, join, dirname } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 import { Id, migrateWorld, type World } from '../../../packages/contracts/src/index.js';
 import { CheckpointSchema, Digest, type Checkpoint } from '../../../packages/contracts/src/checkpoints.js';
 import { digest } from './world-management.js';
-import { validateWorld } from '../../../packages/engine/src/index.js';
+import { advance,applyProposal,validateWorld } from '../../../packages/engine/src/index.js';
 
 export function stateHash(world:World):string {
   return createHash('sha256').update(JSON.stringify(world)).digest('hex');
@@ -172,6 +172,26 @@ export class WorldStore {
     if(index===undefined)return sources.map((source,index)=>{const world=validateWorld(source.world);return {index,id:world.id,name:world.name,tick:world.tick,revision:world.revision,records:source.history.records.length,hash:digest(world)};});
     if(!Number.isInteger(index)||index<0||index>=sources.length)throw Error('Unknown source history');
     const source=sources[index],world=validateWorld(source.world);return memoryJournal(source.history).recent(source.history.head??undefined,world,50,before);
+  }
+  async intervention(id:string,recordId:string){const {world,head,journal}=await this.journalContext(id);return (await journal.intervention(head,world,recordId)).proposal;}
+  async selectiveState(id:string,recordId:string,edit:Parameters<ReplayJournal['selective']>[3],identity:{id:string;name:string}){const {world,head,journal}=await this.journalContext(id);return journal.selective(head,world,recordId,edit,identity);}
+  async createSelective(sourceId:string,result:Awaited<ReturnType<ReplayJournal['selective']>>){
+    if(await this.exists(result.world.id))throw Error('World already exists');
+    // Build a durable journal off to the side. Publish state.json last into an
+    // exclusively reserved destination; no existing directory can be overwritten.
+    const stageRoot=await mkdtemp(join(this.root,'.selective-')),stage=new WorldStore(stageRoot);let destination:string|undefined;
+    try{
+      const origins=await this.readOrigins(sourceId),hashes=artworkHashes([...origins,...[result.start,result.world].map(world=>({world,history:{head:null,records:[],snapshots:[]}}))]),images:Buffer[]=[];
+      if(hashes.size>1024)throw Error('Selective branch exceeds 1024 artwork images');let imageBytes=0;
+      for(const hash of hashes){const image=await this.readArtwork(sourceId,hash);imageBytes+=image.length;if(imageBytes>MAX_BUNDLE_BYTES)throw Error('Selective branch artwork exceeds 128 MiB');images.push(image);}
+      await stage.createNew(result.start,undefined,{origins,images});let replay=result.start;
+      for(const action of result.actions){if(action.kind==='proposal')replay=applyProposal(replay,action.proposal);else if(action.kind==='step')for(let i=0;i<action.days;i++){replay=advance(replay);if(i%10===0)await new Promise<void>(resolve=>setImmediate(resolve));}await stage.save(replay,action);}
+      if(digest(replay)!==result.hash)throw Error('Selective branch reconstruction differs from reviewed result');
+      destination=await this.directory(result.world.id,true);const staged=join(stageRoot,result.world.id);
+      for(const file of (await readdir(staged)).filter(f=>f!=='state.json'))await rename(join(staged,file),join(destination,file));
+      await rename(join(staged,'state.json'),join(destination,'state.json'));const handle=await open(destination,'r');try{await handle.sync();}finally{await handle.close();}
+      const parent=await open(this.root,'r');try{await parent.sync();}finally{await parent.close();}
+    }catch(error){if(destination)await rm(destination,{recursive:true,force:true});throw error;}finally{await rm(stageRoot,{recursive:true,force:true});}
   }
   private async pluginArtifacts(world:World):Promise<void> {
     const definitions=[...world.plugins.map(p=>p.definition),...world.history.flatMap(h=>h.operations).flatMap(op=>op.kind==='plugin-define'?[op.definition]:[])];

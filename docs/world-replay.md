@@ -41,9 +41,9 @@ requires reviewing again. Reconstruction runs again before creation. Existing wo
 IDs cannot be overwritten.
 
 This branches at recorded **save boundaries**. A multi-day step has one boundary
-at its end; choosing an intermediate day, skipping/editing past interventions,
-overwriting the source from a journal record remains
-future work. The current UI searches/paginates within the newest 10,000 records.
+at its end; choosing an intermediate day and overwriting the source from a journal record
+remain future work. Omitting/replacing interventions is available through
+[selective replay](selective-replay.md). The current UI searches/paginates within the newest 10,000 records.
 
 ## Verify a world
 
@@ -103,8 +103,11 @@ small records rather than full world snapshots; initialization/adoption, restore
 and explicit replacements store snapshots. This retention is independent of the
 100-day automatic checkpoint policy, which still keeps ten automatic checkpoints.
 Automatic checkpoint pruning never deletes journal artifacts. Journal compaction,
-editing/skipping replay events and arbitrary historical restore
-remain future work.
+arbitrary historical restore remains future work.
+
+[Selective replay](selective-replay.md) now supports omitting or replacing one
+recorded intervention and replaying later inputs into a reviewed independent world,
+with explicit failure boundaries and work limits.
 
 Older engine builds do not maintain `journalHead`; avoid using them as writers on
 journaled worlds. Replay requires compatible simulation behavior and validates

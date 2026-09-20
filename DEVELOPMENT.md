@@ -1076,3 +1076,43 @@ runoff with sediment conservation, and checksummed storage/path validation.
   generation passed. LAN deployment preserved day 792/revision 805.
 - Phase 4 items 1–3 complete. Selective replay and final integration/compatibility
   acceptance remain; Phase 4 is not yet closed.
+
+### 2026-09-19 — Selective replay in progress
+
+- Implementing omit/replace for one committed intervention, with deterministic
+  replay of subsequent steps/proposals and explicit revision rebasing.
+- Invalid later dependencies stop with the recorded day/action and reason.
+  Restore/replacement snapshots after the edit are explicit blocking boundaries.
+- Successful candidates will be reviewed, then published as independent worlds
+  with their replayed input journal. Source worlds remain unchanged.
+
+### 2026-09-19 — Selective replay verification
+
+- Omit/replace replays original transitions for integrity and a separate candidate
+  for consequences, with explicit revision rebasing and fixed work limits.
+- Later dependency/plugin failures report their recorded action/day; snapshots
+  after the target block replay rather than overwriting the experiment.
+- Browser acceptance passed omission/cancel, replacement editing/review, independent
+  branch/reload, verified journal, visible dependency failure and mobile layout.
+- Added staged-publication cleanup and replay-time plugin-failure tests.
+- Documented source boundaries, work accounting, branch journal retention and recovery.
+
+### 2026-09-19 — Selective replay acceptance
+
+- All 103 engine/API tests and typecheck/build passed.
+- Selective browser acceptance and existing historical-branch browser regression
+  passed; inspected the original/replacement and outcome review.
+- Branch construction is staged, hash-checked and published with state last;
+  source-state and artwork limits are checked before publication.
+- Completion item 4 is complete. Only final integration/compatibility acceptance
+  remains before Phase 4 closes, including automatic local Cursor CLI support.
+
+### 2026-09-19 — Selective replay deployment
+
+- Deployed to 0.0.0.0:5180 after confirming no active player prompt.
+- Captured the latest save at shutdown and verified its exact hash after restart:
+  first-world remains at day 826/revision 840.
+- LAN read-only intervention endpoint returned successfully; no alternate worlds
+  or experimental changes were created in the player's world directory.
+- Publishing Phase 4 item 4. Final provider integration, compatibility and recovery
+  acceptance remains, including automatic Cursor CLI support.

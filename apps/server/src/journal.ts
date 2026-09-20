@@ -2,7 +2,7 @@ import {z} from 'zod';
 import {ProposalSchema,Id,migrateWorld,type World,type Proposal,ENGINE_VERSION} from '../../../packages/contracts/src/index.js';
 import {advance,applyProposal,validateWorld} from '../../../packages/engine/src/index.js';
 import {Digest} from '../../../packages/contracts/src/checkpoints.js';
-import {digest} from './world-management.js';
+import {digest,copyWorld} from './world-management.js';
 const base={version:z.literal(1),engineVersion:z.literal(ENGINE_VERSION),previous:Digest.nullable(),worldId:Id,tick:z.number().int().nonnegative(),revision:z.number().int().nonnegative(),hash:Digest};
 const RecordSchema=z.discriminatedUnion('kind',[
  z.object({...base,kind:z.literal('snapshot'),snapshot:Digest,reason:z.enum(['initial','adopted','replacement','restore'])}).strict(),
@@ -110,6 +110,39 @@ export class ReplayJournal {
   const baseTick=base.tick,baseRevision=base.revision;let replay=base;
   for(const record of records.reverse())replay=await this.replayRecord(record,replay,world.id);
   return {world:replay,recordId:target,hash:digest(replay),days,proposals:records.filter(r=>r.kind==='proposal').length,baseTick,baseRevision,baseKind};
+ }
+ async intervention(head:string|undefined,world:World,target:string){
+  Digest.parse(target);if(!head)throw Error('No replay history yet');await this.head(head,world);
+  let cursor:string|null=head,expected:string|undefined=digest(world);const seen=new Set<string>();
+  while(cursor){if(seen.size>=10000)throw Error('Selective replay exceeds 10000 record search limit');if(seen.has(cursor))throw Error('Cyclic journal');seen.add(cursor);const record=await this.record(cursor);if(record.worldId!==world.id||expected!==undefined&&record.hash!==expected)throw Error('Broken journal chain');if(cursor===target){if(record.kind!=='proposal'||!record.previous)throw Error('Select a recorded intervention with a prior state');return record;}expected=record.kind==='snapshot'?undefined:record.before;cursor=record.previous;}
+  throw Error('Intervention is not in committed history');
+ }
+ async selective(head:string|undefined,world:World,target:string,edit:{mode:'omit'}|{mode:'replace';summary:string;operations:Proposal['operations']},identity:{id:string;name:string},maxWorkDays=1000){
+  if(!Number.isInteger(maxWorkDays)||maxWorkDays<0||maxWorkDays>1000)throw Error('Invalid selective replay work budget');
+  const selected=await this.intervention(head,world,target),suffix:{id:string;record:Record}[]=[];
+  let cursor:string|null=head!;let days=0;
+  while(cursor!==selected.previous){const record=await this.record(cursor!);if(record.kind==='snapshot')throw Error(`Selective replay stops at day ${record.tick}, revision ${record.revision}: ${record.reason} snapshot replaces the timeline. Choose an intervention after this boundary.`);if(record.kind==='step')days+=record.days;suffix.push({id:cursor!,record});cursor=record.previous;}
+  if(days*2>maxWorkDays)throw Error(`Selective replay exceeds ${maxWorkDays} work days (source verification plus candidate replay)`);
+  const base=await this.reconstruct(head,world,selected.previous!,{maxDays:maxWorkDays-days*2});
+  let original=base.world,candidate=copyWorld(base.world,identity.id,identity.name);const start=candidate,actions:SaveAction[]=[];let rebased=0,proposals=0;
+  for(const {id,record} of suffix.reverse()){
+   // Always verify the original transition before interpreting the changed path.
+   original=await this.replayRecord(record,original,world.id);
+   if(id===target&&edit.mode==='omit')continue;
+   try{
+    if(record.kind==='proposal'){
+     const input=id===target&&edit.mode==='replace'?{...record.proposal,summary:edit.summary,operations:edit.operations}:record.proposal;
+     const proposal=ProposalSchema.parse({...input,worldId:candidate.id,expectedRevision:candidate.revision});
+     if(id!==target&&proposal.expectedRevision!==record.proposal.expectedRevision)rebased++;
+     candidate=applyProposal(candidate,proposal);actions.push({kind:'proposal',proposal});proposals++;
+    }else if(record.kind==='step'){
+     for(let day=0;day<record.days;day++){candidate=advance(candidate);if(day%10===0)await new Promise<void>(resolve=>setImmediate(resolve));}
+     actions.push({kind:'step',days:record.days});
+    }
+   }catch(error){throw Error(`Selective replay blocked at day ${record.tick}, revision ${record.revision} (${id.slice(0,12)}): ${record.kind==='proposal'?record.proposal.summary:'advance '+(record.kind==='step'?record.days:0)+' days'}. ${(error as Error).message}. No branch was created; later inputs were not skipped.`);}
+  }
+  if(digest(original)!==digest(world))throw Error('Original replay does not match source world');
+  return {world:candidate,start,actions,hash:digest(candidate),days,workDays:base.days+days*2,proposals,rebased,sourceHash:digest(world),original:selected.proposal,baseTick:base.world.tick};
  }
  async verify(head:string|undefined,world:World,maxDays=10000,maxRecords=10000){
   if(!head)throw Error('No replay history yet; recording begins on the next save');
