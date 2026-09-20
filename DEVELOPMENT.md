@@ -19,7 +19,7 @@ verified with exact saved-world preservation; published milestone `cc7b237`.
 Browser/native acceptance and unchanged-world LAN deployment passed; milestone
 `eb0dda6` is published. Automatic adjacent battles/capture (5h3b) are implemented;
 264 tests/typecheck/build, browser and native Claude acceptance passed.
-LAN deployment preserved the complete live save; publication is in progress. Integrated acceptance (5h4) and whole-world tuning (5i) remain.
+LAN deployment preserved the complete live save; milestone `224aa00` is published. Integrated acceptance (5h4) and whole-world tuning (5i) remain.
 
 ## Completed
 
@@ -2140,3 +2140,10 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Phase5h3b complete. Next:5h4 combined environment/population/conflict acceptance,
   then5i long-run balance/tuning. Naval warfare, sieges, displacement and building
   damage remain future scope. Existing bundle-size warning remains Phase6 work.
+
+
+### 2026-09-20 — Phase 5h3b publication
+
+- Published milestone `224aa00` to public `CyberSecDef/logos_engine` main.
+- Next:5h4 integrated acceptance, then5i whole-world tuning. Live conflict remains
+  inactive until the creator explicitly reviews and applies its activation.
