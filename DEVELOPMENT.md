@@ -9,7 +9,7 @@ before each milestone commit. Never mark unverified functionality complete.
 Implementing reviewed branches from recorded history: committed-record membership,
 verified reconstruction, checkpoint acceleration, stale-review protection and an
 independent copied world. All 77 tests and historical-branch browser acceptance
-pass; deployed on the LAN server. Publication is in progress.
+pass; deployed on the LAN server and published as `151e338`.
 
 Implementing the Phase 4 replay journal: immutable linked records, atomic saved
 head, compact step/proposal entries, snapshot boundaries, read-only verification
@@ -877,3 +877,12 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - History is still empty until this world’s next saved action/day; deployment did
   not create a branch, apply a change or advance the user world.
 - Publishing paged history, verified reconstruction and reviewed independent branches.
+
+### 2026-09-19 — Historical branch publication
+
+- Pushed `151e338` to public `CyberSecDef/logos_engine` on `main`.
+- Recorded moments can be reviewed and copied into independent worlds, using
+  verified checkpoints/replay and paged history. User world remains unchanged.
+- All 77 tests and both browser recovery/branching suites passed.
+- Portable journal bundles, editing/skipping recorded interventions, general
+  entities and external/layered artwork remain future Phase 4 work.
