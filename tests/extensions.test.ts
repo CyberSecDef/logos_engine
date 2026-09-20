@@ -117,3 +117,53 @@ test('additions clamp once, cadence is explicit, and disabled rules do not write
  assert.equal(fieldValue(advance(advance(changed)),0,'soil-fertility'),90);
  const oversized=structuredClone(changed);oversized.definitions.rules=Array.from({length:65},(_,i)=>rule(`rule-${i}`,1));assert.throws(()=>validateWorld(oversized));
 });
+
+test('property conversions migrate defaults and explicit values with coordinated rule updates',()=>{
+ const w=defined();w.tiles[0].properties['soil-fertility']=73;
+ const conversion:Operation={kind:'field-define',tileId:0,definition:{...w.definitions.fields[0],version:2,max:1,defaultValue:.25,unit:'fraction'},migration:'preserve',transform:{scale:.01,offset:0,precision:'exact'}};
+ const rules:Operation[]=w.definitions.rules.map(rule=>({kind:'rule-define',tileId:rule.tileId,rule:{...rule,version:2,effects:rule.effects.map(e=>({...e,value:{...e.value,constant:e.value.constant/100}}))}}));
+ const before=stateHash(w);
+ assert.throws(()=>applyProposal(w,proposal(w,[conversion])),/explicit update/);
+ const converted=applyProposal(w,proposal(w,[conversion,...rules]));
+ assert.equal(fieldValue(converted,0,'soil-fertility'),.73);assert.equal(fieldValue(converted,1,'soil-fertility'),.5);
+ assert.equal(converted.definitions.fields[0].defaultValue,.25);assert.equal(stateHash(w),before);
+ assert.equal(stateHash(advance(converted)),stateHash(advance(structuredClone(converted))));
+ assert.throws(()=>applyProposal(w,proposal(w,[conversion,conversion,...rules])),/at most once/);
+ const preview=forecast(w,proposal(w,[conversion,...rules]));assert.equal(preview.totalTiles,w.tiles.length);assert.equal(preview.tiles[0].properties[0].unit,'fraction');assert.equal(preview.tiles[0].properties[0].baselineUnit,'points');assert.equal(stateHash(w),before);
+ ModelReplySchema.parse({kind:'proposal',message:'Convert units',assumptions:[],operations:[conversion,...rules]});
+ assert.ok(JSON.stringify(modelReplyJsonSchema).includes('precision'));
+});
+
+test('conversion precision and bounds policies are explicit and failed conversions are atomic',()=>{
+ const w=defined();w.definitions.rules=[];w.tiles[0].properties['soil-fertility']=1.234;
+ const op={kind:'field-define' as const,tileId:0,definition:{...w.definitions.fields[0],version:2,max:1,defaultValue:.5},migration:'preserve' as const,transform:{scale:.01,offset:0,precision:'exact' as const}};
+ const hash=stateHash(w);assert.throws(()=>applyProposal(w,proposal(w,[op])),/precision/);
+ const rounded=applyProposal(w,proposal(w,[{...op,transform:{...op.transform,precision:'round'}}]));assert.equal(fieldValue(rounded,0,'soil-fertility'),.012);
+ assert.throws(()=>applyProposal(w,proposal(w,[{...op,transform:{scale:1,offset:1,precision:'exact'}}])),/discard/);
+ const clamped=applyProposal(w,proposal(w,[{...op,migration:'clamp',transform:{scale:1,offset:1,precision:'exact'}}]));assert.equal(fieldValue(clamped,0,'soil-fertility'),1);
+ const shifted=applyProposal(w,proposal(w,[{...op,definition:{...op.definition,min:-100,max:100},transform:{scale:-1,offset:10,precision:'exact'}}]));assert.equal(fieldValue(shifted,0,'soil-fertility'),8.766);
+ assert.throws(()=>applyProposal(make(),proposal(make(),[{...op,definition:{...op.definition,version:1}}])),/existing/);
+ assert.equal(stateHash(w),hash);
+});
+
+test('stock conversions restrict offsets and require review of dependent plugins including disabled programs',()=>{
+ const w=defined();w.definitions.rules=[];w.definitions.fields[0].quantity='stock';
+ w.plugins=[{definition:{id:'stock-watch',version:1,abi:'logos-stack-v1',label:'Watch',description:'',tileId:0,scope:'tile',enabled:false,everyDays:1,stateFields:[],program:[{op:'read',read:{source:'custom',fieldId:'soil-fertility',sample:'self'}},{op:'drop'}]},state:[]}];
+ const op:Operation={kind:'field-define',tileId:0,definition:{...w.definitions.fields[0],version:2,max:1,defaultValue:.5},migration:'preserve',transform:{scale:.01,offset:0,precision:'exact'}};
+ assert.throws(()=>applyProposal(w,proposal(w,[op])),/plugin stock-watch/);
+ const update:Operation={kind:'plugin-define',tileId:0,definition:{...w.plugins[0].definition,version:2},migration:'preserve'};
+ assert.equal(fieldValue(applyProposal(w,proposal(w,[op,update])),0,'soil-fertility'),.5);
+ assert.throws(()=>applyProposal(w,proposal(w,[{...op,transform:{scale:1,offset:1,precision:'exact'}},update])),/positive scale and zero offset/);
+ assert.throws(()=>applyProposal(w,proposal(w,[{...op,transform:{scale:0,offset:0,precision:'exact'}},update])),/positive scale/);
+});
+
+test('converted definitions and history survive save, checkpoint and portable archive',async()=>{
+ const {archiveWorld,unpackWorld}=await import('../apps/server/src/world-management.js');
+ const root=await mkdtemp(join(tmpdir(),'logos-conversion-')),store=new WorldStore(root),w=defined();w.definitions.rules=[];
+ const converted=applyProposal(w,proposal(w,[{kind:'field-define',tileId:0,definition:{...w.definitions.fields[0],version:2,max:1,defaultValue:.5},migration:'preserve',transform:{scale:.01,offset:0,precision:'exact'}}]));
+ try {
+  await store.save(converted);assert.equal(stateHash(await store.load(w.id)),stateHash(converted));
+  const checkpoint=await store.checkpoint(converted,'Converted');assert.equal(stateHash((await store.readCheckpoint(w.id,checkpoint.id)).world),stateHash(converted));
+  assert.equal(stateHash(unpackWorld(archiveWorld(converted))),stateHash(converted));
+ }finally{await rm(root,{recursive:true,force:true});}
+});

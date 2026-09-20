@@ -170,3 +170,5 @@ Forecasts now include `baselineError` (nullable) and `baselineTick`. A failed
 unchanged-world plugin stops its baseline forecast, while a valid recovery
 candidate can still complete five days. Comparisons use the reported last
 successful baseline day, and the browser displays that limitation.
+
+Custom property updates also support reviewed [scale/offset conversions](world-extensibility.md#converting-an-existing-property), with explicit precision policy and coordinated dependent rule/plugin updates.

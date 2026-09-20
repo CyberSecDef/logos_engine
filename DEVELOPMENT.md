@@ -6,6 +6,10 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
+Phase 4 property conversions are implemented and verified: explicit scale/offset
+migrations, dependent-rule/plugin review, precision policy, forecasts, and
+persistence tests. Live on the LAN server; publication is in progress.
+
 Temperature interventions are complete, published, and live on the LAN server.
 The Phase 4b resource-transfer milestone is complete and running locally:
 conserved custom resources, daily accounting, formula clamps, and neighbor extrema.
@@ -664,3 +668,32 @@ runoff with sediment conservation, and checksummed storage/path validation.
   under `packages/tile-packs/public/painterly-v1/`.
 - General entity migrations, a complete replay journal, world-local artwork
   bundles, and layered appearance composition remain future work.
+
+### 2026-09-19 — Property conversion milestone started
+
+- Adding declarative conversions for existing custom properties without gameplay
+  engine edits. Existing defaults and stored values must both migrate.
+- Dependent rules/plugins must be explicitly replaced or removed in the same
+  proposal; no guessed conversion of rule constants or saved plugin counters.
+- Verification, documentation, LAN deployment and publication are pending.
+
+### 2026-09-19 — Property conversion verification
+
+- `npm run check` passed all 56 tests, typecheck, and production build.
+- Browser acceptance passed world-scope prompt, conversion/precision review,
+  unchanged state during preview, coordinated rule updates, Apply and reload.
+- Tests cover defaults, exact/rounded values, bounds, atomic rejection, disabled
+  plugin dependencies, stock restrictions, deterministic ticks and save/checkpoint/archive.
+- Added a fertility conversion example and the contract/recovery documentation.
+- No user world has been edited or advanced by these checks.
+
+### 2026-09-19 — Property conversion deployment
+
+- Final 56-test suite, typecheck/build and conversion browser acceptance passed.
+- Forecasts now retain original baseline units when comparing converted properties
+  and stock totals. Inspected the conversion review in Chromium.
+- Restarted at `0.0.0.0:5180`; LAN verification preserved Aethra at day 792,
+  revision 802, with no running prompt interrupted or world edits made.
+- Publishing this bounded Phase 4 migration milestone. General entity migrations,
+  plugin-state transforms, complete replay journals and world-local/layered artwork
+  remain future work.

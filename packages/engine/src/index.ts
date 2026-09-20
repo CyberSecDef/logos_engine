@@ -2,7 +2,7 @@ import { ProposalSchema, WorldSchema, type World, type Proposal, type WorldEvent
 import { random } from '../../worldgen/src/index.js';
 import {validatePlugins,applyPlugin,advancePlugins} from './plugins.js';
 import { advanceTemperature, climateTemperatureC } from './temperature.js';
-import { validateExtensions, applyExtension, advanceExtensions } from './extensions.js';
+import { validateExtensions, validateConversions, applyExtension, advanceExtensions } from './extensions.js';
 
 export function validateWorld(input:unknown):World {
   const w=WorldSchema.parse(input);
@@ -31,6 +31,7 @@ export function applyProposal(world:World,input:unknown):World {
   if(p.worldId!==world.id) throw Error('Proposal belongs to another world');
   if(world.history.some(h=>h.id===p.id)) throw Error('Proposal has already been applied');
   if(p.expectedRevision!==world.revision) throw Error('Stale proposal: refresh and review again');
+  validateConversions(world,p.operations);
   const next=structuredClone(world);
   for(const op of p.operations) {
     const tile=next.tiles[op.tileId];

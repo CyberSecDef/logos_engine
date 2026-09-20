@@ -23,7 +23,7 @@ export const CustomRuleSchema=z.object({
 export const DefinitionsSchema=z.object({fields:z.array(FieldDefinitionSchema).max(32),rules:z.array(CustomRuleSchema).max(64)}).strict();
 export const extensionOperations=[
  z.object({kind:z.literal('field-transfer'),tileId:z.number().int().nonnegative(),toTileId:z.number().int().nonnegative(),fieldId:id,amount:z.number().finite().min(0).max(1e9)}).strict(),
- z.object({kind:z.literal('field-define'),tileId:z.number().int().nonnegative(),definition:FieldDefinitionSchema,migration:z.enum(['preserve','clamp'])}).strict(),
+ z.object({kind:z.literal('field-define'),tileId:z.number().int().nonnegative(),definition:FieldDefinitionSchema,migration:z.enum(['preserve','clamp']),transform:z.object({scale:scalar,offset:scalar,precision:z.enum(['exact','round'])}).strict().optional()}).strict(),
  z.object({kind:z.literal('field-set'),tileId:z.number().int().nonnegative(),fieldId:id,value:scalar}).strict(),
  z.object({kind:z.literal('field-remove'),tileId:z.number().int().nonnegative(),fieldId:id}).strict(),
  z.object({kind:z.literal('rule-define'),tileId:z.number().int().nonnegative(),rule:CustomRuleSchema}).strict(),

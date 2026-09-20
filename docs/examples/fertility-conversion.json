@@ -1,0 +1,110 @@
+{
+  "id": "fertility-conversion-example",
+  "worldId": "first-world",
+  "expectedRevision": 1,
+  "summary": "Convert fertility points to fractions, preserving existing values and scaling weather outputs.",
+  "operations": [
+    {
+      "kind": "field-define",
+      "tileId": 0,
+      "migration": "preserve",
+      "definition": {
+        "id": "soil-fertility",
+        "version": 2,
+        "label": "Soil fertility",
+        "unit": "fraction",
+        "description": "A fantasy soil condition; does not yet change built-in vegetation or crop yields.",
+        "min": 0,
+        "max": 1,
+        "defaultValue": 0.5
+      },
+      "transform": {
+        "scale": 0.01,
+        "offset": 0,
+        "precision": "exact"
+      }
+    },
+    {
+      "kind": "rule-define",
+      "tileId": 0,
+      "rule": {
+        "id": "rain-replenishes-soil",
+        "version": 2,
+        "label": "Rain replenishes soil",
+        "tileId": 0,
+        "scope": "world",
+        "enabled": true,
+        "everyDays": 1,
+        "conditions": [
+          {
+            "read": {
+              "source": "elevationM",
+              "sample": "self"
+            },
+            "comparison": "gt",
+            "value": 0
+          },
+          {
+            "read": {
+              "source": "rainMm",
+              "sample": "self"
+            },
+            "comparison": "gte",
+            "value": 3
+          }
+        ],
+        "effects": [
+          {
+            "fieldId": "soil-fertility",
+            "kind": "add",
+            "value": {
+              "constant": 0.01,
+              "terms": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "rule-define",
+      "tileId": 0,
+      "rule": {
+        "id": "heat-depletes-soil",
+        "version": 2,
+        "label": "Heat depletes soil",
+        "tileId": 0,
+        "scope": "world",
+        "enabled": true,
+        "everyDays": 1,
+        "conditions": [
+          {
+            "read": {
+              "source": "elevationM",
+              "sample": "self"
+            },
+            "comparison": "gt",
+            "value": 0
+          },
+          {
+            "read": {
+              "source": "temperatureC",
+              "sample": "self"
+            },
+            "comparison": "gt",
+            "value": 40
+          }
+        ],
+        "effects": [
+          {
+            "fieldId": "soil-fertility",
+            "kind": "add",
+            "value": {
+              "constant": -0.02,
+              "terms": []
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

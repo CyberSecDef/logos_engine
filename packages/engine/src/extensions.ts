@@ -72,8 +72,17 @@ export function applyExtension(world:World,op:Operation):void {
   const previous=recorded.reduce((max,version)=>Math.max(max,version),old?.version??0);
   if(op.definition.version!==previous+1)throw Error(`Property definition version must be ${previous+1}`);
   if(op.definition.min>=op.definition.max||!validValue(op.definition,op.definition.defaultValue))throw Error('Invalid property bounds/default');
+  if(op.transform&&!old)throw Error('Property conversion requires an existing definition');
+  if(op.transform&&(old?.quantity==='stock'||op.definition.quantity==='stock')&&(op.transform.scale<=0||op.transform.offset!==0))throw Error('Stock conversions require a positive scale and zero offset');
   if(old)for(const tile of world.tiles) {
-   const value=fieldValue(world,tile.id,old.id);
+   let value=fieldValue(world,tile.id,old.id);
+   if(op.transform) {
+    value=value*op.transform.scale+op.transform.offset;
+    if(!Number.isFinite(value))throw Error('Non-finite property conversion');
+    if(op.migration==='clamp')value=Math.max(op.definition.min,Math.min(op.definition.max,value));
+    if(op.transform.precision==='exact'&&Math.abs(value*1000-Math.round(value*1000))>1e-7)throw Error('Property conversion loses precision; choose round explicitly');
+    value=round(value);
+   }
    if(op.migration==='preserve'&&!validValue(op.definition,value))throw Error('Property migration would discard values; choose clamp explicitly');
    tile.properties[old.id]=op.migration==='clamp'?round(Math.max(op.definition.min,Math.min(op.definition.max,value))):value;
   }
@@ -152,4 +161,21 @@ export function advanceExtensions(world:World,pluginChanges:{tileId:number;field
   world.tiles[change.tileId].properties[change.fieldId]=round(Math.max(field.min,Math.min(field.max,value)));
  }
  settleTransfers(world,transfers,before);
+}
+
+// Unit changes cannot silently leave dependent programs in their former units.
+export function validateConversions(world:World,operations:Operation[]):void {
+ for(const op of operations) {
+  if(op.kind!=='field-define'||!op.transform)continue;
+  const id=op.definition.id;
+  if(operations.filter(o=>o.kind==='field-define'&&o.definition.id===id).length!==1)throw Error('Convert a property at most once per proposal');
+  for(const rule of world.definitions.rules) {
+   if(!rule.effects.some(e=>e.fieldId===id)&&!reads(rule).some(r=>r.fieldId===id))continue;
+   if(!operations.some(o=>o.kind==='rule-define'&&o.rule.id===rule.id||o.kind==='rule-remove'&&o.ruleId===rule.id))throw Error(`Conversion requires an explicit update or removal of rule ${rule.id}`);
+  }
+  for(const {definition:plugin} of world.plugins) {
+   if(!plugin.program.some(i=>i.op==='emit'&&i.fieldId===id||i.op==='read'&&i.read.fieldId===id))continue;
+   if(!operations.some(o=>o.kind==='plugin-define'&&o.definition.id===plugin.id||o.kind==='plugin-remove'&&o.pluginId===plugin.id))throw Error(`Conversion requires an explicit update or removal of plugin ${plugin.id}`);
+  }
+ }
 }

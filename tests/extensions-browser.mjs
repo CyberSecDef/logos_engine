@@ -15,6 +15,13 @@ const before=await hashes();let calls=0;
 await new WorldStore(root).save(createWorld({id:'first-world',name:'Fertility test',seed:'fertility',frequency:2}));
 const app=await startServer({root,port:0,provider:{name:'Rule test provider',async generate(context){
  calls++;assert.equal(context.scope,'world');
+ if(calls===2){
+  const world=await new WorldStore(root).load('first-world');
+  return {kind:'proposal',message:'Convert fertility to a fraction',assumptions:[],operations:[
+   {kind:'field-define',tileId:context.selectedTileId,definition:{...world.definitions.fields[0],version:2,max:1,defaultValue:.5,unit:'fraction'},migration:'preserve',transform:{scale:.01,offset:0,precision:'exact'}},
+   ...world.definitions.rules.map(rule=>({kind:'rule-define',tileId:rule.tileId,rule:{...rule,version:2,effects:rule.effects.map(e=>({...e,value:{...e.value,constant:e.value.constant/100}}))}})),
+  ]};
+ }
  return {kind:'proposal',message:example.summary,assumptions:[],operations:example.operations.map(op=>({...op,tileId:context.selectedTileId,...(op.kind==='rule-define'?{rule:{...op.rule,tileId:context.selectedTileId}}:{})}))};
 }}});
 const base=`http://127.0.0.1:${app.server.address().port}`;
@@ -38,7 +45,22 @@ try {
  await page.locator('#globe').focus();await page.keyboard.press('ArrowRight');assert.match(await page.locator('#tile-details').textContent(),/Soil fertility/);
  await page.locator('#custom-layer').selectOption('custom:soil-fertility');await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'.local/screenshots/extensions-mobile.png'});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
- assert.deepEqual(errors,[]);assert.equal(calls,1);assert.deepEqual(await hashes(),before);
+ await page.setViewportSize({width:1440,height:1000});
+ const prior=await new WorldStore(root).load('first-world');
+ await page.locator('#chat-open').click();await page.locator('#chat-scope').selectOption('world');
+ await page.locator('#chat-message').fill('Convert soil fertility to a fraction, including its weather rules.');await page.locator('#chat-propose').click();
+ await page.locator('#chat-progress').waitFor({state:'hidden'});
+ await page.getByRole('button',{name:'Review five-day preview'}).last().click();await page.locator('#proposal').waitFor({state:'visible'});
+ assert.match(await page.locator('#preview-results').textContent(),/old × 0.01 \+ 0; reject precision loss/);
+ assert.match(await page.locator('#preview-results').textContent(),/points without this change/);
+ assert.equal((await new WorldStore(root).load('first-world')).revision,prior.revision);
+ await page.screenshot({path:'.local/screenshots/conversions-preview.png'});
+ await page.locator('#apply-proposal').click();await page.locator('#proposal').waitFor({state:'hidden'});
+ await page.reload();await page.waitForFunction(()=>document.querySelector('#save-status')?.textContent?.includes('Saved locally'));
+ const converted=await new WorldStore(root).load('first-world');
+ assert.equal(converted.definitions.fields[0].unit,'fraction');assert.equal(converted.definitions.fields[0].version,2);
+ for(const tile of converted.tiles)assert.equal(tile.properties['soil-fertility'],Math.round((prior.tiles[tile.id].properties['soil-fertility']??50)*10)/1000);
+ assert.deepEqual(errors,[]);assert.equal(calls,2);assert.deepEqual(await hashes(),before);
  const saved=await new WorldStore(root).load('first-world');assert.equal(saved.definitions.fields.length,1);assert.equal(saved.definitions.rules.length,2);
- console.log('Extensibility browser passed: world-scope prompt, full definition review, bounded preview, property/rule inspector, overlay, tick/reload, unchanged application sources.');
+ console.log('Extensibility browser passed: world-scope prompt, full definition review, bounded preview, property/rule inspector, overlay, tick/reload, reviewed unit conversion and rule updates, unchanged application sources.');
 }finally{await browser.close();await app.close();await rm(root,{recursive:true,force:true});}
