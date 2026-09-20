@@ -8,7 +8,7 @@ before each milestone commit. Never mark unverified functionality complete.
 
 Phase 4 property conversions are implemented and verified: explicit scale/offset
 migrations, dependent-rule/plugin review, precision policy, forecasts, and
-persistence tests. Live on the LAN server; publication is in progress.
+persistence tests. Live on the LAN server and published as `6a56b58`.
 
 Temperature interventions are complete, published, and live on the LAN server.
 The Phase 4b resource-transfer milestone is complete and running locally:
@@ -697,3 +697,10 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Publishing this bounded Phase 4 migration milestone. General entity migrations,
   plugin-state transforms, complete replay journals and world-local/layered artwork
   remain future work.
+
+### 2026-09-19 — Property conversion publication
+
+- Pushed `6a56b58` to public `CyberSecDef/logos_engine` on `main`.
+- The existing prompt workflow now supports explicit custom-property conversions
+  with coordinated dependent definitions and precision/bounds review.
+- All 56 tests and conversion browser acceptance passed; live world preserved.
