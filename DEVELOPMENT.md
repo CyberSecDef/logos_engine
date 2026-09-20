@@ -6,8 +6,8 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 5c2 named resource routes and travel permissions are complete and deployed;
-publishing this milestone. Routes share conserved stock/capacity reservations with
+Phase 5c2 named resource routes and travel permissions are complete, deployed and
+published as `d813993`. Routes share conserved stock/capacity reservations with
 legacy transfers and expose versioned reserves, targets, cadence and daily reports.
 All 146 tests, four browser checks and native Claude acceptance pass. Land-only is
 the stated first-model default; optional sea-support preference is unanswered.
@@ -1401,3 +1401,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   are available under Resource routes and travel. All changes require reviewed Apply.
 - Phase 5c2 complete; timed journeys/migration remain 5c3. Publishing documentation,
   contract, implementation and tests. Land-only remains the implementation default.
+
+### 2026-09-20 — Phase 5c2 publication
+
+- Published `d813993` to public `CyberSecDef/logos_engine` on `main`.
+- Verified save-preserving deployment. Resource routes/travel gates are complete;
+  Phase 5c3 timed journeys and population migration remain next.
