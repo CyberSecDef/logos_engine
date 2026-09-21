@@ -713,3 +713,10 @@ are presentation-only. Measured rendering/delivery optimization follows in 6c.
 Verified tile buffer caching and rendering parity, data-only browser defaults,
 stable renderer chunking and production cache reuse. Measurements and limits are
 in the [Phase 6 plan](docs/phase-6-plan.md). Local operation/recovery follows in 6d.
+
+### Phase 6 completion
+
+Accessibility/navigation, measured rendering/delivery, local recovery and final
+Chromium/WebKit acceptance are complete within the [recorded scope](docs/phase-6-acceptance.md).
+The report explicitly retains unverified assistive-technology/device combinations
+and performance/operation limits. No additional gameplay phase is implied.

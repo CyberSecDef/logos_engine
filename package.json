@@ -60,17 +60,20 @@
     "test:navigation": "npm run build && node tests/navigation-browser.mjs",
     "test:panels": "npm run build && node tests/panels-browser.mjs",
     "test:render-performance": "tsc && node tests/render-performance.mjs",
-    "test:delivery": "npm run build && node tests/delivery-build.mjs && node tests/delivery-browser.mjs"
+    "test:delivery": "npm run build && node tests/delivery-build.mjs && node tests/delivery-browser.mjs",
+    "test:accessibility": "npm run build && node tests/accessibility-audit.mjs",
+    "test:phase6": "npm run check && node tests/phase6-acceptance.mjs"
   },
   "dependencies": {
     "three": "0.186.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "typescript": "5.9.3",
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0",
     "@types/node": "22.20.2",
     "@types/three": "0.183.1",
-    "vite": "8.3.0",
-    "@playwright/test": "1.63.0"
+    "typescript": "5.9.3",
+    "vite": "8.3.0"
   }
 }

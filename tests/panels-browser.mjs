@@ -1,14 +1,14 @@
-import {chromium} from '@playwright/test';import assert from 'node:assert/strict';
+import {launchTestBrowser} from './browser-engine.mjs';import assert from 'node:assert/strict';
 import {mkdtemp,rm,mkdir} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';
 import {combinedWorld} from '../dist/tests/fixtures/phase5.js';import {WorldStore,stateHash} from '../dist/apps/server/src/store.js';import {startServer} from '../dist/apps/server/src/index.js';
 const root=await mkdtemp(join(tmpdir(),'logos-panels-')),store=new WorldStore(root),world=combinedWorld(12);await store.save(world);await store.selectWorld(world.id);let calls=0;
 const app=await startServer({root,host:'127.0.0.1',port:0,provider:{name:'No model expected',async generate(){calls++;throw Error('Unexpected model call');}}});
-const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const browser=await launchTestBrowser();
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(`http://127.0.0.1:${app.server.address().port}`);await page.waitForFunction(()=>document.querySelector('#save-status').textContent.includes('Saved locally'));
  assert.equal(await page.locator('#inspector-section').isDisabled(),true);await page.locator('#globe').focus();await page.keyboard.press('ArrowRight');
  await page.locator('#inspector-section').selectOption('technology-controls');assert.equal(await page.locator('#technology-controls').evaluate(e=>e.open),true);assert.equal(await page.locator('#technology-controls summary').evaluate(e=>e===document.activeElement),true);
- const top=await page.locator('.inspector-tools').boundingBox(),heading=await page.locator('#technology-controls summary').boundingBox();assert.ok(heading.y>=top.y+top.height-1,'Jump target must remain below the sticky menu');
+ const top=await page.locator('.inspector-tools').boundingBox(),heading=await page.locator('#technology-controls summary').boundingBox();assert.ok(heading.y>=top.y+top.height-1,'Jump target must remain below the sticky menu: '+JSON.stringify({top,heading}));
  await page.locator('#inspector-section').selectOption('disease-controls');assert.equal(await page.locator('#technology-controls').evaluate(e=>e.open),true);assert.equal(await page.locator('#disease-controls').evaluate(e=>e.open),true);
  await page.locator('#inspector-section').selectOption('terrain-heading');assert.equal(await page.evaluate(()=>document.activeElement.id),'terrain-heading');
  await page.locator('#globe').focus();await page.keyboard.press('Home');assert.equal(await page.locator('#view-status').textContent(),'Globe zoom 100%.');await page.keyboard.press('+');assert.equal(await page.locator('#view-status').textContent(),'Globe zoom 125%.');await page.keyboard.press('-');assert.equal(await page.locator('#view-status').textContent(),'Globe zoom 100%.');

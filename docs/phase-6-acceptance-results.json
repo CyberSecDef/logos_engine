@@ -1,0 +1,187 @@
+{
+  "measuredAt": "2026-09-21T00:57:19.615Z",
+  "results": [
+    {
+      "engine": "chromium",
+      "file": "navigation-browser",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "file": "panels-browser",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "file": "review-accessibility-browser",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "file": "simulation-browser",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "file": "accessibility-audit",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "file": "navigation-browser",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "file": "panels-browser",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "file": "review-accessibility-browser",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "file": "simulation-browser",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "file": "accessibility-audit",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "file": "delivery-build",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "file": "delivery-browser",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "file": "render-performance",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "file": "checkpoints-browser",
+      "passed": true
+    },
+    {
+      "engine": "chromium",
+      "file": "portable-browser",
+      "passed": true
+    }
+  ],
+  "engineServerTests": 271,
+  "audits": [
+    {
+      "engine": "chromium",
+      "version": "153.0.8010.12",
+      "reports": [
+        {
+          "name": "desktop overview",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "desktop all inspector sections",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "proposal dialog",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "conversation",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "world management",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "world review dialog",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "mobile inspector",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "mobile layers",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "mobile globe",
+          "violations": [],
+          "incomplete": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "version": "26.6",
+      "reports": [
+        {
+          "name": "desktop overview",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "desktop all inspector sections",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "proposal dialog",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "conversation",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "world management",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "world review dialog",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "mobile inspector",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "mobile layers",
+          "violations": [],
+          "incomplete": []
+        },
+        {
+          "name": "mobile globe",
+          "violations": [],
+          "incomplete": []
+        }
+      ],
+      "errors": []
+    }
+  ]
+}

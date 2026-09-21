@@ -89,8 +89,10 @@ Phase 5 is complete within the [agreed simulation scope](docs/phase-5-plan.md).
 See the [final acceptance matrix](docs/phase-5-acceptance.md) for reproducible
 long-run, balance, scale, restart and browser checks.
 
-[Phase 6](docs/phase-6-plan.md) is underway: desktop-first accessibility and polish,
+[Phase 6](docs/phase-6-plan.md) is complete within its documented scope: desktop-first accessibility and polish,
 usable mobile layouts, measured performance improvements and local operation.
+The [Phase 6 acceptance report](docs/phase-6-acceptance.md) documents repeatable
+checks and browser/accessibility limits.
 
 Creator-placed [settlements](docs/settlements.md) now track food reserves, weather-limited
 harvest, shortage losses and gradual growth, with reviewed prompts and overlays.
@@ -144,6 +146,7 @@ for `.env` configuration, isolation details, and Cursor/manual workflows.
 
 ```sh
 npm run check          # types, engine/integration tests, production build
+npm run test:phase6    # complete Phase 6 checks; install Chromium and WebKit first
 npm run test:browser   # Chromium: select, preview, apply, step, reload, layouts
 npm run test:dev-cache # Concurrent development servers and stylesheet fallback
 npm run test:prompts   # Prompt UI with a simulated provider; no model charges

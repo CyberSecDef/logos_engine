@@ -1,9 +1,9 @@
-import {chromium} from '@playwright/test';import assert from 'node:assert/strict';
+import {launchTestBrowser} from './browser-engine.mjs';import assert from 'node:assert/strict';
 import {mkdtemp,rm,mkdir} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';
 import {combinedWorld} from '../dist/tests/fixtures/phase5.js';import {WorldStore,stateHash} from '../dist/apps/server/src/store.js';import {startServer} from '../dist/apps/server/src/index.js';
 const root=await mkdtemp(join(tmpdir(),'logos-navigation-')),store=new WorldStore(root),world=combinedWorld(12);await store.save(world);await store.selectWorld(world.id);let calls=0;
 const app=await startServer({root,host:'127.0.0.1',port:0,provider:{name:'No model expected',async generate(){calls++;throw Error('Unexpected model call');}}});
-const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const browser=await launchTestBrowser();
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(`http://127.0.0.1:${app.server.address().port}`);await page.waitForFunction(()=>document.querySelector('#save-status').textContent.includes('Saved locally'));
  const selected=async id=>assert.match(await page.locator('#tile-subtitle').textContent(),new RegExp(`ZONE ${String(id).padStart(4,'0')}`));

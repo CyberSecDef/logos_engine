@@ -1,4 +1,4 @@
-import {chromium} from '@playwright/test';
+import {launchTestBrowser} from './browser-engine.mjs';
 import assert from 'node:assert/strict';
 import {mkdtemp,rm,mkdir} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
@@ -11,7 +11,7 @@ const root=await mkdtemp(join(tmpdir(),'logos-simulation-browser-')),store=new W
 const world=combinedWorld(12);await store.save(world);await store.selectWorld(world.id);
 let calls=0;
 const app=await startServer({root,host:'127.0.0.1',port:0,provider:{name:'No autonomous model',async generate(){calls++;throw Error('Unexpected model call');}}});
-const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const browser=await launchTestBrowser();
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));await page.goto(`http://127.0.0.1:${app.server.address().port}`);

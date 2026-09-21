@@ -6,14 +6,11 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 6 has started; see the [milestone plan](docs/phase-6-plan.md). Confirmed:
-desktop first, mobile remains usable. 6a review accessibility is implemented and verified:
-native modal dialogs, keyboard access, focus restoration, error feedback and
-submission/cancellation behavior. LAN deployment preserved the complete live save.
-6b1 direct zone/neighbor navigation and keyboard discovery is complete and
-deployed with exact save preservation. 6b2 panel organization, mobile view switching and keyboard zoom are complete and
-deployed. 6c1 globe buffer caching is complete and verified. 6c2 frontend delivery is implemented and verified: data-only browser defaults, stable renderer chunk and hashed-asset caching. LAN deployment is verified with exact save preservation; 6d startup protection and local-operation/recovery guidance are complete and deployed with exact save preservation. Next: 6e consolidated integration evidence. Phase 5 is complete and its acceptance evidence
-remains in [the final matrix](docs/phase-5-acceptance.md).
+Phase 6a–6e implementation and acceptance checks are complete within the
+[documented scope](docs/phase-6-acceptance.md). Final deployment is verified with exact live-save preservation. All 271 tests and 15 acceptance workflows pass, including Chromium and
+WebKit keyboard/navigation/layout/simulation checks and nine axe views each.
+Desktop remains the priority; mobile remains usable. Human screen-reader/device
+audits and remaining performance/operation limits are explicitly documented.
 
 ## Completed
 
@@ -27,6 +24,8 @@ remains in [the final matrix](docs/phase-5-acceptance.md).
   Claude/Cursor/Codex provider integration.
 - Phase 5: deterministic environment, population, trade/movement, pollution,
   disease, technology, factions/conflict, and final integration/scale acceptance.
+- Phase 6: accessible review/navigation, desktop/mobile panels, measured rendering/
+  delivery improvements, recovery safeguards and Chromium/WebKit acceptance.
 - Public GitHub repository created; prior milestones published.
 
 - Reviewed the reference globe source and documented the product decisions.
@@ -44,7 +43,7 @@ remains in [the final matrix](docs/phase-5-acceptance.md).
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
 | 5. Broader simulation | Complete: 5a–5i implemented and verified | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
-| 6. Polish and scale | In progress: 6a–6d verified; 6e next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
+| 6. Polish and scale | Complete: 6a–6e implemented, verified and deployed | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
 
@@ -2409,3 +2408,42 @@ runoff with sediment conservation, and checksummed storage/path validation.
 
 - Published milestone `e2a8002` to public `CyberSecDef/logos_engine` main.
 - Phase 6d is complete and deployed. Phase 6e final integration and evidence is next.
+
+
+### 2026-09-20 — Phase 6e acceptance in progress
+
+- Added pinned axe/Playwright audit tooling for desktop/mobile overview, inspector,
+  conversation, management and review dialogs. Reports retain violations and
+  incomplete results; both fail acceptance.
+- Added Chromium/WebKit selection for navigation, panels, review keyboard and
+  combined-simulation tests. Consolidated these with delivery, render parity and
+  recovery into npm run test:phase6.
+- Initial audits found a label needing a defined group role on zoom controls.
+  Cross-browser panel checks exposed WebKit's 92px sticky menu exceeding a fixed
+  90px scroll margin. Added group semantics and measured menu-height clearance.
+- Targeted WebKit panel verification passes after the fix. Final consolidated
+  checks are running; acceptance and browser/assistive-technology limits are
+  documented in docs/phase-6-acceptance.md.
+
+
+### 2026-09-20 — Phase 6e final verification
+
+- npm run test:phase6 passes: 271 tests, typecheck/build and all 15 serial acceptance
+  workflows. Chromium 153.0.8010.12 and WebKit 26.6 both pass navigation, panels,
+  review keyboard behavior, combined simulation and nine axe views each.
+- No axe violations or incomplete findings remain. Reviewed desktop panel, mobile
+  globe and mobile review screenshots. All test worlds were temporary.
+- Rendering reference-buffer parity, delivery/cache checks, checkpoint/replay and
+  portable-world workflows pass. Fixed the WebKit issue rather than weakening
+  its visibility assertion.
+- [Final acceptance](docs/phase-6-acceptance.md) and machine-readable results record
+  coverage and limits: no full screen-reader certification, real-device/Firefox/
+  page-zoom audit, or physical GPU benchmark. Existing Three.js advisory retained.
+- Phase 6 development and scoped acceptance are complete; deployment/publication
+  follows. No simulation, world schema, provider/login or live-save edits.
+
+- Final LAN deployment verified on 0.0.0.0:5180. first-world remains day1206/
+  revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`,
+  envelope hash `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Evidence: /tmp/logos-phase6e-deploy.json. Phase 6 table is now Complete.

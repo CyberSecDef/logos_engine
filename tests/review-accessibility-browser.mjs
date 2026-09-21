@@ -1,4 +1,4 @@
-import {chromium} from '@playwright/test';
+import {launchTestBrowser} from './browser-engine.mjs';
 import assert from 'node:assert/strict';
 import {mkdtemp,rm,readFile,mkdir} from 'node:fs/promises';
 import {join} from 'node:path';import {tmpdir} from 'node:os';
@@ -9,7 +9,7 @@ const root=await mkdtemp(join(tmpdir(),'logos-review-accessibility-')),store=new
 const initial=createWorld({id:'first-world',name:'Keyboard world',seed:'review-focus',frequency:2});await store.save(initial);await store.checkpoint(initial,'Original');
 const example=JSON.parse(await readFile('docs/examples/crystal-bloom.json','utf8'));let calls=0;
 const app=await startServer({root,host:'127.0.0.1',port:0,provider:{name:'Review fixture',async generate(context){calls++;return {kind:'proposal',message:example.summary,assumptions:[],operations:example.operations.map(op=>({...op,tileId:context.selectedTileId,...(op.kind==='plugin-define'?{definition:{...op.definition,tileId:context.selectedTileId}}:{})}))};}}});
-const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const browser=await launchTestBrowser();
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(`http://127.0.0.1:${app.server.address().port}`);await page.waitForFunction(()=>document.querySelector('#save-status').textContent.includes('Saved locally'));

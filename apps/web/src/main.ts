@@ -72,7 +72,9 @@ $('inspector-section').onchange=()=>{
  const target=$($<HTMLSelectElement>('inspector-section').value);showPanel('zone');
  if(target instanceof HTMLDetailsElement)target.open=true;
  const focus=target instanceof HTMLDetailsElement?target.querySelector<HTMLElement>('summary')!:target;
- focus.focus();focus.scrollIntoView({block:'start'});
+ // Native select sizing differs between browsers; clear the actual sticky menu.
+ focus.style.scrollMarginTop=(document.querySelector<HTMLElement>('.inspector-tools')!.getBoundingClientRect().height+12)+'px';
+ focus.focus({preventScroll:true});focus.scrollIntoView({block:'start'});
 };
 function zoomView(factor:number|null){text('view-status',`Globe zoom ${globe.zoomView(factor)}%.`);}
 $('zoom-in').onclick=()=>zoomView(0.8);$('zoom-out').onclick=()=>zoomView(1.25);$('zoom-reset').onclick=()=>zoomView(null);
