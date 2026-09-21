@@ -6,9 +6,9 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 6 is complete. The 20 additional biome textures are generated, integrated,
-and verified in the globe. The update is deployed; all verification is complete.
-No remaining tasks for this request; future work follows PLAN.md.
+Phase 6 and the additional terrain variants are complete. The README now reflects
+the implemented game, setup/providers, visual features and current limits.
+Documentation checks are complete; no remaining tasks for this request.
 
 ## Completed
 
@@ -2526,3 +2526,16 @@ runoff with sediment conservation, and checksummed storage/path validation.
   This check passes; production JavaScript totals 694,930 bytes (below 700 kB).
 - Built frontend is served by the existing LAN process; new ocean-5 PNG returns
   HTTP 200. Browser tests use isolated worlds; no live world mutations or model calls.
+
+
+### 2026-09-20 — README current-state refresh
+
+- Reorganized the README around installation, playing, implemented simulation,
+  providers, world extensibility/history, artwork, verification and current limits.
+- Removed outdated claims that implemented conflict, technology and other systems
+  remain planned. Distinguished historical design proposals from current contracts.
+- Documented 26 built-in images, stable biome variants, textured bevels/sides,
+  3% body gaps, library costs, activation boundaries and supported provider paths.
+- Checked all 41 documentation links, every referenced npm script, provider setup
+  against the existing adapter documentation, and whitespace with `git diff --check`.
+  Documentation-only change; no application tests rerun and no world files changed.
