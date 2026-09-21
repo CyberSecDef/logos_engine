@@ -115,6 +115,13 @@ export class WorldGlobe {
     weight.needsUpdate=true;pos.needsUpdate=true;colors.needsUpdate=true;uv.needsUpdate=true;this.geometry.computeVertexNormals();this.geometry.computeBoundingSphere();this.select(this.selected);
     this.onArtwork(!this.texturesEnabled?'Colors only':this.overlay!=='terrain'?'Overlay colors · artwork returns on Terrain':this.textures.status.includes('Loading')?this.textures.status:`${textured} / ${this.world.tiles.length} places illustrated · ${this.textures.status==='Terrain artwork ready'?'reveals through day 1,000':this.textures.status}`);
   }
+  zoomView(factor:number|null):number {
+    const baseline=innerWidth<=760?6.2:4.7;
+    const distance=Math.max(this.scene.controls.minDistance,Math.min(this.scene.controls.maxDistance,factor===null?baseline:this.scene.camera.position.length()*factor));
+    const damping=this.scene.controls.enableDamping;this.scene.controls.enableDamping=false;this.scene.controls.update();
+    this.scene.camera.position.setLength(distance);this.scene.controls.update();this.scene.controls.enableDamping=damping;
+    return Math.round(baseline/this.scene.camera.position.length()*100);
+  }
   focusTile(id:number) {
     const cell=this.world?.cells[id];if(!cell)return;
     this.scene.spin.updateWorldMatrix(true,false);

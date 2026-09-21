@@ -51,7 +51,32 @@ async function action(fn:()=>Promise<void>) {
  finally{busy=false;document.body.classList.remove('busy');$<HTMLInputElement>('chat-import').disabled=!!promptJobId;$<HTMLInputElement>('import-world').disabled=!!promptJobId;$<HTMLInputElement>('import-artwork').disabled=!!promptJobId;}
 }
 function setWorld(value:World) {const changed=world?.id!==value.id;world=value;if(changed){pending=null;closeReview($<HTMLDialogElement>('proposal'),$('worlds-toggle'));selected=-1;text('selection-status','No zone selected.');$('conversation').hidden=true;document.body.classList.remove('chat-open');$('chat-history').replaceChildren();promptState(promptJobId);}updateCustomLayers();globe.setWorld(world);selectTile(selected);text('world-name',world.name);text('day',`DAY ${world.tick}`);text('save-status',`Saved locally · ${fmt(world.tiles.length)} places`);}
-function focusInspector(){ $('inspector').scrollTop=0;$(selected>=0?'tile-title':'zone-number').focus(); }
+function showPanel(panel:'globe'|'layers'|'zone'){
+ document.body.dataset.panel=panel;
+ for(const name of ['globe','layers','zone'])$('panel-'+name).setAttribute('aria-pressed',String(name===panel));
+}
+function activatePanel(panel:'globe'|'layers'|'zone'){
+ if(promptJobId){text('view-status','Wait for the current reply before switching panels.');return false;}
+ if(!$('conversation').hidden)$('chat-close').click();$('worlds').hidden=true;showPanel(panel);return true;
+}
+showPanel('zone');
+for(const panel of ['globe','layers','zone'] as const)$('panel-'+panel).onclick=()=>{
+ if(!activatePanel(panel))return;
+ if(panel==='globe')$('globe').focus();
+ if(panel==='zone')focusInspector();
+ if(panel==='layers')$('zoom-in').focus();
+};
+for(const details of Array.from(document.querySelectorAll<HTMLDetailsElement>('#creator > details'))){const option=document.createElement('option');option.value=details.id;option.textContent=details.querySelector('summary')!.textContent;$('inspector-section').append(option);}
+const terrainOption=document.createElement('option');terrainOption.value='terrain-heading';terrainOption.textContent='Terrain, weather and communication';$('inspector-section').append(terrainOption);
+$('inspector-section').onchange=()=>{
+ const target=$($<HTMLSelectElement>('inspector-section').value);showPanel('zone');
+ if(target instanceof HTMLDetailsElement)target.open=true;
+ const focus=target instanceof HTMLDetailsElement?target.querySelector<HTMLElement>('summary')!:target;
+ focus.focus();focus.scrollIntoView({block:'start'});
+};
+function zoomView(factor:number|null){text('view-status',`Globe zoom ${globe.zoomView(factor)}%.`);}
+$('zoom-in').onclick=()=>zoomView(0.8);$('zoom-out').onclick=()=>zoomView(1.25);$('zoom-reset').onclick=()=>zoomView(null);
+function focusInspector(){ if(!activatePanel('zone'))return; $('inspector').scrollTop=0;$(selected>=0?'tile-title':'zone-number').focus(); }
 function navigateToZone(id:number){
  const notice=$('zone-navigation-error');notice.hidden=true;
  if(promptJobId){notice.textContent='Wait for the current reply before changing zones.';notice.hidden=false;return;}
@@ -59,10 +84,11 @@ function navigateToZone(id:number){
  selectTile(id);globe.spinning=false;text('spin','Resume rotation');globe.focusTile(id);focusInspector();
 }
 $('zone-navigation').onsubmit=e=>{e.preventDefault();navigateToZone($<HTMLInputElement>('zone-number').valueAsNumber);};
-$('focus-globe').onclick=$('skip-globe').onclick=()=>{$('globe').focus();};
+$('focus-globe').onclick=$('skip-globe').onclick=()=>{if(activatePanel('globe'))$('globe').focus();};
 $('skip-inspector').onclick=focusInspector;
-$('skip-layers').onclick=()=>{const active=$('layer-buttons').querySelector<HTMLElement>('[aria-pressed="true"]');(active??$('custom-layer')).focus();};
+$('skip-layers').onclick=()=>{if(!activatePanel('layers'))return;const active=$('layer-buttons').querySelector<HTMLElement>('[aria-pressed="true"]');(active??$('custom-layer')).focus();};
 $('globe').addEventListener('keydown',event=>{
+ if(['+','=','-','Home'].includes(event.key)){event.preventDefault();zoomView(event.key==='Home'?null:event.key==='-'?1.25:0.8);}
  if(event.key==='Enter'){event.preventDefault();focusInspector();}
  if((event.key==='ArrowLeft'||event.key==='ArrowRight')&&selected>=0&&!promptJobId){globe.spinning=false;text('spin','Resume rotation');globe.focusTile(selected);}
 });
@@ -72,9 +98,10 @@ function selectTile(id:number) {
  const changed=id!==selected;selected=id;globe.select(id);
  if(changed&&!$('conversation').hidden)void loadChat();
  const t=world?.tiles[id];$('creator').hidden=!t;
+ $<HTMLSelectElement>('inspector-section').disabled=!t;if(changed)$<HTMLSelectElement>('inspector-section').value='tile-title';
  const zoneInput=$<HTMLInputElement>('zone-number');zoneInput.max=String((world?.tiles.length??1)-1);text('zone-range',`Zones 0–${zoneInput.max}`);
  if(document.activeElement!==zoneInput)zoneInput.value=t?String(id):'';
- if(changed){$('zone-navigation-error').hidden=true;text('selection-status',t?`Zone ${id}: ${appearance(world,t).label} selected.`:'No zone selected.');}
+ if(changed){if(t)showPanel('zone');$('zone-navigation-error').hidden=true;text('selection-status',t?`Zone ${id}: ${appearance(world,t).label} selected.`:'No zone selected.');}
  $('zone-neighbors').hidden=!t;
  // Preserve focused neighbor controls across simulation ticks on the same zone.
  if(changed||!t){$('neighbor-buttons').replaceChildren();if(t)for(const neighbor of [...world.cells[id].neighbors].sort((a,b)=>a-b)){const button=document.createElement('button');button.type='button';button.textContent=String(neighbor);button.setAttribute('aria-label',`Go to neighboring zone ${neighbor}`);button.onclick=()=>navigateToZone(neighbor);$('neighbor-buttons').append(button);}}
@@ -540,7 +567,7 @@ async function reviewProposal(proposal:Proposal) {
 }
 function promptState(id:string|null) {
  promptJobId=id;document.body.classList.toggle('prompt-running',!!id);$('chat-progress').hidden=!id;
- for(const name of ['conflict-save','conflict-pause','army-depart','garrison-save','garrison-release','faction-borders-save','faction-borders-pause','faction-define','faction-claim','faction-release','faction-relation','technology-filtration','knowledge-toggle','technology-toggle','technology-example','research-pause','research-auto','disease-contact-toggle','disease-toggle','disease-introduce','disease-treat','water-quality-toggle','water-pollution-release','water-pollution-cleanup','water-pollution-source','sanitation-configure','water-quality-explain','air-toggle','air-release','air-source','air-wind','air-explain','migration-toggle','neighbor-visits-toggle','chat-discuss','chat-propose','chat-export','chat-close','worlds-toggle','play','step','water-explain','journey-depart','travel-permission','route-create','food-trade-enable','food-trade-permission','soil-enable','settlement-create','settlement-food','rain-change','elevation-change','temperature-change','temperature-reset','communication-change'])$<HTMLButtonElement>(name).disabled=!!id;
+ for(const name of ['panel-globe','panel-layers','panel-zone','conflict-save','conflict-pause','army-depart','garrison-save','garrison-release','faction-borders-save','faction-borders-pause','faction-define','faction-claim','faction-release','faction-relation','technology-filtration','knowledge-toggle','technology-toggle','technology-example','research-pause','research-auto','disease-contact-toggle','disease-toggle','disease-introduce','disease-treat','water-quality-toggle','water-pollution-release','water-pollution-cleanup','water-pollution-source','sanitation-configure','water-quality-explain','air-toggle','air-release','air-source','air-wind','air-explain','migration-toggle','neighbor-visits-toggle','chat-discuss','chat-propose','chat-export','chat-close','worlds-toggle','play','step','water-explain','journey-depart','travel-permission','route-create','food-trade-enable','food-trade-permission','soil-enable','settlement-create','settlement-food','rain-change','elevation-change','temperature-change','temperature-reset','communication-change'])$<HTMLButtonElement>(name).disabled=!!id;
  $<HTMLButtonElement>('temperature-reset').disabled=!!id||!world?.rules.some(r=>r.tileId===selected&&r.kind==='temperature');
  $<HTMLTextAreaElement>('chat-message').disabled=!!id;
  $<HTMLInputElement>('chat-import').disabled=!!id||busy;

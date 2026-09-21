@@ -57,7 +57,8 @@
     "test:simulation": "tsc && node tests/simulation-benchmark.mjs",
     "test:simulation-browser": "npm run build && node tests/simulation-browser.mjs",
     "test:review-accessibility": "npm run build && node tests/review-accessibility-browser.mjs",
-    "test:navigation": "npm run build && node tests/navigation-browser.mjs"
+    "test:navigation": "npm run build && node tests/navigation-browser.mjs",
+    "test:panels": "npm run build && node tests/panels-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",

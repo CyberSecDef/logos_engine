@@ -699,3 +699,11 @@ and pauses globe rotation. Keyboard globe/inspector entry, skip controls, layer
 selection states and quiet selection announcements are implemented and verified.
 Short/narrow viewport navigation is tested; panel organization remains 6b2.
 See the [Phase 6 plan](docs/phase-6-plan.md) for behavior, commands and scope.
+
+### Phase 6b2 panel organization
+
+The confirmed quick-jump menu preserves expandable inspector sections and moves
+focus to the requested controls. Desktop retains side-by-side panels; mobile
+Globe / Map layers / Zone details views remove competing panel overlap. Bounded
+keyboard/button zoom and reset supplement existing pointer controls. All changes
+are presentation-only. Measured rendering/delivery optimization follows in 6c.

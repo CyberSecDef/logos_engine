@@ -195,3 +195,9 @@ Neighbor buttons move to adjacent zones. With the globe focused, left/right arro
 select zone IDs and Enter opens the inspector; **Return to globe** moves focus back.
 These navigation actions center the selected zone and pause rotation without
 changing the world. **Resume rotation** starts the globe turning again.
+
+
+The inspector's **Jump to section** menu opens an existing expandable section
+without closing the others. On phones, **Globe**, **Map layers**, and **Zone details**
+show one view at a time. With the globe focused, **+ / −** zoom and **Home** resets
+zoom; the map-layer panel also has zoom buttons. These controls only change the view.

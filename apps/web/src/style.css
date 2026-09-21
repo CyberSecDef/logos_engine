@@ -49,3 +49,25 @@ summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 #globe-keyboard-help{font-size:10px;line-height:1.6}
 @media(max-width:760px){.skip-navigation{max-width:calc(100vw - 16px);flex-wrap:wrap}.skip-navigation button{font-size:11px}#globe-keyboard-help{display:none}.zone-search button{padding:9px}#zone-navigation input{font-size:16px}#neighbor-buttons button{min-height:40px}#inspector{max-height:40dvh}}
 @media(min-width:761px) and (max-height:750px){.intro{display:none}.layers{max-height:calc(100dvh - 220px);overflow:auto}aside{top:110px;max-height:calc(100dvh - 215px)}}
+
+#view-controls{display:flex;gap:6px;margin-top:12px}#view-controls button{font-size:11px;min-width:38px}
+#mobile-panels{display:none}
+@media(max-width:760px){
+ #mobile-panels{position:fixed;z-index:6;left:12px;right:12px;bottom:126px;display:flex;gap:6px;justify-content:center}
+ #mobile-panels button{font-size:11px;min-height:40px;background:#112027;flex:1}
+ #mobile-panels [aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+ body[data-panel="globe"] #inspector,body[data-panel="layers"] #inspector,body[data-panel="globe"] .layers,body[data-panel="zone"] .layers{display:none}
+ #inspector,.layers{left:12px;right:12px;bottom:174px;top:auto;width:auto;max-width:none;max-height:min(48dvh,calc(100dvh - 290px));padding:16px;background:#112027f5;border:1px solid var(--line);border-radius:12px;overflow:auto;z-index:3}
+ .layers #layer-buttons button{font-size:11px;min-height:40px}
+ .layers #legend,.layers #globe-keyboard-help{display:block;max-width:none}
+ #worlds{bottom:174px;max-height:calc(100dvh - 275px)}
+ #conversation{max-height:calc(100dvh - 275px)}
+ #inspector h2{font-size:25px}
+}
+
+.inspector-tools{position:sticky;top:-22px;z-index:2;background:#132228;padding:10px 0 14px;margin-bottom:12px}
+.inspector-tools label{margin:0 0 7px}.inspector-tools select{display:block;width:100%;padding:9px;background:#101d23;color:inherit;border:1px solid var(--line);border-radius:6px;font-size:12px}
+#inspector summary,#tile-title,#terrain-heading{scroll-margin-top:90px}
+#terrain-heading:focus-visible,#tile-title:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(max-width:1100px){.inspector-tools{top:-18px}}
+@media(max-width:760px){.inspector-tools{top:-16px}.inspector-tools select{font-size:16px}body:has(#worlds:not([hidden])) #inspector,body:has(#worlds:not([hidden])) .layers{display:none}}

@@ -11,7 +11,8 @@ desktop first, mobile remains usable. 6a review accessibility is implemented and
 native modal dialogs, keyboard access, focus restoration, error feedback and
 submission/cancellation behavior. LAN deployment preserved the complete live save.
 6b1 direct zone/neighbor navigation and keyboard discovery is complete and
-deployed with exact save preservation. Panel organization is next in 6b2. Phase 5 is complete and its acceptance evidence
+deployed with exact save preservation. 6b2 panel organization, mobile view switching and keyboard zoom are complete and
+deployed. Next: 6c measured rendering and frontend delivery improvements. Phase 5 is complete and its acceptance evidence
 remains in [the final matrix](docs/phase-5-acceptance.md).
 
 ## Completed
@@ -43,7 +44,7 @@ remains in [the final matrix](docs/phase-5-acceptance.md).
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
 | 5. Broader simulation | Complete: 5a–5i implemented and verified | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
-| 6. Polish and scale | In progress: 6b1 complete; 6b2 next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
+| 6. Polish and scale | In progress: 6a–6b complete; 6c next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
 
@@ -2292,3 +2293,24 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published milestone `bf76bf6` to public `CyberSecDef/logos_engine` main.
 - Next: 6b2 panel organization and broader desktop/mobile usability. Desktop-first
   preference retained; performance and local-operation milestones remain planned.
+
+### 2026-09-20 — Phase 6b2 panels and zoom
+
+- Confirmed existing expandable sections plus quick-jump menu, rather than tabs.
+- Added sticky section selection with heading/summary focus and preserved expansions.
+- Added exclusive mobile Globe / Map layers / Zone details views; panels scroll
+  above the switcher and time controls, with conversation/worlds transitions.
+- Added bounded keyboard/button zoom and reset with explicit-action announcements.
+- Desktop-first preference retained. All 269 tests, typecheck/build and five browser
+  workflows passed: panels, navigation, review accessibility, combined simulation,
+  and checkpoint/replay. Inspected desktop, short-desktop and mobile screenshots.
+- Confirmed quick-jump focus is below the sticky menu, other sections remain open,
+  zoom is bounded/resettable, mobile panels are exclusive, and navigation is read-only.
+- Deployed on `0.0.0.0:5180` and verified new controls over LAN. Preserved
+  first-world day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete save envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Evidence: `/tmp/logos-phase6b2-deploy.json`. No engine/schema or live-world edits.
+- 6b is complete. Next: 6c measured rendering/delivery work, including the existing
+  large-bundle warning. Cross-browser/manual accessibility acceptance remains 6e.

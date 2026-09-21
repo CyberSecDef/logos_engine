@@ -8,7 +8,7 @@ provider activation is implied by this phase.
 | Milestone | Status | Tasks and acceptance |
 | --- | --- | --- |
 | 6a. Review accessibility | Complete and deployed | Native modal reviews, meaningful initial focus, full keyboard access including expandable details, background isolation, Escape/cancel and focus restoration, visible errors and safe in-flight behavior. Browser verification for proposal and world reviews, save preservation on cancel/failure, desktop and narrow screens. |
-| 6b. Desktop navigation and usable small screens | 6b1 complete; 6b2 next | Review inspector density, discoverability, keyboard globe instructions, control labels and status announcements. Keep mobile controls reachable without obscuring every interaction. Verify zoom, short viewports, keyboard use and supported browser behavior. |
+| 6b. Desktop navigation and usable small screens | Complete and deployed | Review inspector density, discoverability, keyboard globe instructions, control labels and status announcements. Keep mobile controls reachable without obscuring every interaction. Verify zoom, short viewports, keyboard use and supported browser behavior. |
 | 6c. Rendering and delivery performance | Planned | Profile standard and maximum reference sizes. Reduce measured rendering/update and delivery bottlenecks, address frontend bundle structure without merely hiding warnings, and compare reproducible before/after measurements. Preserve simulation hashes. |
 | 6d. Local operation and recovery | Planned | Review npm startup/build expectations, LAN configuration, provider availability/errors, save/backup guidance and recovery. Document a repeatable home-server installation/update path. Preserve native login and secret isolation. |
 | 6e. Final integration and evidence | Planned | Consolidate browser, keyboard, responsive and performance regression checks; document supported scope, remaining limitations and acceptance results. Deploy and publish milestones with exact save preservation. |
@@ -61,7 +61,7 @@ milestone, not a claim of a complete screen-reader audit or WCAG certification.
    globe/inspector keyboard entry and return, focus-visible skip controls, explicit
    layer pressed states and selection announcements only when selection changes.
    Keep navigation usable in short desktop and narrow mobile viewports.
-2. **6b2 — panel organization and broader usability:** review inspector density,
+2. **6b2 — panel organization and broader usability (complete and deployed):** review inspector density,
    map-layer/panel overlap, keyboard zoom and remaining labels/status information.
    Continue desktop-first; mobile must retain reachable controls.
 
@@ -93,6 +93,47 @@ center-ray picking, adjacent navigation, invalid input, keyboard focus, layer an
 custom-property states, selection-only announcements, and save preservation.
 Checks cover 1440×1000, 1024×600, 390×844 and 320×640 with screenshot inspection.
 Short desktop panels scroll within available height. Mobile navigation remains
-reachable; overlapping mobile panels and inspector organization remain **6b2**.
+reachable; panel overlap and inspector organization are addressed in **6b2** below.
 These are Chromium browser checks, not a full assistive-technology audit. No
 engine, save schema or prompt-operation changes are introduced.
+
+### 6b2 implementation
+
+Confirmed: retain expandable inspector sections and add a quick-jump menu.
+The sticky menu opens/focuses a chosen section without closing others. Overview
+and terrain/weather controls are included. No section choices are persisted into
+world data. Desktop retains its side-by-side layout.
+
+At mobile widths, Globe / Map layers / Zone details select one view at a time.
+The panel area scrolls above the switcher and time controls; Worlds and conversation
+have their own existing panels. Switching via the toolbar closes those panels
+when no model request is running. Globe Enter/skip navigation reveals the relevant
+panel. Ongoing model requests retain their navigation lock.
+
+Globe + / − keys and zoom buttons adjust camera distance within the existing orbit
+limits; Home / Reset zoom restores the viewport's initial distance. Zoom does not
+alter rotation preference, world state or simulation time. Status is announced on
+explicit zoom actions, not animation frames. Existing scroll-wheel zoom remains.
+
+### 6b2 acceptance
+
+`npm run test:panels` uses an isolated world and fixture provider. It checks:
+
+- Quick-jump focus stays below the sticky menu; other expanded sections remain open.
+- Overview/terrain navigation and disabled section selection before selecting a zone.
+- Keyboard/button zoom, the zoom-in cap and reset; no world changes.
+- Exclusive phone panels at 390×844 and 320×640, no horizontal overflow, and panel
+  bounds above the switcher. Globe Enter restores the inspector.
+- Transitions from Worlds/conversation to the requested panel, plus a short
+  1024×600 desktop layout where the inspector remains above the time controls.
+
+New and existing browser workflows run against temporary worlds. No engine,
+save-schema or provider-operation change is involved. Desktop/mobile screenshots
+are inspected. Current automation is Chromium; other engines, manual screen-reader
+and contrast audits remain final-integration work. Camera zoom is covered here;
+this does not claim a comprehensive browser-page-zoom/assistive-technology audit.
+
+Final verification: all 269 tests, typecheck/build, and panels/navigation/review/
+combined-simulation/checkpoint browser workflows pass. Verified deployed controls
+through LAN with exact live-world and save-envelope preservation. Phase 6c is next;
+remaining cross-browser/manual accessibility acceptance is retained for 6e.
