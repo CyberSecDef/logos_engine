@@ -2404,3 +2404,8 @@ runoff with sediment conservation, and checksummed storage/path validation.
   complete envelope hash
   `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
   Evidence: /tmp/logos-phase6d-deploy.json. No live save or login changes.
+
+### 2026-09-20 — Phase 6d publication
+
+- Published milestone `e2a8002` to public `CyberSecDef/logos_engine` main.
+- Phase 6d is complete and deployed. Phase 6e final integration and evidence is next.
