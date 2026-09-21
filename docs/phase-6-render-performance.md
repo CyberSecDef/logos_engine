@@ -54,3 +54,9 @@ Overlay switches still rewrite all visual attributes when colors change; large
 terrain edits still recompute normals/bounds. Initial construction is uncached.
 Frontend delivery still has the approximately 752 kB JavaScript bundle warning.
 6c2 will measure and address delivery structure; warning thresholds are unchanged.
+
+## Later geometry update
+
+The requested [textured-wall/bevel update](tile-surfaces.md) intentionally changes
+the geometry. The performance command now checks its new reference; the original
+Phase 6 baseline/results above remain historical and are not overwritten.

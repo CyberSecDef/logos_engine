@@ -1,0 +1,527 @@
+{
+  "node": "v22.22.1",
+  "cpu": "AMD Ryzen 9 8940HX with Radeon Graphics",
+  "measuredAt": "2026-09-21T01:13:41.158Z",
+  "notes": "Chromium/SwiftShader; Vite module in isolated page. CPU update timings exclude animation rendering, GPU submission, asset I/O and production delivery. Eight warm samples; first construction separate.",
+  "reports": [
+    {
+      "frequency": 2,
+      "zones": 42,
+      "firstMs": 9.4,
+      "timings": {
+        "unchanged": {
+          "medianMs": 0.1,
+          "maxMs": 0.2
+        },
+        "overlays": {
+          "medianMs": 2.3,
+          "maxMs": 4.9
+        },
+        "oneElevation": {
+          "medianMs": 0.5,
+          "maxMs": 1
+        }
+      },
+      "signatures": {
+        "initial": {
+          "attributes": {
+            "position": "dda85dfd0b90eebe6cb2da241d1175b528d422a607116e4fd44e73c61a285b29",
+            "normal": "552d0a813c659055a2b804bd31f6a7ca254d6efdba3931c6f81808841e5839f1",
+            "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
+            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "aTexture": "040e136f56e30007f20d1563cc5017728334bce9c7ef82bbe9e4ad187b39ddb1",
+            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
+            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+          },
+          "bounds": {
+            "center": [
+              0.0005428791046142578,
+              -0.0005857348442077637,
+              0.023928582668304443
+            ],
+            "radius": 1.0524605195783965
+          }
+        },
+        "unchanged": {
+          "attributes": {
+            "position": "dda85dfd0b90eebe6cb2da241d1175b528d422a607116e4fd44e73c61a285b29",
+            "normal": "552d0a813c659055a2b804bd31f6a7ca254d6efdba3931c6f81808841e5839f1",
+            "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
+            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "aTexture": "040e136f56e30007f20d1563cc5017728334bce9c7ef82bbe9e4ad187b39ddb1",
+            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
+            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+          },
+          "bounds": {
+            "center": [
+              0.0005428791046142578,
+              -0.0005857348442077637,
+              0.023928582668304443
+            ],
+            "radius": 1.0524605195783965
+          }
+        },
+        "water": {
+          "attributes": {
+            "position": "dda85dfd0b90eebe6cb2da241d1175b528d422a607116e4fd44e73c61a285b29",
+            "normal": "552d0a813c659055a2b804bd31f6a7ca254d6efdba3931c6f81808841e5839f1",
+            "color": "eba5ef1738fa9a687fb180df88dff83bf929ab4cc8ef5679bb313e011623921e",
+            "uv": "70e880042792e3fcbc60906ad248fb4b826f6725ead12ebda5d72806abe69624",
+            "aTexture": "9202e68fbe5587e30738f2f118e87e10202a6eabd7297e1299978ed53c3a8f46",
+            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
+            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+          },
+          "bounds": {
+            "center": [
+              0.0005428791046142578,
+              -0.0005857348442077637,
+              0.023928582668304443
+            ],
+            "radius": 1.0524605195783965
+          }
+        },
+        "colors": {
+          "attributes": {
+            "position": "dda85dfd0b90eebe6cb2da241d1175b528d422a607116e4fd44e73c61a285b29",
+            "normal": "552d0a813c659055a2b804bd31f6a7ca254d6efdba3931c6f81808841e5839f1",
+            "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
+            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "aTexture": "9202e68fbe5587e30738f2f118e87e10202a6eabd7297e1299978ed53c3a8f46",
+            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
+            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+          },
+          "bounds": {
+            "center": [
+              0.0005428791046142578,
+              -0.0005857348442077637,
+              0.023928582668304443
+            ],
+            "radius": 1.0524605195783965
+          }
+        },
+        "raised": {
+          "attributes": {
+            "position": "d6743b2107d788c4c943a08ef5b266252b18d379f9986642f2aca2a8329e6e10",
+            "normal": "76f332cc0d9a9b3d0d68e4a4a990a675059e31a53eef2fa457dfae18fcf73f0a",
+            "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
+            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "aTexture": "040e136f56e30007f20d1563cc5017728334bce9c7ef82bbe9e4ad187b39ddb1",
+            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
+            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+          },
+          "bounds": {
+            "center": [
+              0.0005428791046142578,
+              -0.0005857348442077637,
+              0.023928582668304443
+            ],
+            "radius": 1.0524605195783965
+          }
+        },
+        "elevation": {
+          "attributes": {
+            "position": "d6743b2107d788c4c943a08ef5b266252b18d379f9986642f2aca2a8329e6e10",
+            "normal": "76f332cc0d9a9b3d0d68e4a4a990a675059e31a53eef2fa457dfae18fcf73f0a",
+            "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
+            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "aTexture": "040e136f56e30007f20d1563cc5017728334bce9c7ef82bbe9e4ad187b39ddb1",
+            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
+            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+          },
+          "bounds": {
+            "center": [
+              0.0005428791046142578,
+              -0.0005857348442077637,
+              0.023928582668304443
+            ],
+            "radius": 1.0524605195783965
+          }
+        },
+        "missing": {
+          "attributes": {
+            "position": "d6743b2107d788c4c943a08ef5b266252b18d379f9986642f2aca2a8329e6e10",
+            "normal": "76f332cc0d9a9b3d0d68e4a4a990a675059e31a53eef2fa457dfae18fcf73f0a",
+            "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
+            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "aTexture": "bd8b9c96741d7454bab1aa1b3670d6b77d6b07cc76b2856cc261b0c3f0c816a6",
+            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
+            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+          },
+          "bounds": {
+            "center": [
+              0.0005428791046142578,
+              -0.0005857348442077637,
+              0.023928582668304443
+            ],
+            "radius": 1.0524605195783965
+          }
+        },
+        "switched": {
+          "attributes": {
+            "position": "d6743b2107d788c4c943a08ef5b266252b18d379f9986642f2aca2a8329e6e10",
+            "normal": "76f332cc0d9a9b3d0d68e4a4a990a675059e31a53eef2fa457dfae18fcf73f0a",
+            "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
+            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "aTexture": "bd8b9c96741d7454bab1aa1b3670d6b77d6b07cc76b2856cc261b0c3f0c816a6",
+            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
+            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+          },
+          "bounds": {
+            "center": [
+              0.0005428791046142578,
+              -0.0005857348442077637,
+              0.023928582668304443
+            ],
+            "radius": 1.0524605195783965
+          }
+        }
+      }
+    },
+    {
+      "frequency": 12,
+      "zones": 1442,
+      "firstMs": 105.3,
+      "timings": {
+        "unchanged": {
+          "medianMs": 1,
+          "maxMs": 1.5
+        },
+        "overlays": {
+          "medianMs": 58.1,
+          "maxMs": 64.1
+        },
+        "oneElevation": {
+          "medianMs": 4.9,
+          "maxMs": 5.2
+        }
+      },
+      "signatures": {
+        "initial": {
+          "attributes": {
+            "position": "c7925852b63334e6f2f2df548b44729909799ac79eb51a487cd8e3ac066f2f8e",
+            "normal": "c815d7b84a379890acf69468c649a80f2b221fea43c807582c871bfc36e03cb6",
+            "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
+            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "aTexture": "633eb7d34972d26994859a9921daea3e7dbc76eed3ccfe7ec8f9fc2802c1b506",
+            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
+            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+          },
+          "bounds": {
+            "center": [
+              -0.000027418136596679688,
+              -0.004649817943572998,
+              0.023812294006347656
+            ],
+            "radius": 1.0610614869706803
+          }
+        },
+        "unchanged": {
+          "attributes": {
+            "position": "c7925852b63334e6f2f2df548b44729909799ac79eb51a487cd8e3ac066f2f8e",
+            "normal": "c815d7b84a379890acf69468c649a80f2b221fea43c807582c871bfc36e03cb6",
+            "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
+            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "aTexture": "633eb7d34972d26994859a9921daea3e7dbc76eed3ccfe7ec8f9fc2802c1b506",
+            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
+            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+          },
+          "bounds": {
+            "center": [
+              -0.000027418136596679688,
+              -0.004649817943572998,
+              0.023812294006347656
+            ],
+            "radius": 1.0610614869706803
+          }
+        },
+        "water": {
+          "attributes": {
+            "position": "c7925852b63334e6f2f2df548b44729909799ac79eb51a487cd8e3ac066f2f8e",
+            "normal": "c815d7b84a379890acf69468c649a80f2b221fea43c807582c871bfc36e03cb6",
+            "color": "582204fe3b8af11f25470b5e3a2f6b6d65faa00ce60549e7be7a065b5115db3f",
+            "uv": "f5f6d652ee9e4e48d342aa0c2f80023d4638fc8965104c869f50509fcfc27931",
+            "aTexture": "35cee74fe697d2c7732cc06aede881251e466d1c0f4cd3f4ac46e96bdc1536ff",
+            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
+            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+          },
+          "bounds": {
+            "center": [
+              -0.000027418136596679688,
+              -0.004649817943572998,
+              0.023812294006347656
+            ],
+            "radius": 1.0610614869706803
+          }
+        },
+        "colors": {
+          "attributes": {
+            "position": "c7925852b63334e6f2f2df548b44729909799ac79eb51a487cd8e3ac066f2f8e",
+            "normal": "c815d7b84a379890acf69468c649a80f2b221fea43c807582c871bfc36e03cb6",
+            "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
+            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "aTexture": "35cee74fe697d2c7732cc06aede881251e466d1c0f4cd3f4ac46e96bdc1536ff",
+            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
+            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+          },
+          "bounds": {
+            "center": [
+              -0.000027418136596679688,
+              -0.004649817943572998,
+              0.023812294006347656
+            ],
+            "radius": 1.0610614869706803
+          }
+        },
+        "raised": {
+          "attributes": {
+            "position": "a74c3da83a2e94aecd51bd4c319b33e56347a0a1733dbd0d630f5c035ea3f557",
+            "normal": "2e06292fcba8f4eaaf0138fabadf9adeaf6a9f8ef74b7b5251f4c5e3b7ecb1ba",
+            "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
+            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "aTexture": "633eb7d34972d26994859a9921daea3e7dbc76eed3ccfe7ec8f9fc2802c1b506",
+            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
+            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+          },
+          "bounds": {
+            "center": [
+              -0.000027418136596679688,
+              -0.004649817943572998,
+              0.023812294006347656
+            ],
+            "radius": 1.0610614869706803
+          }
+        },
+        "elevation": {
+          "attributes": {
+            "position": "a74c3da83a2e94aecd51bd4c319b33e56347a0a1733dbd0d630f5c035ea3f557",
+            "normal": "2e06292fcba8f4eaaf0138fabadf9adeaf6a9f8ef74b7b5251f4c5e3b7ecb1ba",
+            "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
+            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "aTexture": "633eb7d34972d26994859a9921daea3e7dbc76eed3ccfe7ec8f9fc2802c1b506",
+            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
+            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+          },
+          "bounds": {
+            "center": [
+              -0.000027418136596679688,
+              -0.004649817943572998,
+              0.023812294006347656
+            ],
+            "radius": 1.0610614869706803
+          }
+        },
+        "missing": {
+          "attributes": {
+            "position": "a74c3da83a2e94aecd51bd4c319b33e56347a0a1733dbd0d630f5c035ea3f557",
+            "normal": "2e06292fcba8f4eaaf0138fabadf9adeaf6a9f8ef74b7b5251f4c5e3b7ecb1ba",
+            "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
+            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "aTexture": "b135fff00747acefe42bc4faf58aa453cde3808bc84164afec5ab68dca9a099d",
+            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
+            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+          },
+          "bounds": {
+            "center": [
+              -0.000027418136596679688,
+              -0.004649817943572998,
+              0.023812294006347656
+            ],
+            "radius": 1.0610614869706803
+          }
+        },
+        "switched": {
+          "attributes": {
+            "position": "a74c3da83a2e94aecd51bd4c319b33e56347a0a1733dbd0d630f5c035ea3f557",
+            "normal": "2e06292fcba8f4eaaf0138fabadf9adeaf6a9f8ef74b7b5251f4c5e3b7ecb1ba",
+            "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
+            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "aTexture": "b135fff00747acefe42bc4faf58aa453cde3808bc84164afec5ab68dca9a099d",
+            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
+            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+          },
+          "bounds": {
+            "center": [
+              -0.000027418136596679688,
+              -0.004649817943572998,
+              0.023812294006347656
+            ],
+            "radius": 1.0610614869706803
+          }
+        }
+      }
+    },
+    {
+      "frequency": 26,
+      "zones": 6762,
+      "firstMs": 412.5,
+      "timings": {
+        "unchanged": {
+          "medianMs": 3.8,
+          "maxMs": 5.5
+        },
+        "overlays": {
+          "medianMs": 257.4,
+          "maxMs": 286
+        },
+        "oneElevation": {
+          "medianMs": 21.5,
+          "maxMs": 23
+        }
+      },
+      "signatures": {
+        "initial": {
+          "attributes": {
+            "position": "971c6c77a4d45aba7074f1362c9ae0b401a291dbc3d47491dcd5b3592f2d2e76",
+            "normal": "c330fa2b815e29d730dff7f2af33f6c81c5492e4f931d8575cef9fe983c38fba",
+            "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
+            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "aTexture": "b1421c7890425440614344cbd8933aa5c6d552aca165e983fdd31d302cbf91c5",
+            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
+            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+          },
+          "bounds": {
+            "center": [
+              0.0001583099365234375,
+              -0.003876984119415283,
+              0.02352297306060791
+            ],
+            "radius": 1.0613901158156067
+          }
+        },
+        "unchanged": {
+          "attributes": {
+            "position": "971c6c77a4d45aba7074f1362c9ae0b401a291dbc3d47491dcd5b3592f2d2e76",
+            "normal": "c330fa2b815e29d730dff7f2af33f6c81c5492e4f931d8575cef9fe983c38fba",
+            "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
+            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "aTexture": "b1421c7890425440614344cbd8933aa5c6d552aca165e983fdd31d302cbf91c5",
+            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
+            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+          },
+          "bounds": {
+            "center": [
+              0.0001583099365234375,
+              -0.003876984119415283,
+              0.02352297306060791
+            ],
+            "radius": 1.0613901158156067
+          }
+        },
+        "water": {
+          "attributes": {
+            "position": "971c6c77a4d45aba7074f1362c9ae0b401a291dbc3d47491dcd5b3592f2d2e76",
+            "normal": "c330fa2b815e29d730dff7f2af33f6c81c5492e4f931d8575cef9fe983c38fba",
+            "color": "911dae618b2550447bf843faab5e26abd263e6a40828ad8e2fd53db98e8d57f6",
+            "uv": "8f24f22bcf56670e3cf6d2df6cefea5f852f4dc029acf6b276bc14610356175f",
+            "aTexture": "3461b83583f8dcb358db23ef45e77d3737ce5e91c2bdd76bad78b042d125e5ee",
+            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
+            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+          },
+          "bounds": {
+            "center": [
+              0.0001583099365234375,
+              -0.003876984119415283,
+              0.02352297306060791
+            ],
+            "radius": 1.0613901158156067
+          }
+        },
+        "colors": {
+          "attributes": {
+            "position": "971c6c77a4d45aba7074f1362c9ae0b401a291dbc3d47491dcd5b3592f2d2e76",
+            "normal": "c330fa2b815e29d730dff7f2af33f6c81c5492e4f931d8575cef9fe983c38fba",
+            "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
+            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "aTexture": "3461b83583f8dcb358db23ef45e77d3737ce5e91c2bdd76bad78b042d125e5ee",
+            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
+            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+          },
+          "bounds": {
+            "center": [
+              0.0001583099365234375,
+              -0.003876984119415283,
+              0.02352297306060791
+            ],
+            "radius": 1.0613901158156067
+          }
+        },
+        "raised": {
+          "attributes": {
+            "position": "ee4732d057dc956e5964611294b4fdf2d0a64648c5a5b4051007f93705002ed2",
+            "normal": "58174da7de5ce142815769568a5eb5b2b190bb24b557c91ef53df00d01be4946",
+            "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
+            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "aTexture": "b1421c7890425440614344cbd8933aa5c6d552aca165e983fdd31d302cbf91c5",
+            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
+            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+          },
+          "bounds": {
+            "center": [
+              0.0001583099365234375,
+              -0.003876984119415283,
+              0.02352297306060791
+            ],
+            "radius": 1.0613901158156067
+          }
+        },
+        "elevation": {
+          "attributes": {
+            "position": "ee4732d057dc956e5964611294b4fdf2d0a64648c5a5b4051007f93705002ed2",
+            "normal": "58174da7de5ce142815769568a5eb5b2b190bb24b557c91ef53df00d01be4946",
+            "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
+            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "aTexture": "b1421c7890425440614344cbd8933aa5c6d552aca165e983fdd31d302cbf91c5",
+            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
+            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+          },
+          "bounds": {
+            "center": [
+              0.0001583099365234375,
+              -0.003876984119415283,
+              0.02352297306060791
+            ],
+            "radius": 1.0613901158156067
+          }
+        },
+        "missing": {
+          "attributes": {
+            "position": "ee4732d057dc956e5964611294b4fdf2d0a64648c5a5b4051007f93705002ed2",
+            "normal": "58174da7de5ce142815769568a5eb5b2b190bb24b557c91ef53df00d01be4946",
+            "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
+            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "aTexture": "7befbc0c5f872a2a1f1e0ec867b8405303b98716cd7b55779ff16705138d5ccb",
+            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
+            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+          },
+          "bounds": {
+            "center": [
+              0.0001583099365234375,
+              -0.003876984119415283,
+              0.02352297306060791
+            ],
+            "radius": 1.0613901158156067
+          }
+        },
+        "switched": {
+          "attributes": {
+            "position": "ee4732d057dc956e5964611294b4fdf2d0a64648c5a5b4051007f93705002ed2",
+            "normal": "58174da7de5ce142815769568a5eb5b2b190bb24b557c91ef53df00d01be4946",
+            "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
+            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "aTexture": "7befbc0c5f872a2a1f1e0ec867b8405303b98716cd7b55779ff16705138d5ccb",
+            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
+            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+          },
+          "bounds": {
+            "center": [
+              0.0001583099365234375,
+              -0.003876984119415283,
+              0.02352297306060791
+            ],
+            "radius": 1.0613901158156067
+          }
+        }
+      }
+    }
+  ]
+}

@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import { GlobeScene } from '../../../packages/globe/src/scene.js';
 import { appearance,textureReveals,terrainPack, type Overlay } from '../../../packages/globe/src/appearance.js';
 import {TerrainTextures} from './terrain-textures.js';
-import {atlasUV} from '../../../packages/globe/src/texture-layout.js';
+import {tileSurface,TRIANGLES_PER_EDGE,TOP_INSET} from '../../../packages/globe/src/tile-surface.js';
+import {atlasUV,ATLAS} from '../../../packages/globe/src/texture-layout.js';
 import type { World } from '../../../packages/contracts/src/index.js';
 
 export class WorldGlobe {
@@ -32,9 +33,27 @@ export class WorldGlobe {
     this.scene.material.onBeforeCompile=(shader,renderer)=>{
       lighting(shader,renderer);shader.uniforms.uTextureDetail=this.detail;
       shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute float aTexture;\nvarying float vTexture;\nattribute vec3 aLayer0;\nattribute vec3 aLayer1;\nvarying vec3 vLayer0;\nvarying vec3 vLayer1;').replace('#include <begin_vertex>','#include <begin_vertex>\nvTexture=aTexture;\nvLayer0=aLayer0;vLayer1=aLayer1;');
-      shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying float vTexture;\nvarying vec3 vLayer0;\nvarying vec3 vLayer1;\nuniform float uTextureDetail;').replace('#include <map_fragment>','').replace('#include <color_fragment>','#include <color_fragment>\n#ifdef USE_MAP\nvec4 artwork=texture2D(map,vMapUv);diffuseColor.rgb=mix(diffuseColor.rgb,artwork.rgb,vTexture*uTextureDetail*artwork.a);\nvec4 layer0=texture2D(map,vLayer0.xy);diffuseColor.rgb=mix(diffuseColor.rgb,layer0.rgb,layer0.a*vLayer0.z*uTextureDetail);\nvec4 layer1=texture2D(map,vLayer1.xy);diffuseColor.rgb=mix(diffuseColor.rgb,layer1.rgb,layer1.a*vLayer1.z*uTextureDetail);\n#endif');
+      // MSAA fragments at narrow bevel edges can extrapolate UVs beyond a triangle.
+      // Carry a flat atlas slot, clamp to its content and keep mip footprints inside gutters.
+      const atlasSampling=`
+flat varying vec3 vSlots;
+vec4 sampleTileAtlas(sampler2D atlas,vec2 coords,float slot){
+ vec2 size=vec2(${ATLAS.columns*ATLAS.slot}.0,${ATLAS.rows*ATLAS.slot}.0);
+ vec2 low=vec2(mod(slot,${ATLAS.columns}.0)*${ATLAS.slot}.0+${ATLAS.gutter+.5},size.y-(floor(slot/${ATLAS.columns}.0)*${ATLAS.slot}.0+${ATLAS.slot-ATLAS.gutter-.5}));
+ vec2 uv=clamp(coords,low/size,(low+${ATLAS.slot-2*ATLAS.gutter-1}.0)/size);
+ vec2 dx=dFdx(uv),dy=dFdy(uv);
+ float limit=min(1.0,${ATLAS.gutter/2}.0/max(max(length(dx*size),length(dy*size)),0.0001));
+ return textureGrad(atlas,uv,dx*limit,dy*limit);
+}`;
+      shader.vertexShader=shader.vertexShader.replace('#include <common>', '#include <common>\nflat varying vec3 vSlots;')
+        .replace('#include <begin_vertex>',`#include <begin_vertex>
+vSlots=vec3(floor(uv.x*${ATLAS.columns}.0)+floor((1.0-uv.y)*${ATLAS.rows}.0)*${ATLAS.columns}.0,
+floor(aLayer0.x*${ATLAS.columns}.0)+floor((1.0-aLayer0.y)*${ATLAS.rows}.0)*${ATLAS.columns}.0,
+floor(aLayer1.x*${ATLAS.columns}.0)+floor((1.0-aLayer1.y)*${ATLAS.rows}.0)*${ATLAS.columns}.0);`);
+      shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>'+atlasSampling);
+      shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying float vTexture;\nvarying vec3 vLayer0;\nvarying vec3 vLayer1;\nuniform float uTextureDetail;\n').replace('#include <map_fragment>','').replace('#include <color_fragment>','#include <color_fragment>\n#ifdef USE_MAP\nvec4 artwork=sampleTileAtlas(map,vMapUv,vSlots.x);diffuseColor.rgb=mix(diffuseColor.rgb,artwork.rgb,vTexture*uTextureDetail*artwork.a);\nvec4 layer0=sampleTileAtlas(map,vLayer0.xy,vSlots.y);diffuseColor.rgb=mix(diffuseColor.rgb,layer0.rgb,layer0.a*vLayer0.z*uTextureDetail);\nvec4 layer1=sampleTileAtlas(map,vLayer1.xy,vSlots.z);diffuseColor.rgb=mix(diffuseColor.rgb,layer1.rgb,layer1.a*vLayer1.z*uTextureDetail);\n#endif');
     };
-    this.scene.material.customProgramCacheKey=()=> 'logos-terrain-atlas-v3';
+    this.scene.material.customProgramCacheKey=()=> 'logos-terrain-atlas-v4';
     this.textures.texture.anisotropy=Math.min(4,this.scene.renderer.capabilities.getMaxAnisotropy());
 
 
@@ -70,14 +89,14 @@ export class WorldGlobe {
     const artworkKey=JSON.stringify([world.id,world.artwork]);
     if(artworkKey!==this.artworkKey){this.artworkKey=artworkKey;void this.textures.load([...terrainPack.entries.map(entry=>{const local=world.artwork?.images.find(i=>i.slot===entry.id);return {...entry,image:local?`/api/artwork/image/${world.id}/${local.hash}`:entry.image};}),...(world.artwork?.images.filter(i=>i.slot==='settlement'||i.slot==='condition').map(i=>({id:i.slot,image:`/api/artwork/image/${world.id}/${i.hash}`}))??[])],this.assetHeaders());}
     if(rebuild) {
-      const triangles=world.cells.reduce((n,c)=>n+c.corners.length*3,0);
+      const triangles=world.cells.reduce((n,c)=>n+c.corners.length*TRIANGLES_PER_EDGE,0);
       this.tileBuffers.clear();
       this.geometry=new THREE.BufferGeometry();
       for(const key of ['position','color'])this.geometry.setAttribute(key,new THREE.BufferAttribute(new Float32Array(triangles*9),3));
       for(const key of ['aLayer0','aLayer1'])this.geometry.setAttribute(key,new THREE.BufferAttribute(new Float32Array(triangles*9),3));
       this.geometry.setAttribute('aTexture',new THREE.BufferAttribute(new Float32Array(triangles*3),1));
       this.geometry.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(triangles*6),2));
-      this.ids=[];for(const c of world.cells)for(let i=0;i<c.corners.length*3;i++)this.ids.push(c.id);
+      this.ids=[];for(const c of world.cells)for(let i=0;i<c.corners.length*TRIANGLES_PER_EDGE;i++)this.ids.push(c.id);
       this.mesh=this.scene.setTiles({geometry:this.geometry},new Float32Array(triangles*3).fill(0.9),new Float32Array(triangles*3));
     }
     this.update();
@@ -95,31 +114,13 @@ export class WorldGlobe {
       const tile=this.world.tiles[cell.id],art=appearance(this.world,tile,this.overlay,this.reveal[cell.id]),base=new THREE.Color(art.color);
       const slot=art.assetId?this.textures.slots.get(art.assetId):undefined;
       const strength=this.texturesEnabled&&slot!==undefined?art.textureOpacity:0;const layerSlots=art.layers.map(l=>({slot:this.textures.slots.get(l.asset),opacity:l.opacity}));if(strength>0||this.texturesEnabled&&art.textureOpacity>0&&layerSlots.some(l=>l.slot!==undefined&&l.opacity>0))textured++;
-      const radius=this.radius(cell.id),n=cell.corners.length,count=n*9;
+      const radius=this.radius(cell.id),n=cell.corners.length,count=n*TRIANGLES_PER_EDGE*3;
       let cached=this.tileBuffers.get(cell.id);
       const terrainDirty=!cached||cached.radius!==radius;
       const style=JSON.stringify([art.color,slot,strength,layerSlots,art.variant%4,this.texturesEnabled,art.textureOpacity]);
       if(terrainDirty) {
-        const center=new THREE.Vector3(...cell.center);
-        const top=cell.corners.map(c=>new THREE.Vector3(...c).lerp(center,0.065).normalize().multiplyScalar(radius));
-        const bottom=top.map(v=>v.clone().normalize().multiplyScalar(0.993));
-        const tangent=new THREE.Vector3().crossVectors(Math.abs(center.y)<0.9?new THREE.Vector3(0,1,0):new THREE.Vector3(1,0,0),center).normalize();
-        const bitangent=new THREE.Vector3().crossVectors(center,tangent);
-        const scale=Math.max(...top.map(p=>p.clone().sub(center.clone().multiplyScalar(radius)).length()))*2;
-        const projection=new Float64Array(count*3);let local=0;
-        const add=(p:THREE.Vector3,shade:number)=>{
-          pos.setXYZ(vertex+local,p.x,p.y,p.z);
-          const delta=p.clone().sub(center.clone().multiplyScalar(radius));
-          projection[local*3]=0.5+delta.dot(tangent)/scale;
-          projection[local*3+1]=0.5+delta.dot(bitangent)/scale;
-          projection[local*3+2]=shade;local++;
-        };
-        for(let i=0;i<n;i++) {
-          const j=(i+1)%n;
-          add(center.clone().multiplyScalar(radius),1);add(top[i],1);add(top[j],1);
-          add(top[i],0.48);add(bottom[i],0.48);add(top[j],0.48);
-          add(top[j],0.48);add(bottom[i],0.48);add(bottom[j],0.48);
-        }
+        const {positions,projection}=tileSurface(cell,radius);
+        for(let local=0;local<count;local++)pos.setXYZ(vertex+local,positions[local*3],positions[local*3+1],positions[local*3+2]);
         cached={radius,projection,style:''};this.tileBuffers.set(cell.id,cached);terrainChanged=true;
       }
       if(cached!.style!==style||terrainDirty) {
@@ -127,10 +128,10 @@ export class WorldGlobe {
         for(let local=0;local<count;local++) {
           const index=vertex+local,u=projection[local*3],v=projection[local*3+1],shade=projection[local*3+2];
           colors.setXYZ(index,base.r*shade,base.g*shade,base.b*shade);
-          uv.setXY(index,...atlasUV(slot??0,u,v,art.variant%4));weight.setX(index,shade===1?strength:0);
+          uv.setXY(index,...atlasUV(slot??0,u,v,art.variant%4));weight.setX(index,strength);
           for(const [i,attribute] of layers.entries()){
             const layer=layerSlots[i];
-            attribute.setXYZ(index,...atlasUV(layer?.slot??0,u,v,art.variant%4),shade===1&&this.texturesEnabled&&layer?.slot!==undefined?art.textureOpacity*layer.opacity:0);
+            attribute.setXYZ(index,...atlasUV(layer?.slot??0,u,v,art.variant%4),this.texturesEnabled&&layer?.slot!==undefined?art.textureOpacity*layer.opacity:0);
           }
         }
         cached!.style=style;appearanceChanged=true;
@@ -167,7 +168,7 @@ export class WorldGlobe {
     this.selected=id;this.marker.visible=id>=0&&!!this.world?.cells[id];
     if(!this.marker.visible)return;
     const cell=this.world!.cells[id],center=new THREE.Vector3(...cell.center);
-    const points=cell.corners.map(c=>new THREE.Vector3(...c).lerp(center,0.05).normalize().multiplyScalar(this.radius(id)+0.004));
+    const points=cell.corners.map(c=>new THREE.Vector3(...c).lerp(center,TOP_INSET).normalize().multiplyScalar(this.radius(id)+0.004));
     this.marker.geometry.dispose();this.marker.geometry=new THREE.BufferGeometry().setFromPoints(points);
   }
 }

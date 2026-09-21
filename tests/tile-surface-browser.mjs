@@ -1,0 +1,41 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import {mkdtemp,rm,mkdir} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';
+import {createWorld} from '../dist/packages/worldgen/src/index.js';
+import {startServer} from '../dist/apps/server/src/index.js';
+const root=await mkdtemp(join(tmpdir(),'logos-surface-')),app=await startServer({root,host:'127.0.0.1',port:0,dev:true});
+const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+try{
+ const page=await browser.newPage({viewport:{width:1100,height:850},reducedMotion:'reduce'}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/surface-test',route=>route.fulfill({contentType:'text/html',body:'<style>body{margin:0;background:#080e17}canvas{width:100vw;height:100vh}</style><canvas id="surface"></canvas>'}));
+ await page.goto('http://127.0.0.1:'+app.server.address().port+'/surface-test');
+ const w=createWorld({id:'surface',name:'Raised terrain',seed:'surface',frequency:8});w.tick=1000;
+ const id=w.tiles.find(t=>t.elevationM>0&&t.vegetation>.4).id;w.tiles[id].elevationM=4000;
+ for(const neighbor of w.cells[id].neighbors)w.tiles[neighbor].elevationM=200;
+ const result=await page.evaluate(async({w,id})=>{
+  const {WorldGlobe}=await import('/src/globe.ts');
+  const g=new WorldGlobe(document.querySelector('#surface'),()=>{});g.setWorld(w);g.spinning=false;
+  while(g.textures.status.includes('Loading'))await new Promise(r=>setTimeout(r,50));
+  g.focusTile(id);g.select(id);
+  const axis=g.scene.camera.position.clone().set(0,1,0);
+  g.scene.camera.position.applyAxisAngle(axis,.3).setLength(2.2);g.scene.controls.update();
+  const light=g.scene.camera.position.clone().normalize();g.scene.setSun({azimuth:Math.atan2(-light.z,light.x)*180/Math.PI,elevation:Math.asin(light.y)*180/Math.PI});
+  const weights=g.geometry.getAttribute('aTexture').array;
+  const start=w.cells.slice(0,id).reduce((n,c)=>n+c.corners.length*15,0),count=w.cells[id].corners.length*15;
+  const textured=Array.from(weights.slice(start,start+count));
+  const triangleCount=g.geometry.getAttribute('position').count/3;
+  const mapped=g.ids.slice(start/3,(start+count)/3);
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  window.surfaceGlobe=g;
+  return {textured,triangleCount,ids:g.ids.length,mapped};
+ },{w,id});
+ assert.equal(result.ids,result.triangleCount);assert.ok(result.mapped.every(value=>value===id));
+ assert.ok(result.textured.every(value=>value>0),'Every cap, bevel and wall vertex receives revealed artwork');
+ await mkdir('.local/screenshots',{recursive:true});await page.screenshot({path:'.local/screenshots/tile-bevel-artwork.png'});
+ await page.evaluate(()=>{window.surfaceGlobe.texturesEnabled=false;window.surfaceGlobe.update();});
+ assert.equal(await page.evaluate(()=>Array.from(window.surfaceGlobe.geometry.getAttribute('aTexture').array).some(v=>v!==0)),false);
+ await page.screenshot({path:'.local/screenshots/tile-bevel-colors.png'});
+ assert.deepEqual(errors,[]);
+ console.log('Tile surface passed: real artwork on every cap/bevel/wall vertex, face-to-zone mapping, color fallback and raised-terrain screenshots.');
+}finally{await browser.close();await app.close();await rm(root,{recursive:true,force:true});}

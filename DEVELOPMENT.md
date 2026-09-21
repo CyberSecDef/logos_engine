@@ -6,11 +6,10 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 6a–6e implementation and acceptance checks are complete within the
-[documented scope](docs/phase-6-acceptance.md). Final deployment is verified with exact live-save preservation. All 271 tests and 15 acceptance workflows pass, including Chromium and
-WebKit keyboard/navigation/layout/simulation checks and nine axe views each.
-Desktop remains the priority; mobile remains usable. Human screen-reader/device
-audits and remaining performance/operation limits are explicitly documented.
+Phase 6 is complete. The requested [textured tile walls and narrow top bevels](docs/tile-surfaces.md)
+are implemented, verified and deployed. Reveals, overlays, selection and world
+data remain intact. Extra geometry cost and the isolated WebKit development-test
+limitation are documented. All 272 tests pass.
 
 ## Completed
 
@@ -2453,3 +2452,31 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published milestone `233b0eb` to public `CyberSecDef/logos_engine` main.
 - All Phase 6 milestones are complete within the recorded acceptance scope and
   deployed on the LAN service. Further gameplay work awaits a new agreed scope.
+
+
+### 2026-09-20 — Textured walls and beveled tile tops
+
+- Added a narrow inset cap/chamfer/wall mesh for hexagons and pentagons. Reuse
+  terrain and overlay artwork continuously down exposed walls; color-only views,
+  reveal timing and missing-image fallbacks remain supported.
+- Updated triangle picking and the selected-tile outline for the new geometry.
+  Existing per-tile caches are retained; unchanged updates do not upload buffers.
+- Layer regression exposed atlas sampling outside image bounds at narrow bevel
+  edges. Fixed both coordinate extrapolation and mip footprints while retaining
+  mipmaps. Transparent-layer GPU equality now passes.
+- Added geometry invariants, an isolated raised-tile browser fixture and a new
+  intentional rendering reference. Original Phase 6 evidence is retained.
+- All 272 tests/typecheck/build and reference checks pass. Final browser and
+  deployment checks are in progress; [surface notes](docs/tile-surfaces.md) record
+  texture stretching and the extra geometry/full-redraw cost.
+
+- Final checks pass: Chromium raised-tile fixture, production WebKit raised world,
+  Chromium/WebKit navigation, texture/layer GPU regressions and current rendering
+  reference stability. Screenshots visually inspected. The isolated development
+  fixture reproducibly closed in WebKit; the identical production world passes,
+  so that fixture is explicitly Chromium-only and a production WebKit test is added.
+- Deployed and verified on 0.0.0.0:5180. Preserved the user's latest first-world
+  day1244/revision1273, world hash
+  `fd674ac98d8ce3a87484ca1aee16c3a89aa968094c3fb34a6b2837e247cb331d`, envelope hash
+  `5f10c526fbe119fe05e5e64bffaa14ce96a27bc36dc95b2ccda877b94c2c2b2f`.
+  Evidence: /tmp/logos-bevel-deploy.json. No world-data or simulation edits.

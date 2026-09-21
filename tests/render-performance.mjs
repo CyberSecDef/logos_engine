@@ -35,6 +35,6 @@ try{
   },{world,capture:!!process.env.LOGOS_CAPTURE_RENDER_REFERENCE,slots:terrainPack.entries.map((e,i)=>[e.id,i])});
   reports.push({frequency,...result});console.error(`Measured ${result.zones} zones: ${JSON.stringify(result.timings)}`);await page.close();
  }
- if(!process.env.LOGOS_CAPTURE_RENDER_REFERENCE){const reference=JSON.parse(await readFile('docs/phase-6-render-baseline.json','utf8'));for(let i=0;i<reports.length;i++)assert.deepEqual(reports[i].signatures,reference.reports[i].signatures,'Rendered buffer parity with pre-cache renderer');}
+ if(!process.env.LOGOS_CAPTURE_RENDER_REFERENCE){const reference=JSON.parse(await readFile('docs/tile-surface-render-reference.json','utf8'));for(let i=0;i<reports.length;i++)assert.deepEqual(reports[i].signatures,reference.reports[i].signatures,'Rendered buffer parity with reviewed beveled-surface reference');}
  console.log(JSON.stringify({node:process.version,cpu:cpus()[0]?.model,measuredAt:new Date().toISOString(),notes:'Chromium/SwiftShader; Vite module in isolated page. CPU update timings exclude animation rendering, GPU submission, asset I/O and production delivery. Eight warm samples; first construction separate.',reports},null,2));
 }finally{await browser.close();await app.close();await rm(root,{recursive:true,force:true});}

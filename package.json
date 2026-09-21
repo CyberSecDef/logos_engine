@@ -62,7 +62,8 @@
     "test:render-performance": "tsc && node tests/render-performance.mjs",
     "test:delivery": "npm run build && node tests/delivery-build.mjs && node tests/delivery-browser.mjs",
     "test:accessibility": "npm run build && node tests/accessibility-audit.mjs",
-    "test:phase6": "npm run check && node tests/phase6-acceptance.mjs"
+    "test:phase6": "npm run check && node tests/phase6-acceptance.mjs",
+    "test:tile-surfaces": "npm run build && node tests/tile-surface-browser.mjs && node tests/raised-world-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",
