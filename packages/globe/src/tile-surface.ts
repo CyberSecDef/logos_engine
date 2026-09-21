@@ -4,7 +4,7 @@ import type {World} from '../../contracts/src/index.js';
 // Per edge: top fan, two bevel triangles, two wall triangles.
 export const TRIANGLES_PER_EDGE=5;
 export const TOP_INSET=0.13;
-const OUTER_INSET=0.065,BASE_RADIUS=0.993;
+const OUTER_INSET=0.03,BASE_RADIUS=0.993;
 export function tileSurface(cell:World['cells'][number],radius:number){
  const center=new Vector3(...cell.center),cap=center.clone().multiplyScalar(radius);
  const outerDirections=cell.corners.map(c=>new Vector3(...c).lerp(center,OUTER_INSET).normalize());

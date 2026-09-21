@@ -9,7 +9,8 @@ before each milestone commit. Never mark unverified functionality complete.
 Phase 6 is complete. The requested [textured tile walls and narrow top bevels](docs/tile-surfaces.md)
 are implemented, verified and deployed. Reveals, overlays, selection and world
 data remain intact. Extra geometry cost and the isolated WebKit development-test
-limitation are documented. All 272 tests pass.
+limitation are documented. Body spacing is now approximately 3% at the user’s request; top inset remains
+13%. The new spacing is verified and served on the existing LAN service.
 
 ## Completed
 
@@ -2486,3 +2487,16 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published `fdde7fc` to public `CyberSecDef/logos_engine` main.
 - Textured walls and narrow beveled tops are live; refresh the browser to load
   the new renderer. Latest saved world was preserved exactly.
+
+
+### 2026-09-20 — Tighter tile spacing
+
+- Reduced outer/body inset from 6.5% to 3%; kept flat-top inset at 13%, widening
+  the connecting bevel. This is a visual-only adjustment.
+- Build/typecheck, existing geometry invariants and raised-tile browser check pass.
+  Inspected the resulting screenshot; refreshed the intentional rendering reference
+  at all three world sizes. No new tests needed for this parameter change.
+- Verified the new client asset over LAN. No restart was needed: the running
+  production server serves the rebuilt frontend directly. Live first-world remains
+  day1244/revision1273 with its complete save unchanged during verification.
+  Evidence: /tmp/logos-spacing-deploy.json.

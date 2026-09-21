@@ -5,7 +5,9 @@ tile's exposed walls. Settlement/condition layers follow the same mapping.
 Colors-only mode, overlays, missing-image fallback and the original reveal
 schedule remain intact. New worlds still start with colored tiles.
 
-The cap is slightly inset from the existing outer footprint. A chamfer joins it
+Tile bodies are inset by 3% toward their centers, giving approximately 3% spacing
+relative to original tile width. Flat tops retain their 13% inset; the bevel spans
+the wider shoulder. The cap is slightly inset from the outer footprint. A chamfer joins it
 to a lower shoulder, followed by the wall down to the existing base radius.
 Its depth tracks its width and is bounded on low terrain so ocean tiles do not
 invert. Both pentagons and hexagons use the same construction. The selection
