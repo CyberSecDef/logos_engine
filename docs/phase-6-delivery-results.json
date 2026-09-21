@@ -1,0 +1,55 @@
+{
+  "assets": [
+    {
+      "file": "index-CUYDARfp.js",
+      "bytes": 134114,
+      "gzipBytes": 40186
+    },
+    {
+      "file": "index-CePuaKcE.css",
+      "bytes": 15370,
+      "gzipBytes": 3966
+    },
+    {
+      "file": "three-BufvPdwM.js",
+      "bytes": 557705,
+      "gzipBytes": 136352
+    }
+  ],
+  "cold": [
+    {
+      "file": "index-CUYDARfp.js",
+      "transferSize": 134414,
+      "decodedBodySize": 134114
+    },
+    {
+      "file": "three-BufvPdwM.js",
+      "transferSize": 558005,
+      "decodedBodySize": 557705
+    },
+    {
+      "file": "index-CePuaKcE.css",
+      "transferSize": 15670,
+      "decodedBodySize": 15370
+    }
+  ],
+  "warm": [
+    {
+      "file": "index-CUYDARfp.js",
+      "transferSize": 0,
+      "decodedBodySize": 134114
+    },
+    {
+      "file": "index-CePuaKcE.css",
+      "transferSize": 0,
+      "decodedBodySize": 15370
+    },
+    {
+      "file": "three-BufvPdwM.js",
+      "transferSize": 0,
+      "decodedBodySize": 557705
+    }
+  ],
+  "totalJavaScriptBytes": 691819,
+  "notes": "Production server; isolated Chromium context, first and repeat navigation. Gzip sizes are estimates; HTTP uses identity encoding. No world writes or model calls."
+}

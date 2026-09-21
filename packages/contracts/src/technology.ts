@@ -11,8 +11,5 @@ export const technologyOperations=[
  z.object({kind:z.literal('research-pause'),tileId:tile}).strict(),
  z.object({kind:z.literal('research-auto'),tileId:tile}).strict(),
 ] as const;
-export const CULTIVATION_TECHNOLOGY={id:'improved-cultivation',label:'Improved cultivation',workRequired:200,farmBonusPermille:200};
 
-export const DEFAULT_RESEARCH_SETTINGS={workerPermille:100,reserveDays:7};
-
-export const FILTRATION_TECHNOLOGY={id:'improved-filtration',label:'Improved filtration',workRequired:300,farmBonusPermille:0,treatmentBonusPermille:500};
+export {CULTIVATION_TECHNOLOGY,DEFAULT_RESEARCH_SETTINGS,FILTRATION_TECHNOLOGY} from './technology-defaults.js';

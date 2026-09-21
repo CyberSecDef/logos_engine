@@ -1,0 +1,16 @@
+{
+  "commit": "7f021dc",
+  "assets": [
+    {
+      "file": "index-B6hPlbY_.js",
+      "bytes": 751500,
+      "gzipBytes": 189701
+    },
+    {
+      "file": "index-CePuaKcE.css",
+      "bytes": 15370,
+      "gzipBytes": 3966
+    }
+  ],
+  "note": "Production disk sizes; gzip estimates only. Server sends identity encoding."
+}

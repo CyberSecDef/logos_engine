@@ -12,7 +12,7 @@ native modal dialogs, keyboard access, focus restoration, error feedback and
 submission/cancellation behavior. LAN deployment preserved the complete live save.
 6b1 direct zone/neighbor navigation and keyboard discovery is complete and
 deployed with exact save preservation. 6b2 panel organization, mobile view switching and keyboard zoom are complete and
-deployed. 6c1 globe buffer caching is complete and verified. Next: 6c2 frontend delivery measurements and improvements. Phase 5 is complete and its acceptance evidence
+deployed. 6c1 globe buffer caching is complete and verified. 6c2 frontend delivery is implemented and verified: data-only browser defaults, stable renderer chunk and hashed-asset caching. LAN deployment is verified with exact save preservation; 6d local operation and recovery is next. Phase 5 is complete and its acceptance evidence
 remains in [the final matrix](docs/phase-5-acceptance.md).
 
 ## Completed
@@ -44,7 +44,7 @@ remains in [the final matrix](docs/phase-5-acceptance.md).
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
 | 5. Broader simulation | Complete: 5a–5i implemented and verified | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
-| 6. Polish and scale | In progress: 6a–6b complete; 6c1 complete; 6c2 next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
+| 6. Polish and scale | In progress: 6a–6c complete; 6d next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
 
@@ -2347,3 +2347,28 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published `d55f4d1` to public `CyberSecDef/logos_engine` main.
 - Rendering cache is deployed and verified. Phase 6c remains in progress;
   frontend delivery is the next milestone.
+
+
+### 2026-09-20 — Phase 6c2 frontend delivery
+
+- Removed browser schema initialization by extracting data-only technology and
+  conflict defaults, preserving values and existing server exports.
+- Separated the renderer from application code using the build's supported chunk
+  configuration. Production hashed JS/CSS are immutable-cacheable; HTML checks for
+  updates, while session/world responses remain no-store.
+- JavaScript falls from 751,500 to 691,819 bytes (7.94%). Application-only build
+  changes retain the renderer hash. Actual repeat Chromium navigation transfers
+  zero bytes for JS/CSS. See [delivery evidence](docs/phase-6-delivery.md).
+- Verification: 269 tests, typecheck/build, delivery build/browser checks, combined
+  simulation, filtration, conflict and review-accessibility browser workflows pass.
+  Tests use temporary worlds and no live models.
+- Three.js still triggers the 500 kB advisory. Warning thresholds are unchanged;
+  identity encoding and cold-start renderer loading remain documented limits.
+- Phase 6c rendering/delivery scope is complete. Next: 6d local operation/recovery,
+  then 6e consolidated integration and accessibility evidence.
+
+- LAN deployment verified on 0.0.0.0:5180. Preserved first-world day1206/revision1235,
+  world hash `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Evidence: /tmp/logos-phase6c2-deploy.json.

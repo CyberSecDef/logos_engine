@@ -707,3 +707,9 @@ focus to the requested controls. Desktop retains side-by-side panels; mobile
 Globe / Map layers / Zone details views remove competing panel overlap. Bounded
 keyboard/button zoom and reset supplement existing pointer controls. All changes
 are presentation-only. Measured rendering/delivery optimization follows in 6c.
+
+### Phase 6c rendering and delivery
+
+Verified tile buffer caching and rendering parity, data-only browser defaults,
+stable renderer chunking and production cache reuse. Measurements and limits are
+in the [Phase 6 plan](docs/phase-6-plan.md). Local operation/recovery follows in 6d.
