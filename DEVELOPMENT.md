@@ -2480,3 +2480,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   `fd674ac98d8ce3a87484ca1aee16c3a89aa968094c3fb34a6b2837e247cb331d`, envelope hash
   `5f10c526fbe119fe05e5e64bffaa14ce96a27bc36dc95b2ccda877b94c2c2b2f`.
   Evidence: /tmp/logos-bevel-deploy.json. No world-data or simulation edits.
+
+### 2026-09-20 — Tile surface publication
+
+- Published `fdde7fc` to public `CyberSecDef/logos_engine` main.
+- Textured walls and narrow beveled tops are live; refresh the browser to load
+  the new renderer. Latest saved world was preserved exactly.
