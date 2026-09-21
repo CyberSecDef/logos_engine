@@ -2372,3 +2372,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   and complete envelope hash
   `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
   Evidence: /tmp/logos-phase6c2-deploy.json.
+
+### 2026-09-20 — Phase 6c2 publication
+
+- Published milestone `7e6d6b9` to public `CyberSecDef/logos_engine` main.
+- Phase 6c is complete within its documented measurement scope. Phase 6d local
+  operation and recovery is next; the Three.js size advisory remains documented.
