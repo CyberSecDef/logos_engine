@@ -2341,3 +2341,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Next: 6c2 delivery profiling and bundle structure. Large bundle warning remains;
   initial construction, full-overlay writes and whole-mesh normals are explicit
   performance limits. 6d local-operation hardening and 6e final acceptance follow.
+
+### 2026-09-20 — Phase 6c1 publication
+
+- Published `d55f4d1` to public `CyberSecDef/logos_engine` main.
+- Rendering cache is deployed and verified. Phase 6c remains in progress;
+  frontend delivery is the next milestone.
