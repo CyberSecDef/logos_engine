@@ -12,7 +12,7 @@ native modal dialogs, keyboard access, focus restoration, error feedback and
 submission/cancellation behavior. LAN deployment preserved the complete live save.
 6b1 direct zone/neighbor navigation and keyboard discovery is complete and
 deployed with exact save preservation. 6b2 panel organization, mobile view switching and keyboard zoom are complete and
-deployed. Next: 6c measured rendering and frontend delivery improvements. Phase 5 is complete and its acceptance evidence
+deployed. 6c1 globe buffer caching is complete and verified. Next: 6c2 frontend delivery measurements and improvements. Phase 5 is complete and its acceptance evidence
 remains in [the final matrix](docs/phase-5-acceptance.md).
 
 ## Completed
@@ -44,7 +44,7 @@ remains in [the final matrix](docs/phase-5-acceptance.md).
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
 | 5. Broader simulation | Complete: 5a–5i implemented and verified | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
-| 6. Polish and scale | In progress: 6a–6b complete; 6c next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
+| 6. Polish and scale | In progress: 6a–6b complete; 6c1 complete; 6c2 next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
 
@@ -2320,3 +2320,24 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published milestone `1636df5` to public `CyberSecDef/logos_engine` main.
 - Confirmed expandable-section/quick-jump preference is implemented. Phase 6b is
   complete; 6c measured rendering and frontend delivery improvements are next.
+
+
+### 2026-09-20 — Phase 6c1 rendering performance
+
+- Added per-tile geometry/projection/style caches. Every update still evaluates
+  appearance; terrain, texture slots, overlays and world switches invalidate
+  affected buffers. Unchanged updates request no GPU attribute uploads.
+- Added reproducible Chromium benchmark/reference parity checks at 42, 1,442 and
+  6,762 zones. Seven buffer hashes and bounds exactly match the original renderer.
+  Corrected the benchmark to edit land rather than height-clamped submerged tiles.
+- Standard unchanged updates: 1.1 ms; maximum: 4.8 ms. Actual single-land edits:
+  3.5 ms and 13.7 ms respectively. Full before/after evidence and memory/measurement
+  limits: [render performance](docs/phase-6-render-performance.md).
+- Validation: all 269 tests, typecheck/build; texture, layered artwork, custom
+  appearance, panel/navigation and combined-simulation browser workflows pass.
+- Deployed on 0.0.0.0:5180. LAN build verified; first-world day1206/revision1235
+  and complete save envelope preserved exactly. Deployment evidence:
+  /tmp/logos-phase6c1-deploy.json. No engine/schema or live-world edits.
+- Next: 6c2 delivery profiling and bundle structure. Large bundle warning remains;
+  initial construction, full-overlay writes and whole-mesh normals are explicit
+  performance limits. 6d local-operation hardening and 6e final acceptance follow.

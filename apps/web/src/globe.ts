@@ -16,6 +16,8 @@ export class WorldGlobe {
   textures:TerrainTextures;
   reveal:number[]=[];
   private artworkKey='';
+  // Geometry/UV projection changes only with terrain; appearance is still evaluated every update.
+  private tileBuffers=new Map<number,{radius:number;projection:Float64Array;style:string}>();
   private detail={value:1};
   spinning=!matchMedia('(prefers-reduced-motion: reduce)').matches;
   selected=-1;
@@ -69,6 +71,7 @@ export class WorldGlobe {
     if(artworkKey!==this.artworkKey){this.artworkKey=artworkKey;void this.textures.load([...terrainPack.entries.map(entry=>{const local=world.artwork?.images.find(i=>i.slot===entry.id);return {...entry,image:local?`/api/artwork/image/${world.id}/${local.hash}`:entry.image};}),...(world.artwork?.images.filter(i=>i.slot==='settlement'||i.slot==='condition').map(i=>({id:i.slot,image:`/api/artwork/image/${world.id}/${i.hash}`}))??[])],this.assetHeaders());}
     if(rebuild) {
       const triangles=world.cells.reduce((n,c)=>n+c.corners.length*3,0);
+      this.tileBuffers.clear();
       this.geometry=new THREE.BufferGeometry();
       for(const key of ['position','color'])this.geometry.setAttribute(key,new THREE.BufferAttribute(new Float32Array(triangles*9),3));
       for(const key of ['aLayer0','aLayer1'])this.geometry.setAttribute(key,new THREE.BufferAttribute(new Float32Array(triangles*9),3));
@@ -87,32 +90,60 @@ export class WorldGlobe {
     const weight=this.geometry.getAttribute('aTexture') as THREE.BufferAttribute;
     const uv=this.geometry.getAttribute('uv') as THREE.BufferAttribute;
     const layers=[0,1].map(i=>this.geometry.getAttribute(`aLayer${i}`) as THREE.BufferAttribute);
-    let vertex=0,textured=0;
+    let vertex=0,textured=0,terrainChanged=false,appearanceChanged=false;
     for(const cell of this.world.cells) {
       const tile=this.world.tiles[cell.id],art=appearance(this.world,tile,this.overlay,this.reveal[cell.id]),base=new THREE.Color(art.color);
       const slot=art.assetId?this.textures.slots.get(art.assetId):undefined;
       const strength=this.texturesEnabled&&slot!==undefined?art.textureOpacity:0;const layerSlots=art.layers.map(l=>({slot:this.textures.slots.get(l.asset),opacity:l.opacity}));if(strength>0||this.texturesEnabled&&art.textureOpacity>0&&layerSlots.some(l=>l.slot!==undefined&&l.opacity>0))textured++;
-      const center=new THREE.Vector3(...cell.center),radius=this.radius(cell.id),n=cell.corners.length;
-      const top=cell.corners.map(c=>new THREE.Vector3(...c).lerp(center,0.065).normalize().multiplyScalar(radius));
-      const bottom=top.map(v=>v.clone().normalize().multiplyScalar(0.993));
-      const tangent=new THREE.Vector3().crossVectors(Math.abs(center.y)<0.9?new THREE.Vector3(0,1,0):new THREE.Vector3(1,0,0),center).normalize();
-      const bitangent=new THREE.Vector3().crossVectors(center,tangent);
-      const scale=Math.max(...top.map(p=>p.clone().sub(center.clone().multiplyScalar(radius)).length()))*2;
-      const add=(p:THREE.Vector3,shade:number)=>{
-        pos.setXYZ(vertex,p.x,p.y,p.z); colors.setXYZ(vertex,base.r*shade,base.g*shade,base.b*shade);
-        const delta=p.clone().sub(center.clone().multiplyScalar(radius)),coords=atlasUV(slot??0,0.5+delta.dot(tangent)/scale,0.5+delta.dot(bitangent)/scale,art.variant%4);uv.setXY(vertex,...coords);weight.setX(vertex,shade===1?strength:0);
-        for(const [i,attribute] of layers.entries()){const layer=layerSlots[i],coords=atlasUV(layer?.slot??0,0.5+delta.dot(tangent)/scale,0.5+delta.dot(bitangent)/scale,art.variant%4);attribute.setXYZ(vertex,...coords,shade===1&&this.texturesEnabled&&layer?.slot!==undefined?art.textureOpacity*layer.opacity:0);}
-        vertex++;
-      };
-      for(let i=0;i<n;i++) {
-        const j=(i+1)%n;
-        add(center.clone().multiplyScalar(radius),1);add(top[i],1);add(top[j],1);
-        add(top[i],0.48);add(bottom[i],0.48);add(top[j],0.48);
-        add(top[j],0.48);add(bottom[i],0.48);add(bottom[j],0.48);
+      const radius=this.radius(cell.id),n=cell.corners.length,count=n*9;
+      let cached=this.tileBuffers.get(cell.id);
+      const terrainDirty=!cached||cached.radius!==radius;
+      const style=JSON.stringify([art.color,slot,strength,layerSlots,art.variant%4,this.texturesEnabled,art.textureOpacity]);
+      if(terrainDirty) {
+        const center=new THREE.Vector3(...cell.center);
+        const top=cell.corners.map(c=>new THREE.Vector3(...c).lerp(center,0.065).normalize().multiplyScalar(radius));
+        const bottom=top.map(v=>v.clone().normalize().multiplyScalar(0.993));
+        const tangent=new THREE.Vector3().crossVectors(Math.abs(center.y)<0.9?new THREE.Vector3(0,1,0):new THREE.Vector3(1,0,0),center).normalize();
+        const bitangent=new THREE.Vector3().crossVectors(center,tangent);
+        const scale=Math.max(...top.map(p=>p.clone().sub(center.clone().multiplyScalar(radius)).length()))*2;
+        const projection=new Float64Array(count*3);let local=0;
+        const add=(p:THREE.Vector3,shade:number)=>{
+          pos.setXYZ(vertex+local,p.x,p.y,p.z);
+          const delta=p.clone().sub(center.clone().multiplyScalar(radius));
+          projection[local*3]=0.5+delta.dot(tangent)/scale;
+          projection[local*3+1]=0.5+delta.dot(bitangent)/scale;
+          projection[local*3+2]=shade;local++;
+        };
+        for(let i=0;i<n;i++) {
+          const j=(i+1)%n;
+          add(center.clone().multiplyScalar(radius),1);add(top[i],1);add(top[j],1);
+          add(top[i],0.48);add(bottom[i],0.48);add(top[j],0.48);
+          add(top[j],0.48);add(bottom[i],0.48);add(bottom[j],0.48);
+        }
+        cached={radius,projection,style:''};this.tileBuffers.set(cell.id,cached);terrainChanged=true;
       }
+      if(cached!.style!==style||terrainDirty) {
+        const projection=cached!.projection;
+        for(let local=0;local<count;local++) {
+          const index=vertex+local,u=projection[local*3],v=projection[local*3+1],shade=projection[local*3+2];
+          colors.setXYZ(index,base.r*shade,base.g*shade,base.b*shade);
+          uv.setXY(index,...atlasUV(slot??0,u,v,art.variant%4));weight.setX(index,shade===1?strength:0);
+          for(const [i,attribute] of layers.entries()){
+            const layer=layerSlots[i];
+            attribute.setXYZ(index,...atlasUV(layer?.slot??0,u,v,art.variant%4),shade===1&&this.texturesEnabled&&layer?.slot!==undefined?art.textureOpacity*layer.opacity:0);
+          }
+        }
+        cached!.style=style;appearanceChanged=true;
+      }
+      vertex+=count;
     }
-    for(const layer of layers)layer.needsUpdate=true;
-    weight.needsUpdate=true;pos.needsUpdate=true;colors.needsUpdate=true;uv.needsUpdate=true;this.geometry.computeVertexNormals();this.geometry.computeBoundingSphere();this.select(this.selected);
+    if(appearanceChanged) {
+      for(const attribute of [colors,weight,uv,...layers])attribute.needsUpdate=true;
+    }
+    if(terrainChanged) {
+      pos.needsUpdate=true;this.geometry.computeVertexNormals();this.geometry.computeBoundingSphere();
+    }
+    this.select(this.selected);
     this.onArtwork(!this.texturesEnabled?'Colors only':this.overlay!=='terrain'?'Overlay colors · artwork returns on Terrain':this.textures.status.includes('Loading')?this.textures.status:`${textured} / ${this.world.tiles.length} places illustrated · ${this.textures.status==='Terrain artwork ready'?'reveals through day 1,000':this.textures.status}`);
   }
   zoomView(factor:number|null):number {
