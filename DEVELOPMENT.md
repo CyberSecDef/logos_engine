@@ -2314,3 +2314,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   Evidence: `/tmp/logos-phase6b2-deploy.json`. No engine/schema or live-world edits.
 - 6b is complete. Next: 6c measured rendering/delivery work, including the existing
   large-bundle warning. Cross-browser/manual accessibility acceptance remains 6e.
+
+### 2026-09-20 — Phase 6b2 publication
+
+- Published milestone `1636df5` to public `CyberSecDef/logos_engine` main.
+- Confirmed expandable-section/quick-jump preference is implemented. Phase 6b is
+  complete; 6c measured rendering and frontend delivery improvements are next.
