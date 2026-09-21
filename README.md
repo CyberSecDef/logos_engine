@@ -188,3 +188,10 @@ intervention, review the consequences, and create an independent alternate world
 collection, farm work and exploration. New web-created worlds enable it by default;
 existing worlds can enable it under **Everyday neighbor travel**. Each trip runs
 without player approval or a model call, respects travel closures and returns home.
+
+
+Use **Go to zone number** at the top of the inspector to revisit a place directly.
+Neighbor buttons move to adjacent zones. With the globe focused, left/right arrows
+select zone IDs and Enter opens the inspector; **Return to globe** moves focus back.
+These navigation actions center the selected zone and pause rotation without
+changing the world. **Resume rotation** starts the globe turning again.

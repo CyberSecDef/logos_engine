@@ -10,7 +10,8 @@ Phase 6 has started; see the [milestone plan](docs/phase-6-plan.md). Confirmed:
 desktop first, mobile remains usable. 6a review accessibility is implemented and verified:
 native modal dialogs, keyboard access, focus restoration, error feedback and
 submission/cancellation behavior. LAN deployment preserved the complete live save.
-Next: 6b desktop navigation and usable small screens. Phase 5 is complete and its acceptance evidence
+6b1 direct zone/neighbor navigation and keyboard discovery is complete and
+deployed with exact save preservation. Panel organization is next in 6b2. Phase 5 is complete and its acceptance evidence
 remains in [the final matrix](docs/phase-5-acceptance.md).
 
 ## Completed
@@ -42,7 +43,7 @@ remains in [the final matrix](docs/phase-5-acceptance.md).
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
 | 5. Broader simulation | Complete: 5a–5i implemented and verified | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
-| 6. Polish and scale | In progress: 6a complete; 6b next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
+| 6. Polish and scale | In progress: 6b1 complete; 6b2 next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
 
@@ -2262,3 +2263,26 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published milestone `e50e292` to public `CyberSecDef/logos_engine` main.
 - Desktop-first preference recorded. Next: 6b navigation and usable small screens;
   6c performance, 6d local operation/recovery and 6e final acceptance remain planned.
+
+### 2026-09-20 — Phase 6b1 zone navigation
+
+- Added direct zone-number navigation and neighboring-zone buttons, with camera
+  centering and paused rotation to keep the requested place visible.
+- Added keyboard skip controls, Enter from globe to inspector, return-to-globe
+  control, instructions, explicit map-layer pressed states and selection-only
+  announcements. Same-zone ticks preserve neighbor controls and live-region text.
+- Added short-desktop scrolling bounds and narrow-screen navigation sizing.
+- All 269 tests, typecheck and build pass. New browser checks pass for zones
+  447/444, real center picking, neighbors, invalid input, keyboard focus, overlay
+  pressed states, quiet tick announcements and save preservation.
+- Inspected 1440×1000, 1024×600 and 320×640 screenshots; 390×844 also tested.
+  Mobile navigation remains reachable, with panel overlap explicitly left for 6b2.
+- Navigation, review-accessibility, globe smoke and checkpoint/replay browser
+  workflows pass. No engine, schema or prompt-operation changes.
+- Deployed and verified through LAN at `0.0.0.0:5180`. Preserved first-world
+  day1206/revision1235, world hash
+  `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`
+  and complete save envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Evidence: `/tmp/logos-phase6b1-deploy.json`. No test edits or ticks on live save.
+- Desktop-first preference retained; panel organization remains 6b2.

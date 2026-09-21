@@ -691,3 +691,11 @@ measurements do not imply fully populated/custom-rule worst-case performance.
 navigation with usable mobile layouts, measured rendering/delivery performance,
 local operation/recovery and final integration. Start with keyboard-accessible
 review dialogs; preserve the engine, saved worlds and explicit creator approval.
+
+### Phase 6b1 navigation update
+
+Direct zone-number and adjacent-zone navigation now centers the requested place
+and pauses globe rotation. Keyboard globe/inspector entry, skip controls, layer
+selection states and quiet selection announcements are implemented and verified.
+Short/narrow viewport navigation is tested; panel organization remains 6b2.
+See the [Phase 6 plan](docs/phase-6-plan.md) for behavior, commands and scope.

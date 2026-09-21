@@ -115,6 +115,16 @@ export class WorldGlobe {
     weight.needsUpdate=true;pos.needsUpdate=true;colors.needsUpdate=true;uv.needsUpdate=true;this.geometry.computeVertexNormals();this.geometry.computeBoundingSphere();this.select(this.selected);
     this.onArtwork(!this.texturesEnabled?'Colors only':this.overlay!=='terrain'?'Overlay colors · artwork returns on Terrain':this.textures.status.includes('Loading')?this.textures.status:`${textured} / ${this.world.tiles.length} places illustrated · ${this.textures.status==='Terrain artwork ready'?'reveals through day 1,000':this.textures.status}`);
   }
+  focusTile(id:number) {
+    const cell=this.world?.cells[id];if(!cell)return;
+    this.scene.spin.updateWorldMatrix(true,false);
+    const direction=this.scene.spin.localToWorld(new THREE.Vector3(...cell.center)).normalize();
+    const distance=this.scene.camera.position.length();
+    // Clear residual orbit damping before positioning so a prior drag cannot
+    // carry the camera away from the requested zone on the next frame.
+    const damping=this.scene.controls.enableDamping;this.scene.controls.enableDamping=false;this.scene.controls.update();
+    this.scene.camera.position.copy(direction.multiplyScalar(distance));this.scene.camera.lookAt(0,0,0);this.scene.controls.update();this.scene.controls.enableDamping=damping;
+  }
   select(id:number) {
     this.selected=id;this.marker.visible=id>=0&&!!this.world?.cells[id];
     if(!this.marker.visible)return;

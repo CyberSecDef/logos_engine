@@ -56,7 +56,8 @@
     "test:disease": "npm run build && node tests/disease-browser.mjs",
     "test:simulation": "tsc && node tests/simulation-benchmark.mjs",
     "test:simulation-browser": "npm run build && node tests/simulation-browser.mjs",
-    "test:review-accessibility": "npm run build && node tests/review-accessibility-browser.mjs"
+    "test:review-accessibility": "npm run build && node tests/review-accessibility-browser.mjs",
+    "test:navigation": "npm run build && node tests/navigation-browser.mjs"
   },
   "dependencies": {
     "three": "0.186.0",
