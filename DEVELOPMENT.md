@@ -2286,3 +2286,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
   Evidence: `/tmp/logos-phase6b1-deploy.json`. No test edits or ticks on live save.
 - Desktop-first preference retained; panel organization remains 6b2.
+
+### 2026-09-20 — Phase 6b1 publication
+
+- Published milestone `bf76bf6` to public `CyberSecDef/logos_engine` main.
+- Next: 6b2 panel organization and broader desktop/mobile usability. Desktop-first
+  preference retained; performance and local-operation milestones remain planned.
