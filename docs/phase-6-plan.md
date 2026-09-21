@@ -10,7 +10,7 @@ provider activation is implied by this phase.
 | 6a. Review accessibility | Complete and deployed | Native modal reviews, meaningful initial focus, full keyboard access including expandable details, background isolation, Escape/cancel and focus restoration, visible errors and safe in-flight behavior. Browser verification for proposal and world reviews, save preservation on cancel/failure, desktop and narrow screens. |
 | 6b. Desktop navigation and usable small screens | Complete and deployed | Review inspector density, discoverability, keyboard globe instructions, control labels and status announcements. Keep mobile controls reachable without obscuring every interaction. Verify zoom, short viewports, keyboard use and supported browser behavior. |
 | 6c. Rendering and delivery performance | Complete: 6c1–6c2 verified | Profile standard and maximum reference sizes. Reduce measured rendering/update and delivery bottlenecks, address frontend bundle structure without merely hiding warnings, and compare reproducible before/after measurements. Preserve simulation hashes. |
-| 6d. Local operation and recovery | Planned | Review npm startup/build expectations, LAN configuration, provider availability/errors, save/backup guidance and recovery. Document a repeatable home-server installation/update path. Preserve native login and secret isolation. |
+| 6d. Local operation and recovery | Complete and deployed | Review npm startup/build expectations, LAN configuration, provider availability/errors, save/backup guidance and recovery. Document a repeatable home-server installation/update path. Preserve native login and secret isolation. |
 | 6e. Final integration and evidence | Planned | Consolidate browser, keyboard, responsive and performance regression checks; document supported scope, remaining limitations and acceptance results. Deploy and publish milestones with exact save preservation. |
 
 ## 6a implementation
@@ -150,3 +150,22 @@ Data-only defaults remove browser schema initialization; a separate renderer chu
 and hashed-asset caching reduce downloads. See [delivery evidence and limits](phase-6-delivery.md).
 The remaining Three.js size advisory is documented, with no warning suppression.
 6c is complete within the measured scope; 6d local operation/recovery is next.
+
+
+## 6d local operation and recovery
+
+Added [the home-server runbook](local-operation.md): locked dependency installs,
+production/dev expectations, LAN configuration, stopped-server updates, full tar
+backups, archive verification, staged recovery, matching-version rollback and
+provider troubleshooting without credential copying or model probes.
+
+Startup validates ports before save access and refuses to initialize a replacement
+when an existing first-world directory or explicit selection points to a missing
+save. Damaged saves receive recovery guidance. No simulation/default/schema changes.
+
+Verification: all 271 tests, typecheck/build; focused tar backup/extraction and
+exact-directory restore, active selection, history verification and no offline
+progression. Checkpoint/replay and portable-world browser flows also pass.
+No automatic filesystem backup schedule or cross-process writer lock is added;
+the one-writer requirement and external-backup limits are documented.
+Phase 6e consolidated integration/accessibility acceptance is next.

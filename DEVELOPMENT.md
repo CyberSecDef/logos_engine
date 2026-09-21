@@ -12,7 +12,7 @@ native modal dialogs, keyboard access, focus restoration, error feedback and
 submission/cancellation behavior. LAN deployment preserved the complete live save.
 6b1 direct zone/neighbor navigation and keyboard discovery is complete and
 deployed with exact save preservation. 6b2 panel organization, mobile view switching and keyboard zoom are complete and
-deployed. 6c1 globe buffer caching is complete and verified. 6c2 frontend delivery is implemented and verified: data-only browser defaults, stable renderer chunk and hashed-asset caching. LAN deployment is verified with exact save preservation; 6d local operation and recovery is next. Phase 5 is complete and its acceptance evidence
+deployed. 6c1 globe buffer caching is complete and verified. 6c2 frontend delivery is implemented and verified: data-only browser defaults, stable renderer chunk and hashed-asset caching. LAN deployment is verified with exact save preservation; 6d startup protection and local-operation/recovery guidance are complete and deployed with exact save preservation. Next: 6e consolidated integration evidence. Phase 5 is complete and its acceptance evidence
 remains in [the final matrix](docs/phase-5-acceptance.md).
 
 ## Completed
@@ -44,7 +44,7 @@ remains in [the final matrix](docs/phase-5-acceptance.md).
 | 3. Prompt workflow | Complete | Discuss/propose/apply; direct API adapter; `.env` config; explicit local Cursor/Claude Code exchange; no autonomous calls. |
 | 4. World extensibility | Complete | Validated definitions/migrations; restricted plugins; layered artwork; complete portable bundles; generic entities; selective replay; final provider/compatibility acceptance. |
 | 5. Broader simulation | Complete: 5a–5i implemented and verified | Rich hydrology/erosion; trade/food/population; knowledge, technology, conflict, migration; wind/air pollution, water contamination, generic disease and travel-linked spread; long-run tuning. |
-| 6. Polish and scale | In progress: 6a–6c complete; 6d next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
+| 6. Polish and scale | In progress: 6a–6d verified; 6e next | Accessibility, browser automation, performance at reference resolution, packaging and integration hardening. |
 
 ## Publishing
 
@@ -2378,3 +2378,29 @@ runoff with sediment conservation, and checksummed storage/path validation.
 - Published milestone `7e6d6b9` to public `CyberSecDef/logos_engine` main.
 - Phase 6c is complete within its documented measurement scope. Phase 6d local
   operation and recovery is next; the Three.js size advisory remains documented.
+
+
+### 2026-09-20 — Phase 6d local operation and recovery
+
+- Fixed startup replacing a missing first-world save when its directory already
+  existed. Existing directories or explicit active-world selection now prevent
+  automatic replacement; malformed/integrity failures include recovery guidance.
+- Validate port configuration before any save access. Fresh installations retain
+  automatic initial-world creation; no default values or engine/schema changes.
+- Added the [home-server runbook](docs/local-operation.md) for npm ci/build/start,
+  LAN setup, stopped updates, full-directory tar backups, checksums, staged restore,
+  version rollback and provider failures. README links it and uses npm ci.
+- Added regression tests for invalid ports, missing/damaged saves and explicit
+  missing selections. Exercised actual tar archive/extraction and an isolated
+  restart, checking exact files, active world, sidecars, history and no offline ticks.
+- Validation: all 271 tests, typecheck/build, focused recovery tests, checkpoint/
+  replay and portable-world browser workflows pass. Only temporary worlds used.
+- No automatic filesystem backup policy, credential probes or writer locking
+  introduced. Those operational limits are explicit in the runbook.
+- Next: 6e final integration, supported-browser/accessibility scope and acceptance.
+
+- Deployed and verified on 0.0.0.0:5180. first-world remains day1206/revision1235,
+  world hash `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`,
+  complete envelope hash
+  `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
+  Evidence: /tmp/logos-phase6d-deploy.json. No live save or login changes.

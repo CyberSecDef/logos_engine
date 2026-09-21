@@ -7,7 +7,7 @@ import {unpackBundle,MAX_BUNDLE_BYTES,artworkHashes} from './portable.js';
 import {parseArtwork,MAX_ARTWORK_BYTES} from './artwork.js';
 import type {SaveAction} from './journal.js';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { readFile, mkdtemp, rm } from 'node:fs/promises';
+import { readFile, mkdtemp, rm, lstat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { isIP } from 'node:net';
@@ -24,6 +24,8 @@ import { PromptService, configuredProvider, forecast } from './prompts.js';
 import type { ModelProvider } from '../../../packages/agent-bridge/src/context.js';
 
 export async function startServer(options:{port?:number; host?:string; root?:string; dev?:boolean; provider?:ModelProvider; promptTimeoutMs?:number}={}) {
+  const port=options.port??Number(process.env.PORT??5180);
+  if(!Number.isInteger(port)||port<0||port>65535)throw Error('PORT must be an integer from 0 to 65535 (0 selects a temporary port).');
   const store=new WorldStore(resolve(options.root??'worlds'));
   const token=randomUUID();
   const prompts=new PromptService(store,options.provider??configuredProvider(),options.promptTimeoutMs??120000);
@@ -31,9 +33,13 @@ export async function startServer(options:{port?:number; host?:string; root?:str
   const allowedHosts=['localhost',hostname(),`${hostname()}.local`,...(process.env.ALLOWED_HOSTS??'').split(',').map(h=>h.trim()).filter(Boolean)];
   let world:World;
   const activeId=await store.activeWorldId();
+  const existed=await store.exists(activeId);
+  const selected=await lstat(resolve(store.root,'.active-world.json')).then(()=>true,(error:NodeJS.ErrnoException)=>{if(error.code==='ENOENT')return false;throw error;});
   try {world=await store.load(activeId);}
   catch(error) {
-    if((error as NodeJS.ErrnoException).code!=='ENOENT'||activeId!=='first-world') throw error;
+    if((error as NodeJS.ErrnoException).code!=='ENOENT'||activeId!=='first-world'||existed||selected) {
+      throw new Error(`Cannot open saved world ${activeId}: ${error instanceof Error?error.message:'load failed'}. Preserve worlds/ and follow docs/local-operation.md; no replacement world was created.`,{cause:error});
+    }
     world=createWorld({id:'first-world',name:'Aethra',seed:'aethra-01',frequency:12});
     world.neighborVisits=defaultNeighborVisits();world.migration=defaultMigration();
     await store.save(world);
@@ -205,7 +211,7 @@ export async function startServer(options:{port?:number; host?:string; root?:str
     res.writeHead(200,{'Content-Type':types[extname(target)]??'application/octet-stream','X-Content-Type-Options':'nosniff','Cache-Control':immutable?'public, max-age=31536000, immutable':'no-cache'});res.end(content);
   }
   try {
-    await new Promise<void>((yes,no)=>{server.once('error',no);server.listen(options.port??Number(process.env.PORT??5180),bindHost,yes);});
+    await new Promise<void>((yes,no)=>{server.once('error',no);server.listen(port,bindHost,yes);});
   } catch(error) {await closeVite();throw error;}
   return {server,close:async()=>{await prompts.close();await closeVite();await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}};
 }

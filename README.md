@@ -6,10 +6,11 @@ progression.
 
 ## Run
 
-Requires Node.js 22.12+ and npm.
+Requires Node.js 22.12+ and npm. See [home-server operation and recovery](docs/local-operation.md)
+for updates, complete backups, restoration and startup/provider troubleshooting.
 
 ```sh
-npm install
+npm ci
 npm run build
 npm start
 ```
