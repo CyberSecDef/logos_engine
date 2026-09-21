@@ -2,7 +2,7 @@ import test from 'node:test';
 import { Color } from 'three';
 import assert from 'node:assert/strict';
 import { createWorld } from '../packages/worldgen/src/index.js';
-import { appearance } from '../packages/globe/src/appearance.js';
+import { appearance, terrainImages, terrainTextureId } from '../packages/globe/src/appearance.js';
 import { stateHash } from '../apps/server/src/store.js';
 test('appearance starts as colors, reveals by day 1000, and never changes simulation',()=>{
  const w=createWorld({id:'art',name:'Art',seed:'green',frequency:2});
@@ -41,15 +41,33 @@ test('staggered reveals finish at day 1000; Apply reveals targets immediately an
 
 test('atlas coordinates stay within padded slots for hexagons, pentagons and rotations',async()=>{
  const {ATLAS,atlasRect,atlasUV}=await import('../packages/globe/src/texture-layout.js');
- for(let slot=0;slot<8;slot++)for(let rotation=0;rotation<4;rotation++)for(const sides of [5,6])for(let k=0;k<sides;k++){
+ for(let slot=0;slot<ATLAS.columns*ATLAS.rows;slot++)for(let rotation=0;rotation<4;rotation++)for(const sides of [5,6])for(let k=0;k<sides;k++){
   const angle=k*2*Math.PI/sides,[u,v]=atlasUV(slot,.5+Math.cos(angle)*.5,.5+Math.sin(angle)*.5,rotation),r=atlasRect(slot);
   assert.ok(u>r.x/r.width&&u<(r.x+r.size)/r.width);assert.ok(v>1-(r.y+r.size)/r.height&&v<1-r.y/r.height);
  }
- assert.equal(ATLAS.slot*ATLAS.columns,2048);assert.throws(()=>atlasUV(8,0,0));
+ assert.equal(ATLAS.slot*ATLAS.columns,4096);assert.equal(ATLAS.slot*ATLAS.rows,2048);assert.throws(()=>atlasUV(ATLAS.columns*ATLAS.rows,0,0));
 });
 
 test('pack catalog and PNG assets are complete, local, and bounded',async()=>{
  const {terrainPack}=await import('../packages/globe/src/appearance.js');const {readFile}=await import('node:fs/promises');
  assert.equal(terrainPack.version,1);assert.equal(new Set(terrainPack.entries.map(e=>e.id)).size,terrainPack.entries.length);assert.ok(terrainPack.entries.length<=8);
- for(const entry of terrainPack.entries){assert.match(entry.image,/^\/painterly-v1\/[a-z-]+\.png$/);const png=await readFile('packages/tile-packs/public'+entry.image);assert.equal(png.subarray(1,4).toString(),'PNG');assert.ok(png.readUInt32BE(16)<=4096&&png.readUInt32BE(20)<=4096);}
+ const images=terrainImages(createWorld({id:'assets',name:'Assets',seed:'assets',frequency:2}));
+ assert.equal(images.length,26);assert.equal(new Set(images.map(e=>e.id)).size,26);
+ const {createHash}=await import('node:crypto');const hashes=new Set<string>();
+ for(const entry of images){assert.match(entry.image,/^\/painterly-v1\/[a-z0-9-]+\.png$/);const png=await readFile('packages/tile-packs/public'+entry.image);assert.equal(png.subarray(1,4).toString(),'PNG');assert.ok(png.readUInt32BE(16)<=4096&&png.readUInt32BE(20)<=4096);hashes.add(createHash('sha256').update(png).digest('hex'));}
+ assert.equal(hashes.size,26,'Every texture is a distinct image');
+});
+
+test('terrain variants are stable across time and copies, diverse, and subordinate to world artwork',async()=>{
+ const w=createWorld({id:'variants',name:'Variants',seed:'variety',frequency:12}),before=stateHash(w);
+ const {copyWorld}=await import('../apps/server/src/world-management.js');
+ for(const biome of ['alpine','dry','forest','meadow','ocean']){
+  const choices=w.tiles.map(t=>terrainTextureId(w,t.id,biome));
+  assert.deepEqual([...new Set(choices)].sort(),[biome,...[2,3,4,5].map(n=>`${biome}-${n}`)].sort());
+  for(const other of [structuredClone(w),{...w,tick:2000,revision:2000},copyWorld(w,'branch','Branch')])assert.deepEqual(other.tiles.map(t=>terrainTextureId(other,t.id,biome)),choices);
+ }
+ assert.equal(stateHash(w),before);assert.equal(terrainTextureId(w,0,'city'),'city');
+ w.artwork={id:'custom',version:1,label:'Custom',credit:'Test fixture',images:[{slot:'forest',hash:'a'.repeat(64)}]};
+ assert.ok(w.tiles.every(t=>terrainTextureId(w,t.id,'forest')==='forest'));
+ assert.equal(terrainImages(w).find(e=>e.id==='forest')?.image,`/api/artwork/image/variants/${'a'.repeat(64)}`);
 });

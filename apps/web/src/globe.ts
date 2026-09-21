@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GlobeScene } from '../../../packages/globe/src/scene.js';
-import { appearance,textureReveals,terrainPack, type Overlay } from '../../../packages/globe/src/appearance.js';
+import { appearance,textureReveals,terrainTextureId,terrainImages, type Overlay } from '../../../packages/globe/src/appearance.js';
 import {TerrainTextures} from './terrain-textures.js';
 import {tileSurface,TRIANGLES_PER_EDGE,TOP_INSET} from '../../../packages/globe/src/tile-surface.js';
 import {atlasUV,ATLAS} from '../../../packages/globe/src/texture-layout.js';
@@ -87,7 +87,7 @@ floor(aLayer1.x*${ATLAS.columns}.0)+floor((1.0-aLayer1.y)*${ATLAS.rows}.0)*${ATL
     const rebuild=this.world?.id!==world.id || this.world.cells.length!==world.cells.length;
     this.world=world;this.reveal=textureReveals(world);
     const artworkKey=JSON.stringify([world.id,world.artwork]);
-    if(artworkKey!==this.artworkKey){this.artworkKey=artworkKey;void this.textures.load([...terrainPack.entries.map(entry=>{const local=world.artwork?.images.find(i=>i.slot===entry.id);return {...entry,image:local?`/api/artwork/image/${world.id}/${local.hash}`:entry.image};}),...(world.artwork?.images.filter(i=>i.slot==='settlement'||i.slot==='condition').map(i=>({id:i.slot,image:`/api/artwork/image/${world.id}/${i.hash}`}))??[])],this.assetHeaders());}
+    if(artworkKey!==this.artworkKey){this.artworkKey=artworkKey;void this.textures.load(terrainImages(world),this.assetHeaders());}
     if(rebuild) {
       const triangles=world.cells.reduce((n,c)=>n+c.corners.length*TRIANGLES_PER_EDGE,0);
       this.tileBuffers.clear();
@@ -112,8 +112,9 @@ floor(aLayer1.x*${ATLAS.columns}.0)+floor((1.0-aLayer1.y)*${ATLAS.rows}.0)*${ATL
     let vertex=0,textured=0,terrainChanged=false,appearanceChanged=false;
     for(const cell of this.world.cells) {
       const tile=this.world.tiles[cell.id],art=appearance(this.world,tile,this.overlay,this.reveal[cell.id]),base=new THREE.Color(art.color);
-      const slot=art.assetId?this.textures.slots.get(art.assetId):undefined;
-      const strength=this.texturesEnabled&&slot!==undefined?art.textureOpacity:0;const layerSlots=art.layers.map(l=>({slot:this.textures.slots.get(l.asset),opacity:l.opacity}));if(strength>0||this.texturesEnabled&&art.textureOpacity>0&&layerSlots.some(l=>l.slot!==undefined&&l.opacity>0))textured++;
+      const textureSlot=(asset:string)=>this.textures.slots.get(terrainTextureId(this.world!,cell.id,asset))??this.textures.slots.get(asset);
+      const slot=art.assetId?textureSlot(art.assetId):undefined;
+      const strength=this.texturesEnabled&&slot!==undefined?art.textureOpacity:0;const layerSlots=art.layers.map(l=>({slot:textureSlot(l.asset),opacity:l.opacity}));if(strength>0||this.texturesEnabled&&art.textureOpacity>0&&layerSlots.some(l=>l.slot!==undefined&&l.opacity>0))textured++;
       const radius=this.radius(cell.id),n=cell.corners.length,count=n*TRIANGLES_PER_EDGE*3;
       let cached=this.tileBuffers.get(cell.id);
       const terrainDirty=!cached||cached.radius!==radius;

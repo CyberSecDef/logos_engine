@@ -1,5 +1,5 @@
 // Fixed, bounded atlas layout. Pixel gutters protect adjacent images at mip levels.
-export const ATLAS={columns:4,rows:2,slot:512,gutter:16} as const;
+export const ATLAS={columns:8,rows:4,slot:512,gutter:16} as const;
 export function atlasRect(index:number) {
  if(!Number.isInteger(index)||index<0||index>=ATLAS.columns*ATLAS.rows)throw Error('Atlas slot out of range');
  const width=ATLAS.columns*ATLAS.slot,height=ATLAS.rows*ATLAS.slot;

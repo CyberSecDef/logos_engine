@@ -1,0 +1,188 @@
+{
+  "mode": "built-in imagegen",
+  "date": "2026-09-20",
+  "prompts": "../../../../docs/terrain-variant-prompts.json",
+  "notes": "One generation per asset, using the original biome image as a style reference. Generated PNGs copied unmodified; no API or CLI fallback.",
+  "assets": [
+    {
+      "id": "alpine-2",
+      "file": "alpine-2.png",
+      "reference": "alpine.png",
+      "sha256": "89bb0984f8e5fb459d1646a86f0465fb57e5c4de438dec78cc85332863d487cb",
+      "bytes": 3537201,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "alpine-3",
+      "file": "alpine-3.png",
+      "reference": "alpine.png",
+      "sha256": "091314965c3aadbb495562cc185f061fa53fd4b9904652f1e2797278838bea9c",
+      "bytes": 3487908,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "alpine-4",
+      "file": "alpine-4.png",
+      "reference": "alpine.png",
+      "sha256": "d37a0a64866b46c08824827a666544519c0730f05cc0277e2ac43ac80960a5ba",
+      "bytes": 3471973,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "alpine-5",
+      "file": "alpine-5.png",
+      "reference": "alpine.png",
+      "sha256": "171674ffc1d7611a8eb8ceb2a1e947ad649c9a49949e96283a06ed240c41501a",
+      "bytes": 3440074,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "dry-2",
+      "file": "dry-2.png",
+      "reference": "dry.png",
+      "sha256": "ddbd483135e5b68590a6f5697f7916b62b5825787a59ef710374aea809b0e154",
+      "bytes": 3452044,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "dry-3",
+      "file": "dry-3.png",
+      "reference": "dry.png",
+      "sha256": "aa76056d293258434a0ffb9c89abc9e26007943da500d060d731d446ac796e9c",
+      "bytes": 3520132,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "dry-4",
+      "file": "dry-4.png",
+      "reference": "dry.png",
+      "sha256": "2c6229430b25c2cc778b75faa75497dec1a45167665df6df7b6cc8ce9499726b",
+      "bytes": 3430933,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "dry-5",
+      "file": "dry-5.png",
+      "reference": "dry.png",
+      "sha256": "fe5d778a85c9764537512a97cfdb4db2caa61da2db5b2ee4d2ce492e4461fe26",
+      "bytes": 3528791,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "forest-2",
+      "file": "forest-2.png",
+      "reference": "forest.png",
+      "sha256": "ace6e70d950817b8b69ceecf93710ec5243f625843624d735543e5fe09d48aa5",
+      "bytes": 2610092,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "forest-3",
+      "file": "forest-3.png",
+      "reference": "forest.png",
+      "sha256": "26f65bb9865509a2574bdc5a39f412d00f47bd1b50369f4ce54775a677c76b49",
+      "bytes": 2616170,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "forest-4",
+      "file": "forest-4.png",
+      "reference": "forest.png",
+      "sha256": "f16dfa59d63056da3e424c6bf2158134daae1a3ecff6822a44addf7f61bd51b0",
+      "bytes": 2724887,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "forest-5",
+      "file": "forest-5.png",
+      "reference": "forest.png",
+      "sha256": "c821186d6ea806110803d215cbf08a8b31c5a81db8a487fdfb89f4102078b559",
+      "bytes": 2576620,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "meadow-2",
+      "file": "meadow-2.png",
+      "reference": "meadow.png",
+      "sha256": "362c6fe5f998b0e875221ff671f4abf23c08fd759150be534daa096931f119cf",
+      "bytes": 3314426,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "meadow-3",
+      "file": "meadow-3.png",
+      "reference": "meadow.png",
+      "sha256": "746dafa573bac72b563b0e80a238b6d51eb8f01b7010924ba2d76ccca8e14c5c",
+      "bytes": 3144227,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "meadow-4",
+      "file": "meadow-4.png",
+      "reference": "meadow.png",
+      "sha256": "d1672276dabba422275ca83fe59e68cc795db835658bdaedc32f39e3f62b88b0",
+      "bytes": 3380008,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "meadow-5",
+      "file": "meadow-5.png",
+      "reference": "meadow.png",
+      "sha256": "ae66f38eee75f1a0939515759373c278d0245be78ace5197cb57a38831cd8755",
+      "bytes": 3269621,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "ocean-2",
+      "file": "ocean-2.png",
+      "reference": "ocean.png",
+      "sha256": "939b97ae73a96cb25982b68d625383ae0fddfb6854fd03d21db02127d004ffc0",
+      "bytes": 2106540,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "ocean-3",
+      "file": "ocean-3.png",
+      "reference": "ocean.png",
+      "sha256": "e9da77b7bc9a59a715f6223cb7ad9a0b65e14f08910ac96ff563db4c28dc1f5c",
+      "bytes": 2148729,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "ocean-4",
+      "file": "ocean-4.png",
+      "reference": "ocean.png",
+      "sha256": "662e5898309c4bc3835f6e40ebb8a79c89fa063257c4cdda7db97a0579efc640",
+      "bytes": 2192548,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "ocean-5",
+      "file": "ocean-5.png",
+      "reference": "ocean.png",
+      "sha256": "ff0f117e7f014f3b47f2bb62248d7289c353a68db8cf0f0fbb002441f8aae123",
+      "bytes": 2254991,
+      "width": 1254,
+      "height": 1254
+    }
+  ]
+}

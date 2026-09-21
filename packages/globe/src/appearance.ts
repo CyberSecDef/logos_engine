@@ -3,7 +3,7 @@ import type { Tile, World } from '../../contracts/src/index.js';
 export type Overlay='territory'|'terrain'|'water'|'rain'|'temperature'|'population'|'food'|'communication'|'air'|'wind'|'water-quality'|'deposits'|'illness'|`custom:${string}`;
 export type Appearance={label:string;color:string;assetId?:string;variant:number;textureOpacity:number;layers:{asset:string;opacity:number}[]};
 import manifest from '../../tile-packs/public/painterly-v1/manifest.json' with {type:'json'};
-export type TerrainEntry={id:string;label:string;color:string;image:string;conditions:{field:'elevationM'|'vegetation'|'population'|'temperatureC'|'rainMm';comparison:'lt'|'lte'|'gt'|'gte';value:number}[]};
+export type TerrainEntry={id:string;label:string;color:string;image:string;variants?:{id:string;image:string}[];conditions:{field:'elevationM'|'vegetation'|'population'|'temperatureC'|'rainMm';comparison:'lt'|'lte'|'gt'|'gte';value:number}[]};
 export const terrainPack=manifest as {id:string;version:number;revealDays:number;entries:TerrainEntry[]};
 export const catalog=terrainPack.entries;
 function hash(text:string):number {let n=2166136261;for(const c of text)n=Math.imul(n^c.charCodeAt(0),16777619);n^=n>>>16;n=Math.imul(n,0x7feb352d);n^=n>>>15;return n>>>0;}
@@ -49,4 +49,25 @@ export function matchingAppearance(world:World,tile:Tile) {
    const n=readValue(world,tile.id,c.read);
    return c.comparison==='lt'?n<c.value:c.comparison==='lte'?n<=c.value:c.comparison==='eq'?n===c.value:c.comparison==='gte'?n>=c.value:n>c.value;
   }));
+}
+
+
+// Stable visual choice only: no tick/revision/world-ID input and no simulation RNG.
+// A world-supplied biome image always wins over built-in variations.
+export function terrainTextureId(world:World,tileId:number,assetId:string):string {
+ if(world.artwork?.images.some(image=>image.slot===assetId))return assetId;
+ const variants=catalog.find(entry=>entry.id===assetId)?.variants??[];
+ const index=hash(`${terrainPack.id}:${world.seed}:${tileId}:${assetId}:texture`)%(variants.length+1);
+ return index===0?assetId:variants[index-1].id;
+}
+export function terrainImages(world:World):{id:string;image:string}[] {
+ return [
+  ...catalog.map(entry=>{
+   const local=world.artwork?.images.find(image=>image.slot===entry.id);
+   return {id:entry.id,image:local?`/api/artwork/image/${world.id}/${local.hash}`:entry.image};
+  }),
+  ...catalog.flatMap(entry=>entry.variants??[]),
+  ...(world.artwork?.images.filter(image=>image.slot==='settlement'||image.slot==='condition')
+   .map(image=>({id:image.slot,image:`/api/artwork/image/${world.id}/${image.hash}`}))??[])
+ ];
 }

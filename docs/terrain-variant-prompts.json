@@ -1,0 +1,126 @@
+{
+  "mode": "Built-in image_gen",
+  "referenceRole": "Original biome texture: style, color and scale reference",
+  "prompts": [
+    {
+      "id": "alpine-2",
+      "biome": "alpine",
+      "n": 2,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation alpine-2: Broken slate-like gray rocks in a new irregular mosaic, pale lichen and only tiny sparse snow pockets."
+    },
+    {
+      "id": "alpine-3",
+      "biome": "alpine",
+      "n": 3,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation alpine-3: Clustered coarse granite boulders and fine scree between them, subtle moss, occasional snow flecks."
+    },
+    {
+      "id": "alpine-4",
+      "biome": "alpine",
+      "n": 4,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation alpine-4: Weathered cracked bedrock plates and smaller angular stones, gray mineral streaks and a little white snow."
+    },
+    {
+      "id": "alpine-5",
+      "biome": "alpine",
+      "n": 5,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation alpine-5: Mixed fractured rock slabs and loose gravel, muted olive lichen and thin snow remnants in crevices."
+    },
+    {
+      "id": "dry-2",
+      "biome": "dry",
+      "n": 2,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation dry-2: Golden dry grass tufts with scattered small pebbles and irregular bare ochre soil patches."
+    },
+    {
+      "id": "dry-3",
+      "biome": "dry",
+      "n": 3,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation dry-3: Fine straw-colored grasses in loose curving patches, a few low dusty olive shrubs and tiny stones."
+    },
+    {
+      "id": "dry-4",
+      "biome": "dry",
+      "n": 4,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation dry-4: Patchy ochre grassland with more visible sandy earth and scattered dry weeds, staying mostly grassy."
+    },
+    {
+      "id": "dry-5",
+      "biome": "dry",
+      "n": 5,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation dry-5: Dense wisps of dry golden grass broken by small uneven clay-colored gaps and sparse stones."
+    },
+    {
+      "id": "forest-2",
+      "biome": "forest",
+      "n": 2,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation forest-2: Closely packed rounded broadleaf tree crowns in varied sizes with small dark gaps, rich green palette."
+    },
+    {
+      "id": "forest-3",
+      "biome": "forest",
+      "n": 3,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation forest-3: A different dense arrangement of overlapping broadleaf canopies, a few smaller saplings, olive and emerald greens."
+    },
+    {
+      "id": "forest-4",
+      "biome": "forest",
+      "n": 4,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation forest-4: Clustered leafy treetops with irregular dark openings and a few slightly lighter crowns, no open clearing."
+    },
+    {
+      "id": "forest-5",
+      "biome": "forest",
+      "n": 5,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation forest-5: Dense mixed-size broadleaf crowns with more fine leaves and dark interlocking shade pockets, forest green palette."
+    },
+    {
+      "id": "meadow-2",
+      "biome": "meadow",
+      "n": 2,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation meadow-2: Soft green grasses with little scattered white wildflowers and a few low leafy clumps in a new irregular arrangement."
+    },
+    {
+      "id": "meadow-3",
+      "biome": "meadow",
+      "n": 3,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation meadow-3: Lush yellow-green meadow with subtle bare earthy flecks, tiny pale flowers and scattered small shrubs."
+    },
+    {
+      "id": "meadow-4",
+      "biome": "meadow",
+      "n": 4,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation meadow-4: Fine green grass in irregular patches, sparse white and yellow flowers and low clover-like foliage."
+    },
+    {
+      "id": "meadow-5",
+      "biome": "meadow",
+      "n": 5,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation meadow-5: Varied grassy meadow texture with slightly darker leafy patches and small scattered white flower clusters."
+    },
+    {
+      "id": "ocean-2",
+      "biome": "ocean",
+      "n": 2,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation ocean-2: Deep blue teal water with small interlacing ripples and sparse turquoise highlights in a new pattern."
+    },
+    {
+      "id": "ocean-3",
+      "biome": "ocean",
+      "n": 3,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation ocean-3: Deep ocean water with broad gentle wavelets crossing finer ripple patterns, dark blue and muted teal palette."
+    },
+    {
+      "id": "ocean-4",
+      "biome": "ocean",
+      "n": 4,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation ocean-4: Blue teal ocean with small uneven ripples and delicate bright wave crests, no white foam patches."
+    },
+    {
+      "id": "ocean-5",
+      "biome": "ocean",
+      "n": 5,
+      "prompt": "Use case: stylized-concept. Asset type: seamless square terrain texture for a fantasy globe game. Create ONE new variation of the attached reference; reference is for painterly style, scale, colors and material only, not an edit target. Preserve the same detailed hand-painted top-down/orthographic look and approximately the same brightness. Full bleed square, texture covers entire image edge-to-edge, no hexagon shape, no frame, no perspective horizon, no text, no icons, no buildings or creatures. Natural irregular arrangement with fine detail that remains legible as a small terrain tile. Match reference visual scale; do not create a landscape scene. Output a single 1024x1024 PNG texture.\nVariation ocean-5: Dark marine blue water with softly swirling wave patterns and subtle turquoise glints, similar overall brightness."
+    }
+  ]
+}

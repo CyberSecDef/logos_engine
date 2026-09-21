@@ -13,10 +13,13 @@ try{
  const w=createWorld({id:'surface',name:'Raised terrain',seed:'surface',frequency:8});w.tick=1000;
  const id=w.tiles.find(t=>t.elevationM>0&&t.vegetation>.4).id;w.tiles[id].elevationM=4000;
  for(const neighbor of w.cells[id].neighbors)w.tiles[neighbor].elevationM=200;
- const result=await page.evaluate(async({w,id})=>{
+ const result=await page.evaluate(async({w,id,appearanceUrl})=>{
   const {WorldGlobe}=await import('/src/globe.ts');
   const g=new WorldGlobe(document.querySelector('#surface'),()=>{});g.setWorld(w);g.spinning=false;
   while(g.textures.status.includes('Loading'))await new Promise(r=>setTimeout(r,50));
+  const {terrainTextureId}=await import(appearanceUrl);
+  const loaded=[...g.textures.slots.keys()];
+  const variants=Object.fromEntries(['alpine','dry','forest','meadow','ocean'].map(b=>[b,[...new Set(w.tiles.map(t=>terrainTextureId(w,t.id,b)))]]));
   g.focusTile(id);g.select(id);
   const axis=g.scene.camera.position.clone().set(0,1,0);
   g.scene.camera.position.applyAxisAngle(axis,.3).setLength(2.2);g.scene.controls.update();
@@ -28,10 +31,12 @@ try{
   const mapped=g.ids.slice(start/3,(start+count)/3);
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
   window.surfaceGlobe=g;
-  return {textured,triangleCount,ids:g.ids.length,mapped};
- },{w,id});
+  return {textured,triangleCount,ids:g.ids.length,mapped,loaded,variants};
+ },{w,id,appearanceUrl:'/@fs'+process.cwd()+'/packages/globe/src/appearance.ts'});
  assert.equal(result.ids,result.triangleCount);assert.ok(result.mapped.every(value=>value===id));
  assert.ok(result.textured.every(value=>value>0),'Every cap, bevel and wall vertex receives revealed artwork');
+ assert.equal(result.loaded.length,26,'All originals and variants load into the atlas');
+ for(const choices of Object.values(result.variants)){assert.equal(choices.length,5);assert.ok(choices.every(id=>result.loaded.includes(id)));}
  await mkdir('.local/screenshots',{recursive:true});await page.screenshot({path:'.local/screenshots/tile-bevel-artwork.png'});
  await page.evaluate(()=>{window.surfaceGlobe.texturesEnabled=false;window.surfaceGlobe.update();});
  assert.equal(await page.evaluate(()=>Array.from(window.surfaceGlobe.geometry.getAttribute('aTexture').array).some(v=>v!==0)),false);

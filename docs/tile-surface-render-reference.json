@@ -1,25 +1,25 @@
 {
   "node": "v22.22.1",
   "cpu": "AMD Ryzen 9 8940HX with Radeon Graphics",
-  "measuredAt": "2026-09-21T01:26:57.152Z",
+  "measuredAt": "2026-09-21T01:53:35.862Z",
   "notes": "Chromium/SwiftShader; Vite module in isolated page. CPU update timings exclude animation rendering, GPU submission, asset I/O and production delivery. Eight warm samples; first construction separate.",
   "reports": [
     {
       "frequency": 2,
       "zones": 42,
-      "firstMs": 6.8,
+      "firstMs": 6.7,
       "timings": {
         "unchanged": {
           "medianMs": 0.1,
-          "maxMs": 0.2
+          "maxMs": 0.1
         },
         "overlays": {
-          "medianMs": 2.8,
-          "maxMs": 3.4
+          "medianMs": 2.7,
+          "maxMs": 3.6
         },
         "oneElevation": {
           "medianMs": 0.4,
-          "maxMs": 0.7
+          "maxMs": 0.9
         }
       },
       "signatures": {
@@ -28,10 +28,10 @@
             "position": "1b666065eb5e48823275d89a3f631c14c76866d49b91a131d1eac766f02547bf",
             "normal": "1e36514d03673ceeed1043c03819cd0faa0b831c9fd36f619659897f2414ffa8",
             "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
-            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "uv": "2601e65cd4a8f4fc3abbc9d5b449285121a09cd2607d687291262b175d59d827",
             "aTexture": "040e136f56e30007f20d1563cc5017728334bce9c7ef82bbe9e4ad187b39ddb1",
-            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
-            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+            "aLayer0": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59",
+            "aLayer1": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59"
           },
           "bounds": {
             "center": [
@@ -47,10 +47,10 @@
             "position": "1b666065eb5e48823275d89a3f631c14c76866d49b91a131d1eac766f02547bf",
             "normal": "1e36514d03673ceeed1043c03819cd0faa0b831c9fd36f619659897f2414ffa8",
             "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
-            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "uv": "2601e65cd4a8f4fc3abbc9d5b449285121a09cd2607d687291262b175d59d827",
             "aTexture": "040e136f56e30007f20d1563cc5017728334bce9c7ef82bbe9e4ad187b39ddb1",
-            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
-            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+            "aLayer0": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59",
+            "aLayer1": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59"
           },
           "bounds": {
             "center": [
@@ -66,10 +66,10 @@
             "position": "1b666065eb5e48823275d89a3f631c14c76866d49b91a131d1eac766f02547bf",
             "normal": "1e36514d03673ceeed1043c03819cd0faa0b831c9fd36f619659897f2414ffa8",
             "color": "eba5ef1738fa9a687fb180df88dff83bf929ab4cc8ef5679bb313e011623921e",
-            "uv": "70e880042792e3fcbc60906ad248fb4b826f6725ead12ebda5d72806abe69624",
+            "uv": "545e64ccd0d05f0c692dae5832c822eba58eaaa9f10507b1b7ae23cff6b32aaa",
             "aTexture": "9202e68fbe5587e30738f2f118e87e10202a6eabd7297e1299978ed53c3a8f46",
-            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
-            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+            "aLayer0": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59",
+            "aLayer1": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59"
           },
           "bounds": {
             "center": [
@@ -85,10 +85,10 @@
             "position": "1b666065eb5e48823275d89a3f631c14c76866d49b91a131d1eac766f02547bf",
             "normal": "1e36514d03673ceeed1043c03819cd0faa0b831c9fd36f619659897f2414ffa8",
             "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
-            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "uv": "2601e65cd4a8f4fc3abbc9d5b449285121a09cd2607d687291262b175d59d827",
             "aTexture": "9202e68fbe5587e30738f2f118e87e10202a6eabd7297e1299978ed53c3a8f46",
-            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
-            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+            "aLayer0": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59",
+            "aLayer1": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59"
           },
           "bounds": {
             "center": [
@@ -104,10 +104,10 @@
             "position": "ac7dd37a0231333ccbc3e724b375673aa6b56ca285e370067221b11ac04a5194",
             "normal": "a13b32f93e019a93e051bc9c8c9d9eca0e0f29ff47c0a6f5df4262b24b0f74ae",
             "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
-            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "uv": "2601e65cd4a8f4fc3abbc9d5b449285121a09cd2607d687291262b175d59d827",
             "aTexture": "040e136f56e30007f20d1563cc5017728334bce9c7ef82bbe9e4ad187b39ddb1",
-            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
-            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+            "aLayer0": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59",
+            "aLayer1": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59"
           },
           "bounds": {
             "center": [
@@ -123,10 +123,10 @@
             "position": "ac7dd37a0231333ccbc3e724b375673aa6b56ca285e370067221b11ac04a5194",
             "normal": "a13b32f93e019a93e051bc9c8c9d9eca0e0f29ff47c0a6f5df4262b24b0f74ae",
             "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
-            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
+            "uv": "2601e65cd4a8f4fc3abbc9d5b449285121a09cd2607d687291262b175d59d827",
             "aTexture": "040e136f56e30007f20d1563cc5017728334bce9c7ef82bbe9e4ad187b39ddb1",
-            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
-            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+            "aLayer0": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59",
+            "aLayer1": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59"
           },
           "bounds": {
             "center": [
@@ -142,10 +142,10 @@
             "position": "ac7dd37a0231333ccbc3e724b375673aa6b56ca285e370067221b11ac04a5194",
             "normal": "a13b32f93e019a93e051bc9c8c9d9eca0e0f29ff47c0a6f5df4262b24b0f74ae",
             "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
-            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
-            "aTexture": "bd8b9c96741d7454bab1aa1b3670d6b77d6b07cc76b2856cc261b0c3f0c816a6",
-            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
-            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+            "uv": "2601e65cd4a8f4fc3abbc9d5b449285121a09cd2607d687291262b175d59d827",
+            "aTexture": "6596d45cd40dd28e80a7e578711c6201cc362aebe0af229e95af833d45094127",
+            "aLayer0": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59",
+            "aLayer1": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59"
           },
           "bounds": {
             "center": [
@@ -161,10 +161,10 @@
             "position": "ac7dd37a0231333ccbc3e724b375673aa6b56ca285e370067221b11ac04a5194",
             "normal": "a13b32f93e019a93e051bc9c8c9d9eca0e0f29ff47c0a6f5df4262b24b0f74ae",
             "color": "2308a754e029d8f9f0f325c820fae8cb1ae0db56114867070b743824996f2351",
-            "uv": "6236edd9f69d2e20f1a527e800f70bfafe2ac04d54b22bee33021c8feab140e9",
-            "aTexture": "bd8b9c96741d7454bab1aa1b3670d6b77d6b07cc76b2856cc261b0c3f0c816a6",
-            "aLayer0": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba",
-            "aLayer1": "b1bb0e922172d4c3683a09efcca2d3a854333e4e71ca60ebe315f7863891dfba"
+            "uv": "2601e65cd4a8f4fc3abbc9d5b449285121a09cd2607d687291262b175d59d827",
+            "aTexture": "6596d45cd40dd28e80a7e578711c6201cc362aebe0af229e95af833d45094127",
+            "aLayer0": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59",
+            "aLayer1": "205abcd916ca8e58952de10d751ef7d20ec83ca4fde9ba953b56f325cc71fb59"
           },
           "bounds": {
             "center": [
@@ -180,19 +180,19 @@
     {
       "frequency": 12,
       "zones": 1442,
-      "firstMs": 89.1,
+      "firstMs": 91.1,
       "timings": {
         "unchanged": {
-          "medianMs": 0.9,
-          "maxMs": 1.4
+          "medianMs": 1.3,
+          "maxMs": 1.9
         },
         "overlays": {
-          "medianMs": 55.8,
-          "maxMs": 70.7
+          "medianMs": 55.9,
+          "maxMs": 59.1
         },
         "oneElevation": {
-          "medianMs": 4.7,
-          "maxMs": 4.8
+          "medianMs": 5.1,
+          "maxMs": 5.3
         }
       },
       "signatures": {
@@ -201,14 +201,14 @@
             "position": "c1cd3653aefb000f7b7f3e1c25f95136dca0c4bcb41cbfa0844a046c5ddfea8c",
             "normal": "61c5bc48102ee38ddb3f792d3c68a49651ce8f29f3f88c4f55ba1de5717072f8",
             "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
-            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "uv": "6c132fa2656384314430ff30e69376cbe6a554995c19206d57a0be29ef5670da",
             "aTexture": "633eb7d34972d26994859a9921daea3e7dbc76eed3ccfe7ec8f9fc2802c1b506",
-            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
-            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+            "aLayer0": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b",
+            "aLayer1": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b"
           },
           "bounds": {
             "center": [
-              -0.000027418136596679688,
+              -2.7418136596679688e-05,
               -0.004649817943572998,
               0.023812294006347656
             ],
@@ -220,14 +220,14 @@
             "position": "c1cd3653aefb000f7b7f3e1c25f95136dca0c4bcb41cbfa0844a046c5ddfea8c",
             "normal": "61c5bc48102ee38ddb3f792d3c68a49651ce8f29f3f88c4f55ba1de5717072f8",
             "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
-            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "uv": "6c132fa2656384314430ff30e69376cbe6a554995c19206d57a0be29ef5670da",
             "aTexture": "633eb7d34972d26994859a9921daea3e7dbc76eed3ccfe7ec8f9fc2802c1b506",
-            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
-            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+            "aLayer0": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b",
+            "aLayer1": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b"
           },
           "bounds": {
             "center": [
-              -0.000027418136596679688,
+              -2.7418136596679688e-05,
               -0.004649817943572998,
               0.023812294006347656
             ],
@@ -239,14 +239,14 @@
             "position": "c1cd3653aefb000f7b7f3e1c25f95136dca0c4bcb41cbfa0844a046c5ddfea8c",
             "normal": "61c5bc48102ee38ddb3f792d3c68a49651ce8f29f3f88c4f55ba1de5717072f8",
             "color": "582204fe3b8af11f25470b5e3a2f6b6d65faa00ce60549e7be7a065b5115db3f",
-            "uv": "f5f6d652ee9e4e48d342aa0c2f80023d4638fc8965104c869f50509fcfc27931",
+            "uv": "7a9394bbd98866a13f7f4d546a67c697fdf6f520a4d50a129e5155658081cb97",
             "aTexture": "35cee74fe697d2c7732cc06aede881251e466d1c0f4cd3f4ac46e96bdc1536ff",
-            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
-            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+            "aLayer0": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b",
+            "aLayer1": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b"
           },
           "bounds": {
             "center": [
-              -0.000027418136596679688,
+              -2.7418136596679688e-05,
               -0.004649817943572998,
               0.023812294006347656
             ],
@@ -258,14 +258,14 @@
             "position": "c1cd3653aefb000f7b7f3e1c25f95136dca0c4bcb41cbfa0844a046c5ddfea8c",
             "normal": "61c5bc48102ee38ddb3f792d3c68a49651ce8f29f3f88c4f55ba1de5717072f8",
             "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
-            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "uv": "6c132fa2656384314430ff30e69376cbe6a554995c19206d57a0be29ef5670da",
             "aTexture": "35cee74fe697d2c7732cc06aede881251e466d1c0f4cd3f4ac46e96bdc1536ff",
-            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
-            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+            "aLayer0": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b",
+            "aLayer1": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b"
           },
           "bounds": {
             "center": [
-              -0.000027418136596679688,
+              -2.7418136596679688e-05,
               -0.004649817943572998,
               0.023812294006347656
             ],
@@ -277,14 +277,14 @@
             "position": "866bd9cf9a0dc963302907a887dae0134f920a697dc28b49c3cd32d156505bfb",
             "normal": "325b18963255f4608e4ebb83dbaeb8d7e8f1b1200ee039f19bc0d688bc4a6a93",
             "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
-            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "uv": "6c132fa2656384314430ff30e69376cbe6a554995c19206d57a0be29ef5670da",
             "aTexture": "633eb7d34972d26994859a9921daea3e7dbc76eed3ccfe7ec8f9fc2802c1b506",
-            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
-            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+            "aLayer0": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b",
+            "aLayer1": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b"
           },
           "bounds": {
             "center": [
-              -0.000027418136596679688,
+              -2.7418136596679688e-05,
               -0.004649817943572998,
               0.023812294006347656
             ],
@@ -296,14 +296,14 @@
             "position": "866bd9cf9a0dc963302907a887dae0134f920a697dc28b49c3cd32d156505bfb",
             "normal": "325b18963255f4608e4ebb83dbaeb8d7e8f1b1200ee039f19bc0d688bc4a6a93",
             "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
-            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
+            "uv": "6c132fa2656384314430ff30e69376cbe6a554995c19206d57a0be29ef5670da",
             "aTexture": "633eb7d34972d26994859a9921daea3e7dbc76eed3ccfe7ec8f9fc2802c1b506",
-            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
-            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+            "aLayer0": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b",
+            "aLayer1": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b"
           },
           "bounds": {
             "center": [
-              -0.000027418136596679688,
+              -2.7418136596679688e-05,
               -0.004649817943572998,
               0.023812294006347656
             ],
@@ -315,14 +315,14 @@
             "position": "866bd9cf9a0dc963302907a887dae0134f920a697dc28b49c3cd32d156505bfb",
             "normal": "325b18963255f4608e4ebb83dbaeb8d7e8f1b1200ee039f19bc0d688bc4a6a93",
             "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
-            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
-            "aTexture": "b135fff00747acefe42bc4faf58aa453cde3808bc84164afec5ab68dca9a099d",
-            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
-            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+            "uv": "6c132fa2656384314430ff30e69376cbe6a554995c19206d57a0be29ef5670da",
+            "aTexture": "7e9fbc7f6cb7cc29019c56e512f087292b70a574e4d4764b383f1748490eb1ba",
+            "aLayer0": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b",
+            "aLayer1": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b"
           },
           "bounds": {
             "center": [
-              -0.000027418136596679688,
+              -2.7418136596679688e-05,
               -0.004649817943572998,
               0.023812294006347656
             ],
@@ -334,14 +334,14 @@
             "position": "866bd9cf9a0dc963302907a887dae0134f920a697dc28b49c3cd32d156505bfb",
             "normal": "325b18963255f4608e4ebb83dbaeb8d7e8f1b1200ee039f19bc0d688bc4a6a93",
             "color": "7eec2317b5ab77d27e503e2bbf0de12a468b0ae739924a0b395b495b7677d3c2",
-            "uv": "a66a20a97a77a5183d3c61ce3a7fb202c393b6412001b92e982db81988450f34",
-            "aTexture": "b135fff00747acefe42bc4faf58aa453cde3808bc84164afec5ab68dca9a099d",
-            "aLayer0": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41",
-            "aLayer1": "4faf927096b8f7137b12eb908f043a9d115adbe7c83a6ff1074ed1d1b9437a41"
+            "uv": "6c132fa2656384314430ff30e69376cbe6a554995c19206d57a0be29ef5670da",
+            "aTexture": "7e9fbc7f6cb7cc29019c56e512f087292b70a574e4d4764b383f1748490eb1ba",
+            "aLayer0": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b",
+            "aLayer1": "a8bb9c5becd8d156e5f6c87fc7e878971339f292e3f50f2b870ff6cccce0694b"
           },
           "bounds": {
             "center": [
-              -0.000027418136596679688,
+              -2.7418136596679688e-05,
               -0.004649817943572998,
               0.023812294006347656
             ],
@@ -353,19 +353,19 @@
     {
       "frequency": 26,
       "zones": 6762,
-      "firstMs": 372.1,
+      "firstMs": 394.8,
       "timings": {
         "unchanged": {
-          "medianMs": 3.5,
-          "maxMs": 5.4
+          "medianMs": 5.4,
+          "maxMs": 8.2
         },
         "overlays": {
-          "medianMs": 258.9,
-          "maxMs": 273.1
+          "medianMs": 255.3,
+          "maxMs": 284.7
         },
         "oneElevation": {
-          "medianMs": 20.7,
-          "maxMs": 22.8
+          "medianMs": 22.6,
+          "maxMs": 24.7
         }
       },
       "signatures": {
@@ -374,10 +374,10 @@
             "position": "3b153e2555da488cec1ddac6f40cfaea68207da31170e6127750de9b782bc5ae",
             "normal": "0e4874fb0e20e712929dea8508c70f605082a6364c8802833b4f180ca0b1a78e",
             "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
-            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "uv": "bb2698397403e409c63921941db646ca7164437a551e37f9310a1f2951e65ee6",
             "aTexture": "b1421c7890425440614344cbd8933aa5c6d552aca165e983fdd31d302cbf91c5",
-            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
-            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+            "aLayer0": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22",
+            "aLayer1": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22"
           },
           "bounds": {
             "center": [
@@ -393,10 +393,10 @@
             "position": "3b153e2555da488cec1ddac6f40cfaea68207da31170e6127750de9b782bc5ae",
             "normal": "0e4874fb0e20e712929dea8508c70f605082a6364c8802833b4f180ca0b1a78e",
             "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
-            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "uv": "bb2698397403e409c63921941db646ca7164437a551e37f9310a1f2951e65ee6",
             "aTexture": "b1421c7890425440614344cbd8933aa5c6d552aca165e983fdd31d302cbf91c5",
-            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
-            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+            "aLayer0": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22",
+            "aLayer1": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22"
           },
           "bounds": {
             "center": [
@@ -412,10 +412,10 @@
             "position": "3b153e2555da488cec1ddac6f40cfaea68207da31170e6127750de9b782bc5ae",
             "normal": "0e4874fb0e20e712929dea8508c70f605082a6364c8802833b4f180ca0b1a78e",
             "color": "911dae618b2550447bf843faab5e26abd263e6a40828ad8e2fd53db98e8d57f6",
-            "uv": "8f24f22bcf56670e3cf6d2df6cefea5f852f4dc029acf6b276bc14610356175f",
+            "uv": "fb762b94541e4909e886059507b87f681ca5487c47f8f2e1f9ffc02cd33b33a0",
             "aTexture": "3461b83583f8dcb358db23ef45e77d3737ce5e91c2bdd76bad78b042d125e5ee",
-            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
-            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+            "aLayer0": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22",
+            "aLayer1": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22"
           },
           "bounds": {
             "center": [
@@ -431,10 +431,10 @@
             "position": "3b153e2555da488cec1ddac6f40cfaea68207da31170e6127750de9b782bc5ae",
             "normal": "0e4874fb0e20e712929dea8508c70f605082a6364c8802833b4f180ca0b1a78e",
             "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
-            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "uv": "bb2698397403e409c63921941db646ca7164437a551e37f9310a1f2951e65ee6",
             "aTexture": "3461b83583f8dcb358db23ef45e77d3737ce5e91c2bdd76bad78b042d125e5ee",
-            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
-            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+            "aLayer0": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22",
+            "aLayer1": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22"
           },
           "bounds": {
             "center": [
@@ -450,10 +450,10 @@
             "position": "53ea311976b0729c009f348d9276a76504179fb8522b5626c953920720f5b47b",
             "normal": "f119d715dd53d3194086b33fa1076efdf0ae41b069f1eac96a039991c5ef0c25",
             "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
-            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "uv": "bb2698397403e409c63921941db646ca7164437a551e37f9310a1f2951e65ee6",
             "aTexture": "b1421c7890425440614344cbd8933aa5c6d552aca165e983fdd31d302cbf91c5",
-            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
-            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+            "aLayer0": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22",
+            "aLayer1": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22"
           },
           "bounds": {
             "center": [
@@ -469,10 +469,10 @@
             "position": "53ea311976b0729c009f348d9276a76504179fb8522b5626c953920720f5b47b",
             "normal": "f119d715dd53d3194086b33fa1076efdf0ae41b069f1eac96a039991c5ef0c25",
             "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
-            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
+            "uv": "bb2698397403e409c63921941db646ca7164437a551e37f9310a1f2951e65ee6",
             "aTexture": "b1421c7890425440614344cbd8933aa5c6d552aca165e983fdd31d302cbf91c5",
-            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
-            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+            "aLayer0": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22",
+            "aLayer1": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22"
           },
           "bounds": {
             "center": [
@@ -488,10 +488,10 @@
             "position": "53ea311976b0729c009f348d9276a76504179fb8522b5626c953920720f5b47b",
             "normal": "f119d715dd53d3194086b33fa1076efdf0ae41b069f1eac96a039991c5ef0c25",
             "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
-            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
-            "aTexture": "7befbc0c5f872a2a1f1e0ec867b8405303b98716cd7b55779ff16705138d5ccb",
-            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
-            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+            "uv": "bb2698397403e409c63921941db646ca7164437a551e37f9310a1f2951e65ee6",
+            "aTexture": "3e66913be63b4cd8528f7c1c1c09862e0e506067f7ae979168612ff16800f539",
+            "aLayer0": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22",
+            "aLayer1": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22"
           },
           "bounds": {
             "center": [
@@ -507,10 +507,10 @@
             "position": "53ea311976b0729c009f348d9276a76504179fb8522b5626c953920720f5b47b",
             "normal": "f119d715dd53d3194086b33fa1076efdf0ae41b069f1eac96a039991c5ef0c25",
             "color": "6f5e6bc49c6f4f62d18527fec01e683bf5a7a56c076745dc4b601d2f94a6ff08",
-            "uv": "4504e9eafdb4aee7ef9d7ba43b614a3fbe4b2c0c3cf74a8d648465696f42973b",
-            "aTexture": "7befbc0c5f872a2a1f1e0ec867b8405303b98716cd7b55779ff16705138d5ccb",
-            "aLayer0": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd",
-            "aLayer1": "789dfe93e8e4cd657e321ad67b6f03010a0d2565db8761c697c8b72f4dc6fcbd"
+            "uv": "bb2698397403e409c63921941db646ca7164437a551e37f9310a1f2951e65ee6",
+            "aTexture": "3e66913be63b4cd8528f7c1c1c09862e0e506067f7ae979168612ff16800f539",
+            "aLayer0": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22",
+            "aLayer1": "fba607d94ace32c538dbc6b46b196dcd173da57fb829434b36cd7ba2723bfb22"
           },
           "bounds": {
             "center": [

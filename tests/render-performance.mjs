@@ -1,6 +1,6 @@
 import {chromium} from '@playwright/test';import assert from 'node:assert/strict';
 import {mkdtemp,rm,readFile} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir,cpus} from 'node:os';
-import {createWorld} from '../dist/packages/worldgen/src/index.js';import {terrainPack} from '../dist/packages/globe/src/appearance.js';import {startServer} from '../dist/apps/server/src/index.js';
+import {createWorld} from '../dist/packages/worldgen/src/index.js';import {terrainImages} from '../dist/packages/globe/src/appearance.js';import {startServer} from '../dist/apps/server/src/index.js';
 const root=await mkdtemp(join(tmpdir(),'logos-render-bench-'));
 const app=await startServer({root,host:'127.0.0.1',port:0,dev:true,provider:{name:'No model',async generate(){throw Error('Unexpected model call');}}});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
@@ -32,7 +32,7 @@ try{
    g.textures.slots.delete(slots[0][0]);g.update();signatures.missing=await signature();
    const other=structuredClone(world);other.id='other-world';other.tiles[1].elevationM-=100;g.setWorld(other);signatures.switched=await signature();
    return {zones:world.tiles.length,firstMs:Math.round(firstMs*100)/100,timings,signatures};
-  },{world,capture:!!process.env.LOGOS_CAPTURE_RENDER_REFERENCE,slots:terrainPack.entries.map((e,i)=>[e.id,i])});
+  },{world,capture:!!process.env.LOGOS_CAPTURE_RENDER_REFERENCE,slots:terrainImages(world).map((e,i)=>[e.id,i])});
   reports.push({frequency,...result});console.error(`Measured ${result.zones} zones: ${JSON.stringify(result.timings)}`);await page.close();
  }
  if(!process.env.LOGOS_CAPTURE_RENDER_REFERENCE){const reference=JSON.parse(await readFile('docs/tile-surface-render-reference.json','utf8'));for(let i=0;i<reports.length;i++)assert.deepEqual(reports[i].signatures,reference.reports[i].signatures,'Rendered buffer parity with reviewed beveled-surface reference');}

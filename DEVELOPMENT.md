@@ -6,11 +6,9 @@ before each milestone commit. Never mark unverified functionality complete.
 
 ## Current work
 
-Phase 6 is complete. The requested [textured tile walls and narrow top bevels](docs/tile-surfaces.md)
-are implemented, verified and deployed. Reveals, overlays, selection and world
-data remain intact. Extra geometry cost and the isolated WebKit development-test
-limitation are documented. Body spacing is now approximately 3% at the user’s request; top inset remains
-13%. The new spacing is verified and served on the existing LAN service.
+Phase 6 is complete. The 20 additional biome textures are generated, integrated,
+and verified in the globe. The update is deployed; all verification is complete.
+No remaining tasks for this request; future work follows PLAN.md.
 
 ## Completed
 
@@ -2500,3 +2498,31 @@ runoff with sediment conservation, and checksummed storage/path validation.
   production server serves the rebuilt frontend directly. Live first-world remains
   day1244/revision1273 with its complete save unchanged during verification.
   Evidence: /tmp/logos-spacing-deploy.json.
+
+
+### 2026-09-20 — Twenty additional painterly terrain textures
+
+- Generated four new PNGs each for alpine, dry, forest, meadow and ocean using
+  built-in imagegen and the corresponding original image as a style reference.
+  Files are `biome-2.png` through `biome-5.png`; originals and city remain intact.
+  Full prompts and SHA-256 provenance are recorded in the repository.
+- Stable seed/tile/biome selection provides five visual choices per requested
+  biome across reloads and branches. World-local artwork overrides the entire
+  biome. Reveal timing, top/bevel/side mapping, rotations and 3% gaps are preserved.
+- Expanded the bounded atlas to 32 slots at 4096×2048, preserving per-image detail
+  and padded sampling. Twenty-six built-in images plus two optional world layers
+  fit. Approximate costs: 74 MiB downloaded PNGs, 42.7 MiB atlas with mipmaps.
+- `npm run check` passes all 273 tests and the production build. Chromium tests
+  pass for all 26 atlas assets, five choices per biome, textured tile surfaces,
+  reveal/overlays/fallbacks, layered composition and custom artwork review/reset.
+  Production WebKit raised-world rendering also passes with no save mutation.
+- Refreshed the atlas UV rendering reference at 42/1442/6762 zones and verified
+  exact buffer parity on a separate run. Geometry, normals, colors and bounds
+  match the prior reference. At 1442 zones, unchanged updates were about 1.3 ms
+  in the isolated CPU benchmark; this excludes rendering and image loading.
+- The larger pack evicts JS/CSS from the test's incognito memory cache. Delivery
+  verification now uses an isolated temporary persistent profile to test normal
+  disk-cache behavior, retaining the same zero-transfer warm-navigation assertion.
+  This check passes; production JavaScript totals 694,930 bytes (below 700 kB).
+- Built frontend is served by the existing LAN process; new ocean-5 PNG returns
+  HTTP 200. Browser tests use isolated worlds; no live world mutations or model calls.
