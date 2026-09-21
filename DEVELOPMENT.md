@@ -2447,3 +2447,9 @@ runoff with sediment conservation, and checksummed storage/path validation.
   `7a2de9ddaad7b4d20474ca904afd0a7f95d0b17651735e0d94ec5166b133f47f`,
   envelope hash `a75081e558ad278cc619201a478c0af6428fe6212150f3fe56063aaa0479b128`.
   Evidence: /tmp/logos-phase6e-deploy.json. Phase 6 table is now Complete.
+
+### 2026-09-20 — Phase 6 completion publication
+
+- Published milestone `233b0eb` to public `CyberSecDef/logos_engine` main.
+- All Phase 6 milestones are complete within the recorded acceptance scope and
+  deployed on the LAN service. Further gameplay work awaits a new agreed scope.
